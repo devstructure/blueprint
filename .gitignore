@@ -1,0 +1,12 @@
+*.swp
+*.pyc
+*.pyo
+*.[12345678]
+*.html
+*.deb
+*.tar
+*.tar.gz
+control
+bin/blueprint-mark
+bin/blueprint-backend
+bin/blueprint-standalone

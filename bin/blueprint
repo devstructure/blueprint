@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+COMMAND="$0-$1"
+[ -x "$COMMAND" ] && {
+	shift
+	exec "$COMMAND" "$@"
+}
+
+echo "Usage: $(basename $0) <command> [...]" >&2
+echo "Common commands: list, create, show, apply, destroy" >&2
+exit 1

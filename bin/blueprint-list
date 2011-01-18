@@ -1,0 +1,21 @@
+#!/usr/bin/python
+
+import optparse
+
+import blueprint
+
+parser = optparse.OptionParser('Usage: %prog [-r] [-q]')
+parser.add_option('-r', '--remote',
+                  dest='remote',
+                  default=False,
+                  action='store_true',
+                  help='list remote blueprints')
+parser.add_option('-q', '--quiet',
+                  dest='quiet',
+                  default=False,
+                  action='store_true',
+                  help='operate quietly')
+(options, args) = parser.parse_args()
+
+for name in blueprint.Blueprint.iter(remote=options.remote):
+    print('  {0}'.format(name))
