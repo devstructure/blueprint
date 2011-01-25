@@ -35,8 +35,6 @@ except KeyError:
 
 with context_managers.mkdtemp():
     filename = b.sh().dumpf()
-    p = subprocess.Popen(['sudo', 'sh', filename],
-                         close_fds=True,
-                         stdin=subprocess.PIPE)
+    p = subprocess.Popen(['sudo', 'sh', filename], close_fds=True)
     p.communicate()
     sys.exit(p.returncode)
