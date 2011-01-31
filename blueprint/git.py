@@ -49,6 +49,8 @@ def rev_parse(refname):
     """
     status, stdout = git('rev-parse', '-q', '--verify', refname,
                          raise_exc=False)
+    if 0 != status:
+        return None
     return stdout.rstrip()
 
 def tree(commit):
@@ -93,17 +95,16 @@ def content(blob):
     return stdout
 
 def write_tree():
-    status, stdout = git.git('write-tree')
+    status, stdout = git('write-tree')
     if 0 != status:
         return None
     return stdout.rstrip()
 
 def commit_tree(tree, message='', parent=None):
     if parent is None:
-        status, stdout = git.git('commit-tree', tree, stdin=message)
+        status, stdout = git('commit-tree', tree, stdin=message)
     else:
-        status, stdout = git.git('commit-tree', tree, '-p', parent,
-                                 stdin=message)
+        status, stdout = git('commit-tree', tree, '-p', parent, stdin=message)
     if 0 != status:
         return None
     return stdout.rstrip()
