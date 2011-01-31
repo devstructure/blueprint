@@ -187,18 +187,6 @@ class Blueprint(dict):
             self['sources'] = {}
         return self['sources']
 
-    def dumps(self):
-        """
-        Return a JSON serialization of this blueprint.  Make a best effort
-        to prevent variance from run-to-run.  Remove superfluous empty keys.
-        """
-        if 'arch' in self and self['arch'] is None:
-            del self['arch']
-        for key in ['files', 'packages', 'sources']:
-            if key in self and 0 == len(self[key]):
-                del self[key]
-        return dumps(self, indent=2, sort_keys=True)
-
     def commit(self, message=''):
         """
         Create a new revision of this blueprint in the local Git repository.
@@ -232,6 +220,18 @@ class Blueprint(dict):
         parent = git.rev_parse(refname)
         self._commit = git.commit_tree(tree, message, parent)
         git.git('update-ref', refname, self._commit)
+
+    def dumps(self):
+        """
+        Return a JSON serialization of this blueprint.  Make a best effort
+        to prevent variance from run-to-run.  Remove superfluous empty keys.
+        """
+        if 'arch' in self and self['arch'] is None:
+            del self['arch']
+        for key in ['files', 'packages', 'sources']:
+            if key in self and 0 == len(self[key]):
+                del self[key]
+        return dumps(self, indent=2, sort_keys=True)
 
     def puppet(self):
         """
