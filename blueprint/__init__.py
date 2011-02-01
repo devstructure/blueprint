@@ -1,6 +1,6 @@
 import base64
 import copy
-from json import dumps, loads
+import json
 import os
 import os.path
 import re
@@ -8,6 +8,7 @@ import subprocess
 import time
 import urllib
 
+import backend
 import chef
 import context_managers
 import git
@@ -50,10 +51,7 @@ class Blueprint(dict):
             if 'refs/heads' == os.path.dirname(refname):
                 yield os.path.basename(refname)
 
-    def __init__(self,
-                 name=None,
-                 json=None,
-                 commit=None):
+    def __init__(self, name=None, commit=None, create=False):
         """
         Construct a blueprint in the new format in a backwards-compatible
         manner.
@@ -61,9 +59,11 @@ class Blueprint(dict):
         self.name = name
         self._commit = commit
 
-        # Create a blueprint from a JSON blob.
-        if json is not None:
-            super(Blueprint, self).__init__(**loads(json))
+        # Create a new blueprint object and populate it based on this server.
+        if create:
+            super(Blueprint, self).__init__()
+            for funcname in backend.__all__:
+                getattr(backend, funcname)(self)
 
         # Create a blueprint from a Git repository.
         elif name is not None:
@@ -73,7 +73,11 @@ class Blueprint(dict):
             tree = git.tree(self._commit)
             blob = git.blob(tree, 'blueprint.json')
             content = git.content(blob)
-            super(Blueprint, self).__init__(**loads(content))
+            super(Blueprint, self).__init__(**json.loads(content))
+
+        # Create an empty blueprint object to be filled in later.
+        else:
+            super(Blueprint, self).__init__()
 
     def __sub__(self, other):
         """
@@ -231,7 +235,7 @@ class Blueprint(dict):
         for key in ['files', 'packages', 'sources']:
             if key in self and 0 == len(self[key]):
                 del self[key]
-        return dumps(self, indent=2, sort_keys=True)
+        return json.dumps(self, indent=2, sort_keys=True)
 
     def puppet(self):
         """

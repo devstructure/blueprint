@@ -46,19 +46,8 @@ if re.search(r'[/ \t\r\n]', args[0]):
     sys.exit(1)
 name = args[0]
 
-def backend(*args):
-    args = list(args)
-    if options.quiet:
-        args.append('-q')
-    p = subprocess.Popen(['blueprint-backend'] + args,
-                         close_fds=True,
-                         stdout=subprocess.PIPE)
-    stdout, stderr = p.communicate()
-    if 0 != p.returncode:
-        sys.exit(1)
-    return stdout
 with context_managers.mkdtemp():
-    b = blueprint.Blueprint(name=name, json=backend())
+    b = blueprint.Blueprint(name=name, create=True)
     b.commit(options.message or '')
 
 if options.generate is not None:
