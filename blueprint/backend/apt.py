@@ -32,16 +32,12 @@ def exclusions():
 
     # Find the essential and required packages.  Every server's got 'em, no
     # one wants to muddle their blueprint with 'em.
-    p1 = subprocess.Popen(['dpkg-query',
-                           '-f=${Package} ${Essential}\n',
-                           '-W'],
-                          close_fds=True, stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(['dpkg-query',
-                           '-f=${Package} ${Priority}\n',
-                           '-W'],
-                          close_fds=True, stdout=subprocess.PIPE)
-    for f in (p1.stdout, p2.stdout):
-        for line in f:
+    for field in ('Essential', 'Priority'):
+        p = subprocess.Popen(['dpkg-query',
+                              '-f=${Package} ${%s}\n' % field,
+                              '-W'],
+                             close_fds=True, stdout=subprocess.PIPE)
+        for line in p.stdout:
             package, property = line.rstrip().split()
             if property in ('yes', 'important', 'required', 'standard'):
                 s.add(package)
