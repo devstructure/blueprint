@@ -15,7 +15,7 @@ def init():
     except OSError:
         pass
     p = subprocess.Popen(['git', '--git-dir', repo(), 'init', '--bare'],
-                         close_fds=True)
+                         close_fds=True, stdout=sys.stderr)
     p.communicate()
     if 0 != p.returncode:
         #sys.exit(p.returncode)
@@ -80,7 +80,6 @@ def blob(tree, pathname):
     Return the SHA of the blob by the given name in the given tree.
     """
     for mode, type, sha, pathname2 in ls_tree(tree):
-        print(mode, type, sha, pathname2)
         if pathname == pathname2:
             return sha
     return None
