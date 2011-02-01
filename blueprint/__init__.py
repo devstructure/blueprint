@@ -1,4 +1,5 @@
 import base64
+from collections import defaultdict
 import copy
 import json
 import os
@@ -161,7 +162,7 @@ class Blueprint(dict):
     @property
     def files(self):
         if 'files' not in self:
-            self['files'] = {}
+            self['files'] = defaultdict(dict)
         return self['files']
 
     @property
@@ -182,13 +183,13 @@ class Blueprint(dict):
     @property
     def packages(self):
         if 'packages' not in self:
-            self['packages'] = {}
+            self['packages'] = defaultdict(dict)
         return self['packages']
 
     @property
     def sources(self):
         if 'sources' not in self:
-            self['sources'] = {}
+            self['sources'] = defaultdict(dict)
         return self['sources']
 
     def commit(self, message=''):
