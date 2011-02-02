@@ -2,6 +2,7 @@ import base64
 from collections import defaultdict
 import copy
 import json
+import logging
 import os
 import os.path
 import re
@@ -16,6 +17,9 @@ import git
 from manager import Manager
 import puppet
 import sh
+
+logging.basicConfig(format='# [blueprint] %(message)s',
+                    level=logging.INFO)
 
 class Blueprint(dict):
 

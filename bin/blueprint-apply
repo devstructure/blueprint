@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import logging
 import optparse
 import re
 import subprocess
@@ -16,21 +17,21 @@ parser.add_option('-q', '--quiet',
                   help='operate quietly')
 (options, args) = parser.parse_args()
 
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
+
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
 if re.search(r'[/ \t\r\n]', args[0]):
-    if not options.quiet:
-        sys.stderr.write('# [blueprint-apply] invalid blueprint name\n')
+    logging.error('invalid blueprint name')
     sys.exit(1)
 name = args[0]
 
 try:
     b = blueprint.Blueprint(name=name)
 except KeyError:
-    if not options.quiet:
-        sys.stderr.write('# [blueprint-apply] blueprint {0} does not exist\n'
-                         ''.format(name))
+    logging.error('blueprint {0} does not exist'.format(name))
     sys.exit(1)
 
 with context_managers.mkdtemp():

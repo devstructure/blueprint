@@ -1,9 +1,16 @@
+"""
+Search for `apt` packages to include in the blueprint.
+"""
+
+import logging
 import re
 import subprocess
 
 CACHE = '/tmp/blueprint-exclusions'
 
 def apt(b):
+    logging.info('searching for apt packages')
+
     p = subprocess.Popen(['dpkg-query',
                           '-f=${Package} ${Version}\n',
                           '-W'],

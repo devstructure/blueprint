@@ -1,10 +1,17 @@
 import glob
+import logging
 import os
 import re
 import subprocess
 
 def pypi(b):
-    pattern_manager = re.compile(r'lib/python([^/]+)/(dist|site)-packages')
+    logging.info('searching for Python packages')
+
+    # Precompile a pattern to extract the manager from a pathname.
+    pattern_manager = re.compile(r'lib/(python[^/]+)/(dist|site)-packages')
+
+    # Precompile patterns for differentiating between packages built by
+    # `easy_install` and packages built by `pip`.
     pattern_egg = re.compile(r'\.egg$')
     pattern_egginfo = re.compile(r'\.egg-info$')
     pattern = re.compile(r'^([^-]+)-([^-]+).*\.egg(-info)?$')
@@ -16,8 +23,7 @@ def pypi(b):
                           '{0}/lib/python*/dist-packages'.format(virtualenv)])
     for globname in globnames:
         for dirname in glob.glob(globname):
-            manager = 'python{0}'.format(
-                pattern_manager.search(dirname).group(1))
+            manager = pattern_manager.search(dirname).group(1)
             for entry in os.listdir(dirname):
                 match = pattern.match(entry)
                 if match is None:

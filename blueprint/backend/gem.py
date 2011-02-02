@@ -1,8 +1,13 @@
 import glob
+import logging
 import os
 import re
 
 def gem(b):
+    logging.info('searching for Ruby gems')
+
+    # Precompile a pattern for extracting the version of Ruby that was used
+    # to install the gem.
     pattern = re.compile(r'gems/([^/]+)/gems')
     for globname in ('/usr/lib/ruby/gems/*/gems',
                      '/usr/local/lib/ruby/gems/*/gems',

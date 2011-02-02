@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import logging
 import optparse
 import re
 import sys
@@ -19,24 +20,22 @@ parser.add_option('-q', '--quiet',
                   help='operate quietly')
 (options, args) = parser.parse_args()
 
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
+
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
 if -1 != args[0].find('/'):
-    if not options.quiet:
-        sys.stderr.write(
-            '# [blueprint-destroy] full blueprint name unsupported\n')
+    logging.error('full blueprint name unsupported')
     sys.exit(1)
 if re.search(r'[/ \t\r\n]', args[0]):
-    if not options.quiet:
-        sys.stderr.write('# [blueprint-destroy] invalid blueprint name\n')
+    logging.error('invalid blueprint name')
     sys.exit(1)
 name = args[0]
 
 try:
     blueprint.Blueprint.destroy(name, remote=options.remote)
 except KeyError:
-    if not options.quiet:
-        sys.stderr.write('# [blueprint-destroy] blueprint {0} does not exist\n'
-                         ''.format(name))
+    logging.error('blueprint {0} does not exist'.format(name))
     sys.exit(1)

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import errno
+import logging
 import optparse
 import re
 import subprocess
@@ -37,12 +38,14 @@ parser.add_option('-q', '--quiet',
                   help='operate quietly')
 (options, args) = parser.parse_args()
 
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
+
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
 if re.search(r'[/ \t\r\n]', args[0]):
-    if not options.quiet:
-        sys.stderr.write('# [blueprint-create] invalid blueprint name\n')
+    logging.error('invalid blueprint name')
     sys.exit(1)
 name = args[0]
 
@@ -55,9 +58,7 @@ if options.generate is not None:
         filename = getattr(b, options.generate)().dumpf()
     except OSError as e:
         if errno.EEXIST == e.errno:
-            if not options.quiet:
-                sys.stderr.write('# [blueprint-create] {0} already exists\n'
-                                 ''.format(name))
+            logging.error('{0} already exists'.format(name))
         sys.exit(1)
     if not options.quiet:
         print(filename)

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import logging
 import optparse
 
 import blueprint
@@ -16,6 +17,9 @@ parser.add_option('-q', '--quiet',
                   action='store_true',
                   help='operate quietly')
 (options, args) = parser.parse_args()
+
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
 
 for name in blueprint.Blueprint.iter(remote=options.remote):
     print('  {0}'.format(name))

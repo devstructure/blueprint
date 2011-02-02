@@ -1,6 +1,7 @@
 import base64
 import grp
 import hashlib
+import logging
 import os.path
 import pwd
 import stat
@@ -27,6 +28,7 @@ EXCLUDE = ('/etc/alternatives',
            '/etc/shadow')
 
 def files(b):
+    logging.info('searching for configuration files')
 
     # Visit every file in /etc except those on the exclusion list above.
     def visit(b, dirname, filenames):
@@ -47,7 +49,7 @@ def _visit(b, pathname):
     try:
         content = open(pathname).read()
     except IOError:
-        # TODO Log.
+        #logging.warning('{0} not readable'.format(pathname))
         return
 
     # Don't store files which are part of a package and are unchanged
@@ -84,7 +86,8 @@ def _visit(b, pathname):
     # Other types, like FIFOs and sockets are not supported within
     # a blueprint and really shouldn't appear in /etc at all.
     else:
-        # TODO Log.
+        logging.warning('{0} is not a regular file or symbolic link'
+                        ''.format(pathname))
         return
 
     pw = pwd.getpwuid(s.st_uid)
