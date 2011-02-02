@@ -37,7 +37,9 @@ def pypi(b):
                     stdout, stderr = p.communicate()
                     if 0 != p.returncode:
                         continue
-                    b.packages['apt'][manager].append(stdout)
+                    versions = b.packages['apt'][manager]
+                    if stdout not in versions:
+                        versions.append(stdout)
                     b.packages[manager][package].append(version)
 
                 # This package was installed via pip.  Figure out how pip
