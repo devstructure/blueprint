@@ -183,7 +183,7 @@ class Blueprint(dict):
     @property
     def packages(self):
         if 'packages' not in self:
-            self['packages'] = defaultdict(dict)
+            self['packages'] = defaultdict(lambda: defaultdict(list))
         return self['packages']
 
     @property

@@ -13,7 +13,7 @@ def apt(b):
         package, version = line.strip().split()
         if package in s:
             continue
-        b.packages['apt'][package] = version
+        b.packages['apt'][package].append(version)
 
 def exclusions():
     """
