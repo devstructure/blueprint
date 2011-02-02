@@ -1,3 +1,7 @@
+"""
+Search for Python packages to include in the blueprint.
+"""
+
 import glob
 import logging
 import os
@@ -14,7 +18,15 @@ def pypi(b):
     # `easy_install` and packages built by `pip`.
     pattern_egg = re.compile(r'\.egg$')
     pattern_egginfo = re.compile(r'\.egg-info$')
+
+    # Precompile a pattern for extracting package names and version numbers.
     pattern = re.compile(r'^([^-]+)-([^-]+).*\.egg(-info)?$')
+
+    # Look for packages in the typical places.  `pip` has its `freeze`
+    # subcommand but there is no way but diving into the directory tree to
+    # figure out what packages were `easy_install`ed.  If `VIRTUAL_ENV`
+    # appears in the environment, treat the directory it names just like
+    # the global package directories.
     globnames = ['/usr/local/lib/python*/dist-packages',
                  '/usr/local/lib/python*/site-packages']
     virtualenv = os.getenv('VIRTUAL_ENV')
@@ -30,7 +42,7 @@ def pypi(b):
                     continue
                 package, version = match.group(1), match.group(2)
 
-                # This package was installed via easy_install.  Make sure
+                # This package was installed via `easy_install`.  Make sure
                 # its version of Python is in the blueprint so it can be
                 # used as a package manager.
                 if pattern_egg.search(entry):
@@ -48,7 +60,7 @@ def pypi(b):
                         versions.append(stdout)
                     b.packages[manager][package].append(version)
 
-                # This package was installed via pip.  Figure out how pip
+                # This package was installed via `pip`.  Figure out how `pip`
                 # was installed and use that as this package's manager.
                 elif pattern_egginfo.search(entry):
                     p = subprocess.Popen(['dpkg-query', '-W', 'python-pip'],

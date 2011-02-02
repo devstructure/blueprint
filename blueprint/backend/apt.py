@@ -71,7 +71,7 @@ def exclusions():
                     package = part.strip()
                     new_s.add(package)
 
-            # Packages provided by this package.
+            # Packages provided by this (meta)package.
             p = subprocess.Popen(['dpkg-query',
                                   '-f=${Package} ${Provides}\n',
                                   '-W'],
@@ -79,8 +79,8 @@ def exclusions():
             for line in p.stdout:
                 pass
 
-        # If there is to be a next iteration, new_s must contain some
-        # packages not yet in s.
+        # If there is to be a next iteration, `new_s` must contain some
+        # packages not yet in `s`.
         tmp_s = new_s - s
         if 0 == len(tmp_s):
             break

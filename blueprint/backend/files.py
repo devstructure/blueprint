@@ -1,3 +1,7 @@
+"""
+Search for configuration files to include in the blueprint.
+"""
+
 import base64
 import grp
 import hashlib
@@ -30,7 +34,7 @@ EXCLUDE = ('/etc/alternatives',
 def files(b):
     logging.info('searching for configuration files')
 
-    # Visit every file in /etc except those on the exclusion list above.
+    # Visit every file in `/etc` except those on the exclusion list above.
     def visit(b, dirname, filenames):
         if dirname in EXCLUDE:
             return
@@ -40,12 +44,21 @@ def files(b):
                 continue
 
             # Because of limitations in the Python grammar and in PEP-8,
-            # do the bulk of each visit in a subroutine.
+            # do the bulk of each visit in a subroutine that is free to
+            # bail early for files that should not be included.
             _visit(b, pathname)
 
     os.path.walk('/etc', visit, b)
 
 def _visit(b, pathname):
+    """
+    Include the file at `pathname` in the blueprint if it has been changed
+    from the packaged version and is not otherwise excluded.
+    """
+    logging.debug(pathname)
+
+    # The content is used even for symbolic links to determine whether
+    # it has changed from the packaged version.
     try:
         content = open(pathname).read()
     except IOError:
@@ -57,7 +70,7 @@ def _visit(b, pathname):
     if hashlib.md5(content).hexdigest() == _md5(pathname):
         return
 
-    # Don't store DevStructure's default /etc/fuse.conf.  (This is
+    # Don't store DevStructure's default `/etc/fuse.conf`.  (This is
     # a legacy condition.)
     if '/etc/fuse.conf' == pathname:
         try:
@@ -84,7 +97,7 @@ def _visit(b, pathname):
             encoding = 'base64'
 
     # Other types, like FIFOs and sockets are not supported within
-    # a blueprint and really shouldn't appear in /etc at all.
+    # a blueprint and really shouldn't appear in `/etc` at all.
     else:
         logging.warning('{0} is not a regular file or symbolic link'
                         ''.format(pathname))
@@ -100,8 +113,8 @@ def _visit(b, pathname):
 
 def _md5(pathname):
     """
-    Find the MD5 sum of the packaged version of pathname or None if the
-    pathname does not come from a Debian package.
+    Find the MD5 sum of the packaged version of pathname or `None` if the
+    `pathname` does not come from a Debian package.
     """
     p = subprocess.Popen(['dpkg-query', '-S', pathname],
                          close_fds=True,

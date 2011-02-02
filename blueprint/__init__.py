@@ -100,7 +100,6 @@ class Blueprint(dict):
         # version that appears in the other blueprint is removed from
         # this blueprint.  After that is finished, this blueprint is
         # normalized.  If no versions remain, the package is removed.
-        # If only one version remains, it is converted to a string.
         def package(manager, package, version):
             if package in b.packages:
                 return
@@ -205,7 +204,7 @@ class Blueprint(dict):
         git.init()
         refname = 'refs/heads/{0}'.format(self.name)
 
-        # Add blueprint.json to the index.
+        # Add `blueprint.json` to the index.
         f = open('blueprint.json', 'w')
         f.write(self.dumps())
         f.close()
@@ -215,7 +214,7 @@ class Blueprint(dict):
         for filename in self.sources.itervalues():
             git.git('update-index', '--add', os.path.abspath(filename))
 
-        # Add the .blueprintignore file to the index as .gitignore.
+        # Add the `.blueprintignore` file to the index as `.gitignore`.
         try:
             os.link(os.path.expanduser('~/.blueprintignore'), '.gitignore')
             git.git('update-index', '--add', os.path.abspath('.gitignore'))
@@ -248,7 +247,7 @@ class Blueprint(dict):
         """
         m = puppet.Manifest(self.name, comment=self.DISCLAIMER)
 
-        # Set the default PATH for exec resources.
+        # Set the default `PATH` for exec resources.
         m.add(puppet.Exec.defaults(path=os.environ['PATH']))
 
         # Extract source tarballs.
@@ -317,7 +316,7 @@ class Blueprint(dict):
                                           before=puppet.Class.ref('apt')))
         def package(manager, package, version):
 
-            # APT is easy since it's the default.
+            # `apt` is easy since it's the default.
             if 'apt' == manager.name:
                 m['packages'][manager].add(puppet.Package(package,
                                                           ensure=version))
@@ -573,7 +572,7 @@ def lsb_release_codename():
 
 def rubygems_update():
     """
-    Determine whether the rubygems-update gem is needed.  It is needed
+    Determine whether the `rubygems-update` gem is needed.  It is needed
     on Lucid and older systems.
     """
     return lsb_release_codename()[0] < 'm'
