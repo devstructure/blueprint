@@ -203,6 +203,13 @@ class Blueprint(dict):
         """
         git.init()
         refname = 'refs/heads/{0}'.format(self.name)
+        parent = git.rev_parse(refname)
+
+        # Start with an empty index every time.  Specifically, clear out
+        # source tarballs from the parent commit.
+        if parent is not None:
+            for mode, type, sha, pathname in git.ls_tree(git.tree(parent)):
+                git.git('update-index', '--remove', pathname)
 
         # Add `blueprint.json` to the index.
         f = open('blueprint.json', 'w')
@@ -225,7 +232,6 @@ class Blueprint(dict):
         tree = git.write_tree()
 
         # Write the commit and update the tip of the branch.
-        parent = git.rev_parse(refname)
         self._commit = git.commit_tree(tree, message, parent)
         git.git('update-ref', refname, self._commit)
 
