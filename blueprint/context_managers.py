@@ -63,6 +63,7 @@ class cd(object):
     def __enter__(self):
         self.old_cwd = os.getcwd()
         os.chdir(self.new_cwd)
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         os.chdir(self.old_cwd)
@@ -81,6 +82,7 @@ class mkdtemp(object):
 
     def __enter__(self):
         os.chdir(self.tempdir)
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         os.chdir(self.cwd)
@@ -95,6 +97,7 @@ class root(object):
     def __enter__(self):
         self.euid = os.geteuid()
         os.seteuid(0)
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         os.seteuid(self.euid)
