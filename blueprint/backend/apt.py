@@ -30,7 +30,7 @@ def exclusions():
 
     # Read from a cached copy.
     try:
-        return set([line.rstrip() for line in open(CACHE).readlines()])
+        return set([line.rstrip() for line in open(CACHE)])
     except IOError:
         pass
 
