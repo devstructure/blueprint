@@ -35,81 +35,67 @@ def files(b):
     logging.info('searching for configuration files')
 
     # Visit every file in `/etc` except those on the exclusion list above.
-    def visit(b, dirname, filenames):
-        if dirname in EXCLUDE:
-            return
+    for dirpath, dirnames, filenames in os.walk('/etc'):
+        if dirpath in EXCLUDE:
+            continue
         for filename in filenames:
-            pathname = os.path.join(dirname, filename)
+            pathname = os.path.join(dirpath, filename)
             if pathname in EXCLUDE:
                 continue
 
-            # Because of limitations in the Python grammar and in PEP-8,
-            # do the bulk of each visit in a subroutine that is free to
-            # bail early for files that should not be included.
-            _visit(b, pathname)
+            # The content is used even for symbolic links to determine whether
+            # it has changed from the packaged version.
+            try:
+                content = open(pathname).read()
+            except IOError:
+                #logging.warning('{0} not readable'.format(pathname))
+                continue
 
-    os.path.walk('/etc', visit, b)
+            # Don't store files which are part of a package and are unchanged
+            # from the distribution.
+            if hashlib.md5(content).hexdigest() == _md5(pathname):
+                continue
 
-def _visit(b, pathname):
-    """
-    Include the file at `pathname` in the blueprint if it has been changed
-    from the packaged version and is not otherwise excluded.
-    """
-    logging.debug(pathname)
+            # Don't store DevStructure's default `/etc/fuse.conf`.  (This is
+            # a legacy condition.)
+            if '/etc/fuse.conf' == pathname:
+                try:
+                    if 'user_allow_other\n' == open(pathname).read():
+                        continue
+                except IOError:
+                    pass
 
-    # The content is used even for symbolic links to determine whether
-    # it has changed from the packaged version.
-    try:
-        content = open(pathname).read()
-    except IOError:
-        #logging.warning('{0} not readable'.format(pathname))
-        return
+            s = os.lstat(pathname)
 
-    # Don't store files which are part of a package and are unchanged
-    # from the distribution.
-    if hashlib.md5(content).hexdigest() == _md5(pathname):
-        return
+            # A symbolic link's content is the link target.
+            if stat.S_ISLNK(s.st_mode):
+                content = os.readlink(pathname)
+                encoding = 'plain'
 
-    # Don't store DevStructure's default `/etc/fuse.conf`.  (This is
-    # a legacy condition.)
-    if '/etc/fuse.conf' == pathname:
-        try:
-            if 'user_allow_other\n' == open(pathname).read():
-                return
-        except IOError:
-            pass
+            # A regular file is stored as plain text only if it is valid
+            # UTF-8, which is required for JSON serialization.
+            elif stat.S_ISREG(s.st_mode):
+                try:
+                    content.decode('UTF-8')
+                    encoding = 'plain'
+                except UnicodeDecodeError:
+                    content = base64.b64encode(content)
+                    encoding = 'base64'
 
-    s = os.lstat(pathname)
+            # Other types, like FIFOs and sockets are not supported within
+            # a blueprint and really shouldn't appear in `/etc` at all.
+            else:
+                logging.warning('{0} is not a regular file or symbolic link'
+                                ''.format(pathname))
+                continue
 
-    # A symbolic link's content is the link target.
-    if stat.S_ISLNK(s.st_mode):
-        content = os.readlink(pathname)
-        encoding = 'plain'
-
-    # A regular file is stored as plain text only if it is valid
-    # UTF-8, which is required for JSON serialization.
-    elif stat.S_ISREG(s.st_mode):
-        try:
-            content.decode('UTF-8')
-            encoding = 'plain'
-        except UnicodeDecodeError:
-            content = base64.b64encode(content)
-            encoding = 'base64'
-
-    # Other types, like FIFOs and sockets are not supported within
-    # a blueprint and really shouldn't appear in `/etc` at all.
-    else:
-        logging.warning('{0} is not a regular file or symbolic link'
-                        ''.format(pathname))
-        return
-
-    pw = pwd.getpwuid(s.st_uid)
-    gr = grp.getgrgid(s.st_gid)
-    b.files[pathname] = dict(content=content,
-                             encoding=encoding,
-                             group=gr.gr_name,
-                             mode='{0:o}'.format(s.st_mode),
-                             owner=pw.pw_name)
+            pw = pwd.getpwuid(s.st_uid)
+            gr = grp.getgrgid(s.st_gid)
+            b.files[pathname] = dict(content=content,
+                                     encoding=encoding,
+                                     group=gr.gr_name,
+                                     mode='{0:o}'.format(s.st_mode),
+                                     owner=pw.pw_name)
 
 def _md5(pathname):
     """
