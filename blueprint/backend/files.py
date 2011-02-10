@@ -3,6 +3,8 @@ Search for configuration files to include in the blueprint.
 """
 
 import base64
+import fnmatch
+import glob
 import grp
 import hashlib
 import logging
@@ -36,11 +38,27 @@ def files(b):
 
     # Visit every file in `/etc` except those on the exclusion list above.
     for dirpath, dirnames, filenames in os.walk('/etc'):
+
+        # Don't even bother recursing into hard-coded excluded directories.
         if dirpath in EXCLUDE:
+            del dirnames[:]
             continue
+
+        # Determine if this entire directory should be ignored by default.
+        # FIXME This doesn't actually work right without a recursive
+        # implementation.  (Ignoring /foo won't currently affect /foo/bar.)
+        ignored = _ignore(os.path.basename(dirpath), dirpath)
+
         for filename in filenames:
             pathname = os.path.join(dirpath, filename)
+
+            # Ignore hard-coded excluded files.
             if pathname in EXCLUDE:
+                continue
+
+            # Ignore files that match in the `gitignore`(5)-style
+            # `~/.blueprintignore` file.
+            if _ignore(filename, pathname, ignored=ignored):
                 continue
 
             # The content is used even for symbolic links to determine whether
@@ -54,14 +72,16 @@ def files(b):
             # Don't store files which are part of a package and are unchanged
             # from the distribution.
             if hashlib.md5(content).hexdigest() == _md5(pathname):
-                continue
+                if _ignore(filename, pathname, ignored=True):
+                    continue
 
             # Don't store DevStructure's default `/etc/fuse.conf`.  (This is
             # a legacy condition.)
             if '/etc/fuse.conf' == pathname:
                 try:
                     if 'user_allow_other\n' == open(pathname).read():
-                        continue
+                        if _ignore(filename, pathname, ignored=True):
+                            continue
                 except IOError:
                     pass
 
@@ -96,6 +116,61 @@ def files(b):
                                      group=gr.gr_name,
                                      mode='{0:o}'.format(s.st_mode),
                                      owner=pw.pw_name)
+
+def _ignore(filename, pathname, ignored=False):
+    """
+    Return `True` if the `gitignore`(5)-style `~/.blueprintignore` file says
+    the given file should be ignored.  The starting state of the file may be
+    overridden by setting `ignored` to `True`.
+
+    This accepts the filename as well as the pathname so as to avoid
+    unnecessary O(n) string manipulations in a loop that traverses the
+    entire `/etc` tree of the filesystem.
+    """
+
+    # Cache the patterns stored in the `~/.blueprintignore` file.
+    if not hasattr(_ignore, '_cache'):
+        _ignore._cache = []
+        try:
+            for pattern in open(os.path.expanduser('~/.blueprintignore')):
+                pattern = pattern.rstrip()
+                if '' == pattern or '#' == pattern[0]:
+                    continue
+                if '!' == pattern[0]:
+                    _ignore._cache.append((pattern[1:], True))
+                else:
+                    _ignore._cache.append((pattern, False))
+        except IOError:
+            pass
+
+    # Determine if the `pathname` matches the `pattern`.  `filename` is
+    # given as a convenience.  See `gitignore`(5) for the rules in play.
+    def match(filename, pathname, pattern):
+        dir_only = '/' == pattern[-1]
+        pattern = pattern.rstrip('/')
+        if -1 == pattern.find('/'):
+            if fnmatch.fnmatch(filename, pattern):
+                return os.path.isdir(pathname) if dir_only else True
+        else:
+            for p in glob.glob(os.path.join('/etc', pattern)):
+                if pathname == p or pathname.startswith('{0}/'.format(p)):
+                    return True
+        return False
+
+    # Iterate over exclusion rules until a match is found.  Then iterate
+    # over inclusion rules that appear later.  If there are no matches,
+    # include the file.  If only an exclusion rule matches, exclude the
+    # file.  If an inclusion rule also matches, include the file.
+    for pattern, negate in _ignore._cache:
+        if ignored != negate:
+            continue
+        if ignored:
+            if match(filename, pathname, pattern):
+                return False
+        else:
+            ignored = match(filename, pathname, pattern)
+
+    return ignored
 
 def _md5(pathname):
     """
