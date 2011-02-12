@@ -29,28 +29,22 @@ class Blueprint(dict):
 """
 
     @classmethod
-    def destroy(cls, name, remote=False):
+    def destroy(cls, name):
         """
         Destroy the named blueprint.
         """
-        if remote:
-            git.git('push', 'origin', ':{0}'.format(name))
-        else:
-            if not os.path.isdir(git.repo()):
-                raise KeyError(name)
-            git.git('branch', '-D', name)
+        if not os.path.isdir(git.repo()):
+            raise KeyError(name)
+        git.git('branch', '-D', name)
 
     @classmethod
-    def iter(cls, remote=False):
+    def iter(cls):
         """
         Yield the name of each blueprint.
         """
         if not os.path.isdir(git.repo()):
             return
-        if remote:
-            status, stdout = git.git('ls-remote', '--heads', 'origin')
-        else:
-            status, stdout = git.git('branch')
+        status, stdout = git.git('branch')
         for line in stdout.splitlines():
             sha, refname = line.split()
             if 'refs/heads' == os.path.dirname(refname):
