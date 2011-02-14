@@ -1,0 +1,33 @@
+blueprintignore(5) -- ignore specific files when creating blueprints
+====================================================================
+
+## SYNOPSIS
+
+	/etc/foo
+	!foo/bar
+	baz*
+
+## DESCRIPTION
+
+Lines in `~/.blueprintignore` are interpreted as in `gitignore`(5).  Blank lines and lines that begin with a `#` will be ignored.  Patterns that begin with a `!` are negated.  As files are considered for inclusion in a blueprint, the last matching line in `~/.blueprintignore` wins.
+
+Patterns that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
+
+As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to create the blueprint is stored as `.gitignore` in the local blueprint repository.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+`blueprint`(1).

@@ -1,0 +1,38 @@
+blueprint-apply(1) -- run a blueprint's generated shell code
+============================================================
+
+## SYNOPSIS
+
+`blueprint apply` [`-q`] _name_  
+
+## DESCRIPTION
+
+`blueprint-apply` generated POSIX shell code for the blueprint _name_ and executes it.  It is equivalent to
+
+	blueprint show <name> --sh | sudo sh
+
+and provided for convenience and completeness.
+
+## OPTIONS
+
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

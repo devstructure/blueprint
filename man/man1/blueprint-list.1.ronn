@@ -1,0 +1,34 @@
+blueprint-list(1) -- list all blueprints
+========================================
+
+## SYNOPSIS
+
+`blueprint list` [`-q`]  
+
+## DESCRIPTION
+
+`blueprint-list` lists all blueprints.  That is, all branches in the local blueprint repository.
+
+## OPTIONS
+
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

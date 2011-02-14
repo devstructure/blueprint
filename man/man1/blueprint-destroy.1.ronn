@@ -1,0 +1,34 @@
+blueprint-destroy(1) -- destroy a blueprint
+===========================================
+
+## SYNOPSIS
+
+`blueprint destroy` [`-q`] _name_  
+
+## DESCRIPTION
+
+`blueprint-destroy` removes the blueprint _name_.  That is, it removes the branch _name_ from the local blueprint repository.
+
+## OPTIONS
+
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).
