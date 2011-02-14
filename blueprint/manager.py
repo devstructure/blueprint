@@ -28,7 +28,7 @@ class Manager(dict):
         match = re.match(r'^python(\d+\.\d+)', self.name)
         if match is not None:
             return 'easy_install-{0} {1}'.format(match.group(1), package)
-        if 'pip' == self.name:
+        if 'pip' == self.name or 'python-pip' == self.name:
             return 'pip install {0}'.format(package)
 
         if 'php-pear' == self.name:
