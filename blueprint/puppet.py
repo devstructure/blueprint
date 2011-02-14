@@ -354,7 +354,7 @@ class File(Resource):
             if 'source' in self:
                 raise ValueError("source tarballs can't be dumped as strings.")
 
-            if self.content is not None:
+            if getattr(self, 'content', None) is not None:
                 self['content'] = self.content
                 del self.content
         else:
