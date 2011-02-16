@@ -1,0 +1,41 @@
+# vim:ft=sh
+_blueprint() {
+	case "$COMP_CWORD" in
+		0) return 0;;
+		1) local command="${COMP_WORDS[0]}";;
+		*) local command="${COMP_WORDS[1]}";;
+	esac
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
+	case "$command" in
+		blueprint)
+			words="list create show apply destroy";;
+		list|blueprint-list)
+			case "$prev" in
+				-q|--quiet|-h|--help) return 0;;
+				*) words="--quiet --help";;
+			esac;;
+		create|blueprint-create)
+			case "$prev" in
+				-m|--message|-h|--help) return 0;;
+				*) words="--sh --puppet --chef --message --quiet --help";;
+			esac;;
+		show|blueprint-show)
+			case "$prev" in
+				-h|--help) return 0;;
+				*) words="$(blueprint-list) --sh --puppet --chef --quiet --help";;
+			esac;;
+		apply|blueprint-apply)
+			case "$prev" in
+				-h|--help) return 0;;
+				*) words="$(blueprint-list) --quiet --help";;
+			esac;;
+		destroy|blueprint-destroy)
+			case "$prev" in
+				-h|--help) return 0;;
+				*) words="$(blueprint-list) --quiet --help";;
+			esac;;
+	esac
+	COMPREPLY=( $(compgen -W "$words" -- "${COMP_WORDS[COMP_CWORD]}") )
+	return 0
+}
+complete -F _blueprint blueprint blueprint-{list,create,show,apply,destroy}
