@@ -7,6 +7,3 @@
 *.tar
 *.tar.gz
 control
-bin/blueprint-mark
-bin/blueprint-backend
-bin/blueprint-standalone
