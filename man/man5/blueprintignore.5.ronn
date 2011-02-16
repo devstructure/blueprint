@@ -15,6 +15,31 @@ Patterns that do not contain a `/` are matched using `fnmatch`(3) against the la
 
 As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to create the blueprint is stored as `.gitignore` in the local blueprint repository.
 
+The following files and directories are part of the default ignore list.  They can be negated using `!` just like any other pattern.
+
+* `/etc/alternatives`
+* `/etc/apparmor.d/cache`
+* `/etc/ca-certificates.conf`
+* `/etc/group-`
+* `/etc/group`
+* `/etc/gshadow-`
+* `/etc/gshadow`
+* `/etc/initramfs-tools/conf.d/resume`
+* `/etc/ld.so.cache`
+* `/etc/mtab`
+* `/etc/passwd-`
+* `/etc/passwd`
+* `/etc/rc0.d`
+* `/etc/rc1.d`
+* `/etc/rc2.d`
+* `/etc/rc3.d`
+* `/etc/rc4.d`
+* `/etc/rc5.d`
+* `/etc/rc6.d`
+* `/etc/rcS.d`
+* `/etc/shadow-`
+* `/etc/shadow`
+
 ## FILES
 
 * `~/.blueprints.git`:
