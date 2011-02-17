@@ -173,12 +173,15 @@ def files(b):
                 except IOError:
                     pass
 
-            # At this point, it's almost certain the file is going to be
-            # included in the blueprint.
-
             # A symbolic link's content is the link target.
             if stat.S_ISLNK(s.st_mode):
                 content = os.readlink(pathname)
+
+                # Ignore symbolic links providing backwards compatibility
+                # between SystemV init and Upstart.
+                if '/lib/init/upstart-job' == content:
+                    continue
+
                 encoding = 'plain'
 
             # A regular file is stored as plain text only if it is valid
