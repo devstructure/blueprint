@@ -156,7 +156,7 @@ def files(b):
                     try:
                         md5sum = hashlib.md5(open(md5sum).read()).hexdigest()
                     except IOError:
-                        pass
+                        md5sum = None
             else:
                 md5sum = None
             if hashlib.md5(content).hexdigest() == md5sum:
