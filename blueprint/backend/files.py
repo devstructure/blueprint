@@ -279,7 +279,15 @@ def _dpkg_query_S(pathname):
                          stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
     if 0 != p.returncode:
-        return None
+
+        # If `pathname` isn't in a package but is a symbolic link, see if
+        # the symbolic link is in a package.  `postinst` programs commonly
+        # display this pattern.
+        try:
+            return _dpkg_query_S(os.readlink(pathname))
+
+        except OSError:
+            return None
     package, _ = stdout.split(':')
     return package
 
