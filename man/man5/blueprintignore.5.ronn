@@ -17,18 +17,30 @@ As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to
 
 The following files and directories are part of the default ignore list.  They can be negated using `!` just like any other pattern.
 
+* `/etc/.pwd.lock`
 * `/etc/alternatives`
-* `/etc/apparmor.d/cache`
+* `/etc/apparmor`
+* `/etc/apparmor.d`
 * `/etc/ca-certificates.conf`
+* `/etc/fstab`
 * `/etc/group-`
 * `/etc/group`
 * `/etc/gshadow-`
 * `/etc/gshadow`
+* `/etc/hostname`
+* `/etc/init.d/.legacy-bootordering`
 * `/etc/initramfs-tools/conf.d/resume`
 * `/etc/ld.so.cache`
+* `/etc/localtime`
+* `/etc/mailcap`
 * `/etc/mtab`
+* `/etc/modules`
+* `/etc/motd`
+* `/etc/network/interfaces`
 * `/etc/passwd-`
 * `/etc/passwd`
+* `/etc/popularity-contest.conf`
+* `/etc/resolv.conf`
 * `/etc/rc0.d`
 * `/etc/rc1.d`
 * `/etc/rc2.d`
@@ -39,6 +51,42 @@ The following files and directories are part of the default ignore list.  They c
 * `/etc/rcS.d`
 * `/etc/shadow-`
 * `/etc/shadow`
+* `/etc/ssl/certs`
+* `/etc/timezone`
+* `/etc/udev/rules.d/70-persistent-*.rules`
+
+The following files are ignored if their content matches an expected hash.  They can be negated using `!` just like any other pattern.  These comparisions are made to augment searching files from packages to handle files that are part of packages but are not explicitly listed.
+
+* `/etc/adduser.conf`
+* `/etc/apparmor.d/tunables/home.d/ubuntu`
+* `/etc/chatscripts/provider`
+* `/etc/environment`
+* `/etc/hosts.allow`
+* `/etc/hosts.deny`
+* `/etc/initramfs-tools/modules`
+* `/etc/inputrc`
+* `/etc/iscsi/iscsid.conf`
+* `/etc/kernel-img.conf`
+* `/etc/ld.so.conf`
+* `/etc/networks`
+* `/etc/nsswitch.conf`
+* `/etc/ppp/chap-secrets`
+* `/etc/ppp/pap-secrets`
+* `/etc/ppp/peers/provider`
+* `/etc/profile`
+* `/etc/python/debian_config`
+* `/etc/rc.local`
+* `/etc/rsyslog.d/50-default.conf`
+* `/etc/security/opasswd`
+* `/etc/sgml/xml-core.cat`
+* `/etc/shells`
+* `/etc/ssh/sshd_config`
+* `/etc/sudoers`
+* `/etc/ufw/after.rules`
+* `/etc/ufw/after6.rules`
+* `/etc/ufw/before.rules`
+* `/etc/ufw/before6.rules`
+* `/etc/ufw/ufw.conf`
 
 ## FILES
 

@@ -14,20 +14,33 @@ import pwd
 import stat
 import subprocess
 
-# The default list of ignore patterns.  Update `blueprintignore`(5) if you
-# make changes here.
-IGNORE = ('/etc/alternatives',
-          '/etc/apparmor.d/cache',
+# The default list of ignore patterns.
+#
+# XXX Update `blueprintignore`(5) if you make changes here.
+IGNORE = ('/etc/.pwd.lock',
+          '/etc/alternatives',
+          '/etc/apparmor',
+          '/etc/apparmor.d',
           '/etc/ca-certificates.conf',
+          '/etc/fstab',
           '/etc/group-',
           '/etc/group',
           '/etc/gshadow-',
           '/etc/gshadow',
+          '/etc/hostname',
+          '/etc/init.d/.legacy-bootordering',
           '/etc/initramfs-tools/conf.d/resume',
           '/etc/ld.so.cache',
+          '/etc/localtime',
+          '/etc/mailcap',
           '/etc/mtab',
+          '/etc/modules',
+          '/etc/motd', # TODO Only if it's a symbolic link (to /var/run/motd).
+          '/etc/network/interfaces',
           '/etc/passwd-',
           '/etc/passwd',
+          '/etc/popularity-contest.conf',
+          '/etc/resolv.conf', # Most people use the defaults.
           '/etc/rc0.d',
           '/etc/rc1.d',
           '/etc/rc2.d',
@@ -37,16 +50,52 @@ IGNORE = ('/etc/alternatives',
           '/etc/rc6.d',
           '/etc/rcS.d',
           '/etc/shadow-',
-          '/etc/shadow')
+          '/etc/shadow',
+          '/etc/ssl/certs',
+          '/etc/timezone',
+          '/etc/udev/rules.d/70-persistent-*.rules')
 
 # An extra list of pathnames and MD5 sums that will be checked after no
 # match is found in `dpkg`(1)'s list.  If a pathname is given as the value
 # then that file's contents will be hashed.
-MD5SUMS = {'/etc/apparmor.d/tunables/home.d/ubuntu':
+#
+# Many of these files are distributed with packages and copied from
+# `/usr/share` in the `postinst` program.
+#
+# XXX Update `blueprintignore`(5) if you make changes here.
+MD5SUMS = {'/etc/adduser.conf': '/usr/share/adduser/adduser.conf',
+           '/etc/apparmor.d/tunables/home.d/ubuntu':
                '2a88811f7b763daa96c20b20269294a4',
+           '/etc/chatscripts/provider': '/usr/share/ppp/provider.chatscript',
+           '/etc/environment': '44ad415fac749e0c39d6302a751db3f2',
+           '/etc/hosts.allow': '8c44735847c4f69fb9e1f0d7a32e94c1',
+           '/etc/hosts.deny': '92a0a19db9dc99488f00ac9e7b28eb3d',
+           '/etc/initramfs-tools/modules':
+                '/usr/share/initramfs-tools/modules',
+           '/etc/inputrc': '/usr/share/readline/inputrc',
            '/etc/iscsi/iscsid.conf': '6c6fd718faae84a4ab1b276e78fea471',
+           '/etc/kernel-img.conf': 'f1ed9c3e91816337aa7351bdf558a442',
+           '/etc/ld.so.conf': '4317c6de8564b68d628c21efa96b37e4',
+           '/etc/networks': '/usr/share/base-files/networks',
+           '/etc/nsswitch.conf': '/usr/share/base-files/nsswitch.conf',
+           '/etc/ppp/chap-secrets': 'faac59e116399eadbb37644de6494cc4',
+           '/etc/ppp/pap-secrets': '698c4d412deedc43dde8641f84e8b2fd',
            '/etc/ppp/peers/provider': '/usr/share/ppp/provider.peer',
-           '/etc/python/debian_config': '7f4739eb8858d231601a5ed144099ac8'}
+           '/etc/profile': '/usr/share/base-files/profile',
+           '/etc/python/debian_config': '7f4739eb8858d231601a5ed144099ac8',
+           '/etc/rc.local': '10fd9f051accb6fd1f753f2d48371890',
+           '/etc/rsyslog.d/50-default.conf':
+                '/usr/share/rsyslog/50-default.conf',
+           '/etc/security/opasswd': 'd41d8cd98f00b204e9800998ecf8427e',
+           '/etc/sgml/xml-core.cat': 'bcd454c9bf55a3816a134f9766f5928f',
+           '/etc/shells': '0e85c87e09d716ecb03624ccff511760',
+           '/etc/ssh/sshd_config': 'e24f749808133a27d94fda84a89bb27b',
+           '/etc/sudoers': '02f74ccbec48997f402a063a172abb48',
+           '/etc/ufw/after.rules': '/usr/share/ufw/after.rules',
+           '/etc/ufw/after6.rules': '/usr/share/ufw/after6.rules',
+           '/etc/ufw/before.rules': '/usr/share/ufw/before.rules',
+           '/etc/ufw/before6.rules': '/usr/share/ufw/before6.rules',
+           '/etc/ufw/ufw.conf': '/usr/share/ufw/ufw.conf'}
 
 def files(b):
     logging.info('searching for configuration files')
