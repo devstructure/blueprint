@@ -182,6 +182,11 @@ def files(b):
                 if '/lib/init/upstart-job' == content:
                     continue
 
+                # Ignore symbolic links into the Debian alternatives system.
+                # These are almost certainly managed by packages.
+                if content.startswith('/etc/alternatives/'):
+                    continue
+
                 encoding = 'plain'
 
             # A regular file is stored as plain text only if it is valid
