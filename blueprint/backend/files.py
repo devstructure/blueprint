@@ -142,16 +142,23 @@ def files(b):
                 #logging.warning('{0} not readable'.format(pathname))
                 continue
 
-            # Ignore files that are unchanged from their packaged version
-            # or match in the `MD5SUMS` dict.
-            md5sum = _dpkg_md5sum(pathname)
-            if md5sum is None and pathname in MD5SUMS:
+            # Ignore files that are from the `base-files` package (which
+            # doesn't include MD5 sums for every file for some reason),
+            # unchanged from their packaged version, or match in `MD5SUMS`.
+            package = _dpkg_query_S(pathname)
+            if 'base-files' == package:
+                continue
+            if package is not None:
+                md5sum = _dpkg_md5sum(package, pathname)
+            elif pathname in MD5SUMS:
                 md5sum = MD5SUMS[pathname]
                 if '/' == md5sum[0]:
                     try:
                         md5sum = hashlib.md5(open(md5sum).read()).hexdigest()
                     except IOError:
-                        md5sum = None
+                        pass
+            else:
+                md5sum = None
             if hashlib.md5(content).hexdigest() == md5sum:
                 if _ignore(filename, pathname, ignored=True):
                     continue
@@ -254,10 +261,9 @@ def _ignore(filename, pathname, ignored=False):
 
     return ignored
 
-def _dpkg_md5sum(pathname):
+def _dpkg_query_S(pathname):
     """
-    Find the MD5 sum of the packaged version of pathname or `None` if the
-    `pathname` does not come from a Debian package.
+    Return the name of the package that contains `pathname` or `None`.
     """
     p = subprocess.Popen(['dpkg-query', '-S', pathname],
                          close_fds=True,
@@ -267,6 +273,13 @@ def _dpkg_md5sum(pathname):
     if 0 != p.returncode:
         return None
     package, _ = stdout.split(':')
+    return package
+
+def _dpkg_md5sum(package, pathname):
+    """
+    Find the MD5 sum of the packaged version of pathname or `None` if the
+    `pathname` does not come from a Debian package.
+    """
     try:
         for line in open('/var/lib/dpkg/info/{0}.md5sums'.format(package)):
             if line.endswith('{0}\n'.format(pathname[1:])):
