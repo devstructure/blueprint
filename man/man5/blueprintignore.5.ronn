@@ -22,6 +22,7 @@ The following files and directories are part of the default ignore list.  They c
 * `/etc/apparmor`
 * `/etc/apparmor.d`
 * `/etc/ca-certificates.conf`
+* `/etc/dpkg/origins/default`
 * `/etc/fstab`
 * `/etc/group-`
 * `/etc/group`
@@ -60,6 +61,11 @@ The following files are ignored if their content matches an expected hash.  They
 * `/etc/adduser.conf`
 * `/etc/apparmor.d/tunables/home.d/ubuntu`
 * `/etc/chatscripts/provider`
+* `/etc/default/console-setup`
+* `/etc/default/grub`
+* `/etc/default/irqbalance`
+* `/etc/default/locale`
+* `/etc/default/rcS`
 * `/etc/environment`
 * `/etc/hosts.allow`
 * `/etc/hosts.deny`
