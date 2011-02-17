@@ -22,6 +22,7 @@ IGNORE = ('/etc/.pwd.lock',
           '/etc/apparmor',
           '/etc/apparmor.d',
           '/etc/ca-certificates.conf',
+          '/etc/dpkg/origins/default', # TODO Only if it's a symbolic link to ubuntu.
           '/etc/fstab',
           '/etc/group-',
           '/etc/group',
@@ -35,7 +36,7 @@ IGNORE = ('/etc/.pwd.lock',
           '/etc/mailcap',
           '/etc/mtab',
           '/etc/modules',
-          '/etc/motd', # TODO Only if it's a symbolic link (to /var/run/motd).
+          '/etc/motd', # TODO Only if it's a symbolic link to /var/run/motd.
           '/etc/network/interfaces',
           '/etc/passwd-',
           '/etc/passwd',
