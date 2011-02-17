@@ -88,6 +88,8 @@ The following files are ignored if their content matches an expected hash.  They
 * `/etc/ufw/before6.rules`
 * `/etc/ufw/ufw.conf`
 
+These defaults are not meant to be an exhuastive list of exceptions and edge cases found on Debian/Ubuntu systems.  Rather, they're meant to cover the base installation without hassle.
+
 ## FILES
 
 * `~/.blueprints.git`:
