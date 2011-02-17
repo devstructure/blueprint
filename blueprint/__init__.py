@@ -46,9 +46,7 @@ class Blueprint(dict):
             return
         status, stdout = git.git('branch')
         for line in stdout.splitlines():
-            sha, refname = line.split()
-            if 'refs/heads' == os.path.dirname(refname):
-                yield os.path.basename(refname)
+            yield line.strip()
 
     def __init__(self, name=None, commit=None, create=False):
         """
