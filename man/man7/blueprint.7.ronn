@@ -43,7 +43,7 @@ The `blueprint.Blueprint` class manages blueprints stored in the local blueprint
 
 `walk()` is a generic implementation of the package walking algorithm described in `blueprint`(5).
 
-The `blueprint.Blueprint` class (not individual instances) supports `destroy(`_name_`)` to destroy blueprints and `iter()` to iterate over the names of local or remote blueprints.
+The `blueprint.Blueprint` class (not individual instances) supports `destroy(`_name_`)` to destroy blueprints and `iter()` to iterate over the names of blueprints.
 
 ### blueprint.puppet, blueprint.chef, and blueprint.sh
 

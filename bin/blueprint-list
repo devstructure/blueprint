@@ -5,12 +5,7 @@ import optparse
 
 import blueprint
 
-parser = optparse.OptionParser('Usage: %prog [-r] [-q]')
-parser.add_option('-r', '--remote',
-                  dest='remote',
-                  default=False,
-                  action='store_true',
-                  help='list remote blueprints')
+parser = optparse.OptionParser('Usage: %prog [-q]')
 parser.add_option('-q', '--quiet',
                   dest='quiet',
                   default=False,
@@ -21,5 +16,5 @@ parser.add_option('-q', '--quiet',
 if options.quiet:
     logging.root.setLevel(logging.CRITICAL)
 
-for name in blueprint.Blueprint.iter(remote=options.remote):
+for name in blueprint.Blueprint.iter():
     print('  {0}'.format(name))
