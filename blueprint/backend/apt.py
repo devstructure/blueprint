@@ -56,28 +56,17 @@ def exclusions():
     while 1:
         new_s = set()
         for package in tmp_s:
-
-            # Dependencies of this package.
-            p = subprocess.Popen(['dpkg-query',
-                                  '-f=${Pre-Depends}\n${Depends}\n',
-                                  '-W',
-                                  package],
-                                  close_fds=True, stdout=subprocess.PIPE)
+            p = subprocess.Popen(
+                ['dpkg-query',
+                 '-f', '${Pre-Depends}\n${Depends}\n${Recommends}\n',
+                 '-W', package],
+                close_fds=True, stdout=subprocess.PIPE)
             for line in p.stdout:
                 line = line.strip()
                 if '' == line:
                     continue
                 for part in pattern_split.split(pattern_sub.sub('', line)):
-                    package = part.strip()
-                    new_s.add(package)
-
-            # Packages provided by this (meta)package.
-            p = subprocess.Popen(['dpkg-query',
-                                  '-f=${Package} ${Provides}\n',
-                                  '-W'],
-                                  close_fds=True, stdout=subprocess.PIPE)
-            for line in p.stdout:
-                pass
+                    new_s.add(part.strip())
 
         # If there is to be a next iteration, `new_s` must contain some
         # packages not yet in `s`.
