@@ -140,6 +140,10 @@ uninstall-sysconf:
 	rmdir -p --ignore-fail-on-non-empty \
 		$(DESTDIR)$(sysconfdir)/bash_completion.d
 
+build:
+	sudo make deb
+	make pypi
+
 deb:
 	[ "$$(whoami)" = "root" ] || false
 	m4 -D__VERSION__=$(VERSION)-1 control.m4 >control
@@ -149,9 +153,13 @@ deb:
 	debra build debian blueprint_$(VERSION)-1_all.deb
 	debra destroy debian
 
+pypi:
+	python setup.py bdist_egg
+
 deploy:
 	scp -i ~/production.pem blueprint_$(VERSION)-1_all.deb ubuntu@packages.devstructure.com:
 	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-1_all.deb apt/lucid apt/maverick && rm blueprint_$(VERSION)-1_all.deb && sudo freight cache apt/lucid apt/maverick"
+	python setup.py upload
 
 man:
 	find man -name \*.ronn | xargs -n1 ronn \

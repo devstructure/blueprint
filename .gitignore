@@ -4,6 +4,9 @@
 *.[12345678]
 *.html
 *.deb
+*.egg
+*.egg-info
 *.tar
 *.tar.gz
 control
+dist
