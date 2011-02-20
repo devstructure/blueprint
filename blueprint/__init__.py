@@ -33,9 +33,12 @@ class Blueprint(dict):
         """
         Destroy the named blueprint.
         """
-        if not os.path.isdir(git.repo()):
-            raise KeyError(name)
-        git.git('branch', '-D', name)
+        # if not os.path.isdir(git.repo()):
+            # raise KeyError(name)
+        try:
+          git.git('branch', '-D', name)
+        except:
+          raise KeyError(name)
 
     @classmethod
     def iter(cls):
@@ -67,6 +70,8 @@ class Blueprint(dict):
             git.init()
             if self._commit is None:
                 self._commit = git.rev_parse('refs/heads/{0}'.format(name))
+                if self._commit is None:
+                  raise KeyError(name)
             tree = git.tree(self._commit)
             blob = git.blob(tree, 'blueprint.json')
             content = git.content(blob)
