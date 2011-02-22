@@ -153,7 +153,7 @@ class Resource(dict):
             return 'true'
         elif False == value:
             return 'false'
-        elif ':' == value[0]:
+        elif 0 < len(value) and ':' == value[0]:
             return value
         if isinstance(value, unicode):
             value = str(value)
