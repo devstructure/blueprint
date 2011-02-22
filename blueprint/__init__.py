@@ -580,6 +580,13 @@ def rubygems_update():
     """
     return lsb_release_codename()[0] < 'm'
 
+def rubygems_virtual():
+    """
+    Determine whether RubyGems is baked into the Ruby 1.9 distribution.
+    It is on Maverick and newer systems.
+    """
+    return lsb_release_codename()[0] >= 'm'
+
 def rubygems_path():
     """
     Determine based on the OS release where RubyGems will install gems.

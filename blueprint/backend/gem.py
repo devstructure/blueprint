@@ -6,6 +6,9 @@ import glob
 import logging
 import os
 import re
+import subprocess
+
+import blueprint
 
 def gem(b):
     logging.info('searching for Ruby gems')
@@ -21,7 +24,16 @@ def gem(b):
                      '/var/lib/gems/*/gems'):
         for dirname in glob.glob(globname):
 
-            manager = 'rubygems{0}'.format(pattern.search(dirname).group(1))
+            # The `ruby1.9.1` (really 1.9.2) package on Maverick begins
+            # including RubyGems in the `ruby1.9.1` package and marks the
+            # `rubygems1.9.1` package as virtual.  So for Maverick and
+            # newer, the manager is actually `ruby1.9.1`.
+            match = pattern.search(dirname)
+            if '1.9.1' == match.group(1) and blueprint.rubygems_virtual():
+                manager = 'ruby{0}'.format(match.group(1))
+            else:
+                manager = 'rubygems{0}'.format(match.group(1))
+
             for entry in os.listdir(dirname):
                 package, version = entry.rsplit('-', 1)
                 b.packages[manager][package].append(version)
