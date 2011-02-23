@@ -159,7 +159,7 @@ pypi:
 deploy:
 	scp -i ~/production.pem blueprint_$(VERSION)-1_all.deb ubuntu@packages.devstructure.com:
 	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-1_all.deb apt/lucid apt/maverick && rm blueprint_$(VERSION)-1_all.deb && sudo freight cache apt/lucid apt/maverick"
-	python setup.py upload
+	python setup.py sdist upload
 
 man:
 	find man -name \*.ronn | xargs -n1 ronn \
