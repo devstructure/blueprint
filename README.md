@@ -15,7 +15,7 @@ Run this command on your server and follow the instructions to create your accou
 	wget http://devstructure.com/setup.sh
 	sh setup.sh
 
-Not sure what to do next?  The tutorial will take you from setup all the way to production with a simple web application.
+Not sure what to do next?  The [tutorial](http://devstructure.com/tutorial.html) will take you from setup all the way to production with a simple web application.
 
 ## Contribute
 
