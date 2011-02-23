@@ -65,7 +65,7 @@
     <a href="#THEME-SONG">THEME SONG</a>
     <a href="#AUTHOR">AUTHOR</a>
     <a href="#SEE-ALSO">SEE ALSO</a>
-    </div>
+  </div>
 
   <ol class='man-decor man-head man head'>
     <li class='tl'>blueprint(5)</li>
@@ -111,21 +111,21 @@
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p><code>blueprint-backend</code>(1) writes JSON to stdout in a special format that can be used to generate POSIX shell scripts, Puppet modules, Chef cookbooks, and potentially other types of configuration management.</p>
+<p><code>blueprint-create</code>(1) commits <code>blueprint.json</code> to the appropriate branch in the local blueprint repository.  The format described here is used to generate Puppet modules, Chef cookbooks, and POSIX shell scripts in <code>blueprint-show</code>(1) and <code>blueprint-apply</code>(1).</p>
 
 <h3 id="Packages">Packages</h3>
 
 <p>Each key within the <code>packages</code> names a package manager.  Each manager contains keys that name packages to be installed by that manager.  Each package name is associated with an array of versions that should be installed.  In most cases, for most managers, this array will have only one element.</p>
 
-<p>Each manager is itself then name of a package that appears elsewhere.  <code>packages</code> should be processed by starting with the <code>apt</code> manager, installing its dependencies.  Any manager that was installed during this pass should next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.</p>
+<p>Each manager is itself the name of a package that appears elsewhere.  <code>packages</code> should be processed by starting with the <code>apt</code> manager, installing its dependencies.  Any manager that was installed during this pass should next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.</p>
 
 <h3 id="Files">Files</h3>
 
-<p>Each key in the optional  <code>files</code> object is the fully-qualified pathname to a file.  The associated value may contains the <code>owner</code>, owning <code>group</code>, <code>mode</code> (in 6-digit octal representation), <code>content</code>, and the <code>encoding</code> of content (one of <code>plain</code> or <code>base64</code>).</p>
+<p>Each key in the optional <code>files</code> object is the fully-qualified pathname to a file.  The associated value contains the <code>owner</code>, owning <code>group</code>, <code>mode</code> (a string containing the full 6-digit octal representation), <code>content</code>, and the <code>encoding</code> of content (one of <em>plain</em> or <em>base64</em>).</p>
 
 <h3 id="Sources">Sources</h3>
 
-<p>Each key in the optional `` object is the fully-qualified path to a directory.  The associated value is the name of a tarball of the contents of that directory at the time the blueprint was created.  It should be extracted there when the blueprint is applied.  The tarball can be fetched from a URL like this, substituting the filename given for the the last component: http://s3.amazonaws.com/blueprint-sources/<em>0123456789012345678901234567890123456789.tar.gz</em>.</p>
+<p>Each key in the optional <code>sources</code> object is the fully-qualified path to a directory.  The associated value is the name of a tarball of the contents of that directory at the time the blueprint was created.  It should be extracted there when the blueprint is applied.  The tarball is stored in Git alongside <code>blueprint.json</code> and is included in Puppet modules and Chef cookbooks, and referenced from POSIX shell scripts.</p>
 
 <h3 id="Architecture">Architecture</h3>
 
@@ -137,7 +137,7 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#114;&#105;&#99;&#x68;&#97;&#114;&#100;&#x40;&#100;&#x65;&#x76;&#115;&#x74;&#x72;&#x75;&#99;&#x74;&#x75;&#114;&#101;&#x2e;&#99;&#111;&#x6d;" data-bare-link="true">&#x72;&#105;&#x63;&#x68;&#x61;&#114;&#100;&#x40;&#100;&#101;&#118;&#115;&#116;&#x72;&#x75;&#99;&#116;&#x75;&#x72;&#101;&#46;&#99;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#x72;&#105;&#99;&#x68;&#x61;&#114;&#x64;&#x40;&#x64;&#101;&#118;&#115;&#116;&#114;&#x75;&#99;&#x74;&#x75;&#114;&#101;&#46;&#99;&#x6f;&#x6d;" data-bare-link="true">&#114;&#x69;&#x63;&#x68;&#x61;&#x72;&#100;&#64;&#x64;&#101;&#x76;&#115;&#116;&#114;&#x75;&#x63;&#116;&#x75;&#114;&#101;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -146,7 +146,7 @@
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>December 2010</li>
+    <li class='tc'>February 2011</li>
     <li class='tr'>blueprint(5)</li>
   </ol>
 
