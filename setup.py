@@ -11,7 +11,7 @@ import re
 #    break
 #if version is None:
 #    raise EnvironmentError, '/^VERSION=/ not matched in Makefile.'
-version = "3.0.1"
+version = "3.0.2"
 
 setup(name='blueprint',
       version=version,
