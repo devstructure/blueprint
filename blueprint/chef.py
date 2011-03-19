@@ -9,6 +9,7 @@ import os.path
 import re
 import tarfile
 
+
 class Cookbook(object):
     """
     A cookbook is a collection of Chef resources plus the files and other
@@ -123,6 +124,7 @@ class Cookbook(object):
             return filename
         return filename
 
+
 class Resource(dict):
     """
     A Chef resource has a type, a name, and some parameters.  Nothing has
@@ -180,6 +182,7 @@ class Resource(dict):
                 out.append('\t{0} {1}\n'.format(key, self._dumps(value)))
             out.append('end\n')
             return ''.join(out)
+
 
 class File(Resource):
     """

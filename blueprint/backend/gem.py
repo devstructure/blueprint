@@ -10,6 +10,7 @@ import subprocess
 
 import blueprint
 
+
 def gem(b):
     logging.info('searching for Ruby gems')
 

@@ -9,6 +9,7 @@ import os.path
 import re
 import tarfile
 
+
 class Manifest(object):
     """
     A Puppet manifest contains resources and a tree of other manifests
@@ -170,12 +171,14 @@ class Manifest(object):
             return filename
         return filename
 
+
 class BareString(str):
     """
     Strings of this type will not be quoted when written into a Puppet
     manifest.
     """
     pass
+
 
 class Resource(dict):
     """
@@ -315,17 +318,20 @@ class Resource(dict):
 
         return '\n'.join(out)
 
+
 class Package(Resource):
     """
     Puppet package resource.
     """
     pass
 
+
 class Exec(Resource):
     """
     Puppet exec resource.
     """
     pass
+
 
 class File(Resource):
     """
@@ -363,6 +369,7 @@ class File(Resource):
                     self.modulename,
                     self.name[1:]))
         return super(File, self).dumps(inline, tab)
+
 
 class Class(Resource):
     """

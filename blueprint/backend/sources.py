@@ -12,6 +12,7 @@ import re
 import stat
 import tarfile
 
+
 def sources(b):
     logging.info('searching for software built from source')
     tmpname = os.path.join(os.getcwd(), 'usr-local')

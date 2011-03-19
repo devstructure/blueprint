@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 
+
 def pypi(b):
     logging.info('searching for Python packages')
 

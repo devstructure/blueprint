@@ -2,8 +2,10 @@ import os.path
 import subprocess
 import sys
 
+
 class GitError(EnvironmentError):
     pass
+
 
 def init():
     """
@@ -21,6 +23,7 @@ def init():
         #sys.exit(p.returncode)
         raise GitError(p.returncode)
 
+
 def git(*args, **kwargs):
     """
     Execute a Git command.  Raises GitError on non-zero exits unless the
@@ -37,11 +40,13 @@ def git(*args, **kwargs):
         raise GitError(p.returncode)
     return p.returncode, stdout
 
+
 def repo():
     """
     Return the full path to the Git repository.
     """
     return os.path.expanduser('~/.blueprints.git')
+
 
 def rev_parse(refname):
     """
@@ -53,6 +58,7 @@ def rev_parse(refname):
         return None
     return stdout.rstrip()
 
+
 def tree(commit):
     """
     Return the tree in the given commit or None.
@@ -61,6 +67,7 @@ def tree(commit):
     if 0 != status:
         return None
     return stdout[0:40]
+
 
 def ls_tree(tree, dirname=[]):
     """
@@ -75,6 +82,7 @@ def ls_tree(tree, dirname=[]):
         else:
             yield mode, type, sha, os.path.join(*dirname + [filename])
 
+
 def blob(tree, pathname):
     """
     Return the SHA of the blob by the given name in the given tree.
@@ -83,6 +91,7 @@ def blob(tree, pathname):
         if pathname == pathname2:
             return sha
     return None
+
 
 def content(blob):
     """
@@ -93,11 +102,13 @@ def content(blob):
         return None
     return stdout
 
+
 def write_tree():
     status, stdout = git('write-tree')
     if 0 != status:
         return None
     return stdout.rstrip()
+
 
 def commit_tree(tree, message='', parent=None):
     if parent is None:

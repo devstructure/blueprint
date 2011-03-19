@@ -6,6 +6,7 @@ import logging
 import re
 import subprocess
 
+
 def php(b):
     logging.info('searching for PEAR/PECL packages')
 

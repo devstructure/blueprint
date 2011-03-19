@@ -3,6 +3,7 @@
 
 import re
 
+
 class Manager(dict):
     """
     """

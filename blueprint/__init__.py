@@ -21,6 +21,7 @@ import sh
 logging.basicConfig(format='# [blueprint] %(message)s',
                     level=logging.INFO)
 
+
 class Blueprint(dict):
 
     DISCLAIMER = """#
@@ -174,9 +175,11 @@ class Blueprint(dict):
         if hasattr(self, '_managers'):
             return self._managers
         self._managers = {'apt': None}
+
         def package(manager, package, version):
             if package in self.packages and manager != package:
                 self._managers[package] = manager
+
         self.walk(package=package)
         return self._managers
 
@@ -282,7 +285,7 @@ class Blueprint(dict):
                 dirnames = os.path.dirname(pathname).split('/')[1:]
                 for i in xrange(len(dirnames)):
                     m['files'].add(puppet.File(
-                        os.path.join('/', *dirnames[0:i+1]),
+                        os.path.join('/', *dirnames[0:i + 1]),
                         ensure='directory'))
 
                 # Create the actual file resource.
@@ -307,6 +310,7 @@ class Blueprint(dict):
 
         # Install packages.
         deps = []
+
         def before(manager):
             deps.append(manager)
             if 'apt' != manager.name:
@@ -317,8 +321,8 @@ class Blueprint(dict):
                 return
             m['packages'].add(puppet.Exec('apt-get -q update',
                                           before=puppet.Class.ref('apt')))
-        def package(manager, package, version):
 
+        def package(manager, package, version):
             # `apt` is easy since it's the default.
             if 'apt' == manager.name:
                 m['packages'][manager].add(puppet.Package(package,
@@ -423,6 +427,7 @@ class Blueprint(dict):
         def before(manager):
             if 'apt' == manager.name:
                 c.execute('apt-get -q update')
+
         def package(manager, package, version):
             if manager.name == package:
                 return
@@ -497,6 +502,7 @@ class Blueprint(dict):
         def before(manager):
             if 'apt' == manager.name:
                 s.add('apt-get -q update')
+
         def package(manager, package, version):
             if manager.name == package:
                 return
@@ -557,6 +563,7 @@ class Blueprint(dict):
         for managername in managers:
             self.walk(managername, **kwargs)
 
+
 def lsb_release_codename():
     """
     Return the OS release's codename.
@@ -573,6 +580,7 @@ def lsb_release_codename():
     lsb_release_codename._cache = match.group(1)
     return lsb_release_codename._cache
 
+
 def rubygems_update():
     """
     Determine whether the `rubygems-update` gem is needed.  It is needed
@@ -580,12 +588,14 @@ def rubygems_update():
     """
     return lsb_release_codename()[0] < 'm'
 
+
 def rubygems_virtual():
     """
     Determine whether RubyGems is baked into the Ruby 1.9 distribution.
     It is on Maverick and newer systems.
     """
     return lsb_release_codename()[0] >= 'm'
+
 
 def rubygems_path():
     """

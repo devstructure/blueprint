@@ -22,7 +22,8 @@ IGNORE = ('/etc/.pwd.lock',
           '/etc/apparmor',
           '/etc/apparmor.d',
           '/etc/ca-certificates.conf',
-          '/etc/dpkg/origins/default', # TODO Only if it's a symbolic link to ubuntu.
+          # TODO Only if it's a symbolic link to ubuntu.
+          '/etc/dpkg/origins/default',
           '/etc/fstab',
           '/etc/group-',
           '/etc/group',
@@ -36,12 +37,12 @@ IGNORE = ('/etc/.pwd.lock',
           '/etc/mailcap',
           '/etc/mtab',
           '/etc/modules',
-          '/etc/motd', # TODO Only if it's a symbolic link to /var/run/motd.
+          '/etc/motd',  # TODO Only if it's a symbolic link to /var/run/motd.
           '/etc/network/interfaces',
           '/etc/passwd-',
           '/etc/passwd',
           '/etc/popularity-contest.conf',
-          '/etc/resolv.conf', # Most people use the defaults.
+          '/etc/resolv.conf',  # Most people use the defaults.
           '/etc/rc0.d',
           '/etc/rc1.d',
           '/etc/rc2.d',
@@ -102,6 +103,7 @@ MD5SUMS = {'/etc/adduser.conf': '/usr/share/adduser/adduser.conf',
            '/etc/ufw/before.rules': '/usr/share/ufw/before.rules',
            '/etc/ufw/before6.rules': '/usr/share/ufw/before6.rules',
            '/etc/ufw/ufw.conf': '/usr/share/ufw/ufw.conf'}
+
 
 def files(b):
     logging.info('searching for configuration files')
@@ -219,6 +221,7 @@ def files(b):
                                      mode='{0:o}'.format(s.st_mode),
                                      owner=pw.pw_name)
 
+
 def _ignore(filename, pathname, ignored=False):
     """
     Return `True` if the `gitignore`(5)-style `~/.blueprintignore` file says
@@ -274,6 +277,7 @@ def _ignore(filename, pathname, ignored=False):
 
     return ignored
 
+
 def _dpkg_query_S(pathname):
     """
     Return the name of the package that contains `pathname` or `None`.
@@ -295,6 +299,7 @@ def _dpkg_query_S(pathname):
             return None
     package, _ = stdout.split(':')
     return package
+
 
 def _dpkg_md5sum(package, pathname):
     """

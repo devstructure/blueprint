@@ -8,6 +8,7 @@ import subprocess
 
 CACHE = '/tmp/blueprint-exclusions'
 
+
 def apt(b):
     logging.info('searching for apt packages')
 
@@ -21,6 +22,7 @@ def apt(b):
         if package in s:
             continue
         b.packages['apt'][package].append(version)
+
 
 def exclusions():
     """

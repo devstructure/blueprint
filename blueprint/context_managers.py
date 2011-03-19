@@ -4,6 +4,7 @@ import os.path
 import shutil
 import tempfile
 
+
 class cd(object):
     """
     Run in an alternative working directory in this context.
@@ -19,6 +20,7 @@ class cd(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         os.chdir(self.old_cwd)
+
 
 class mkdtemp(object):
     """

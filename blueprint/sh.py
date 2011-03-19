@@ -7,6 +7,7 @@ import os
 import os.path
 import tarfile
 
+
 class Script(object):
     """
     A script is a list of shell commands.  The pomp and circumstance is
