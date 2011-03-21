@@ -10,10 +10,11 @@
 
 ## Try it now!
 
-Run this command on your server and follow the instructions to create your account.  (Remember, you must use Ubuntu 10.04 or newer.)
+Run these commands on your server to get started.  (Remember, you must use Ubuntu 10.04 or newer.)
 
-	wget http://devstructure.com/setup.sh
-	sh setup.sh
+	git clone git@github.com:devstructure/blueprint.git
+	cd blueprint
+	make && sudo make install
 
 Not sure what to do next?  The [tutorial](http://devstructure.com/tutorial.html) will take you from setup all the way to production with a simple web application.
 
@@ -24,3 +25,4 @@ Not sure what to do next?  The [tutorial](http://devstructure.com/tutorial.html)
 * [Source code](https://github.com/devstructure/blueprint)
 * [Issue tracker](https://github.com/devstructure/blueprint/issues)
 * [Documentation](http://devstructure.github.com/blueprint/)
+* [Discuss](https://groups.google.com/forum/#!forum/blueprint-users) or `#devstructure` on Freenode
