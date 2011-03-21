@@ -10,9 +10,7 @@
 
 ## Try it now!
 
-Run these commands on your server to get started.  (Remember, you must use Ubuntu 10.04 or newer.)
-
-	git clone git@github.com:devstructure/blueprint.git
+	git clone git://github.com/devstructure/blueprint.git
 	cd blueprint
 	make && sudo make install
 
