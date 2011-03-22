@@ -17,7 +17,8 @@ import subprocess
 # The default list of ignore patterns.
 #
 # XXX Update `blueprintignore`(5) if you make changes here.
-IGNORE = ('/etc/.pwd.lock',
+IGNORE = ('/etc/.git',
+          '/etc/.pwd.lock',
           '/etc/alternatives',
           '/etc/apparmor',
           '/etc/apparmor.d',
