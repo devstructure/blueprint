@@ -17,8 +17,7 @@ As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to
 
 The following files and directories are part of the default ignore list.  They can be negated using `!` just like any other pattern.
 
-* `*.dpkg-dist`
-* `*.dpkg-old`
+* `*.dpkg-*`
 * `/etc/.git`
 * `/etc/.pwd.lock`
 * `/etc/alternatives`
