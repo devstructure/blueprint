@@ -2,6 +2,7 @@
 Chef code generator.
 """
 
+import codecs
 import errno
 from collections import defaultdict
 import os
@@ -96,11 +97,11 @@ class Cookbook(object):
         cookbook files.
         """
         os.mkdir(self.name)
-        f = open(os.path.join(self.name, 'metadata.rb'), 'w')
+        f = codecs.open(os.path.join(self.name, 'metadata.rb'), 'w', encoding='utf-8')
         f.close()
         os.mkdir(os.path.join(self.name, 'recipes'))
         filename = os.path.join(self.name, 'recipes/default.rb')
-        f = open(filename, 'w')
+        f = codecs.open(filename, 'w', encoding='utf-8')
         self._dump(f.write, inline=False)
         f.close()
         for resource in self.resources:
@@ -113,7 +114,7 @@ class Cookbook(object):
             except OSError as e:
                 if errno.EEXIST != e.errno:
                     raise e
-            f = open(pathname, 'w')
+            f = codecs.open(pathname, 'w', 'utf-8')
             f.write(resource.content)
             f.close()
         if gzip:
@@ -157,8 +158,8 @@ class Resource(dict):
             return 'false'
         elif 0 < len(value) and ':' == value[0]:
             return value
-        if isinstance(value, unicode):
-            value = str(value)
+        elif isinstance(value, basestring):
+            return value
         return repr(value)
 
     def dumps(self, inline=False):
@@ -169,17 +170,17 @@ class Resource(dict):
         braces surrounding a block.
         """
         if 0 == len(self):
-            return '{0}({1})\n'.format(self.type, self._dumps(self.name))
+            return u'{0}({1})\n'.format(self.type, self._dumps(self.name))
         elif 1 == len(self):
             key, value = self.items()[0]
-            return '{0}({1}) {{ {2} {3} }}\n'.format(self.type,
+            return u'{0}({1}) {{ {2} {3} }}\n'.format(self.type,
                                                      self._dumps(self.name),
                                                      key,
                                                      self._dumps(value))
         else:
-            out = ['{0}({1}) do\n'.format(self.type, self._dumps(self.name))]
+            out = [u'{0}({1}) do\n'.format(self.type, self._dumps(self.name))]
             for key, value in sorted(self.iteritems()):
-                out.append('\t{0} {1}\n'.format(key, self._dumps(value)))
+                out.append(u'\t{0} {1}\n'.format(key, self._dumps(value)))
             out.append('end\n')
             return ''.join(out)
 
