@@ -174,9 +174,9 @@ class Resource(dict):
         elif 1 == len(self):
             key, value = self.items()[0]
             return u'{0}({1}) {{ {2} {3} }}\n'.format(self.type,
-                                                     self._dumps(self.name),
-                                                     key,
-                                                     self._dumps(value))
+                                                      self._dumps(self.name),
+                                                      key,
+                                                      self._dumps(value))
         else:
             out = [u'{0}({1}) do\n'.format(self.type, self._dumps(self.name))]
             for key, value in sorted(self.iteritems()):

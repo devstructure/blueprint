@@ -108,7 +108,7 @@ class Manifest(object):
         # scope of individual resources.
         for deps in self.deps:
             w(u'{0}{1}\n'.format(tab_extra,
-                                ' -> '.join([repr(dep) for dep in deps])))
+                                 ' -> '.join([repr(dep) for dep in deps])))
 
         # Resources in this manifest.
         for type, resources in sorted(self.resources.iteritems()):
@@ -277,8 +277,8 @@ class Resource(dict):
         tab_params = tab
         if self.COMPLETE == self.style:
             out.append(u'{0}{1} {{ {2}:'.format(tab,
-                                               self.type,
-                                               self._dumps(self.name, False)))
+                                                self.type,
+                                                self._dumps(self.name, False)))
         elif self.PARTIAL == self.style:
             out.append(u'{0}\t{1}:'.format(tab, self._dumps(self.name, False)))
             tab_params = '{0}\t'.format(tab)
@@ -297,8 +297,8 @@ class Resource(dict):
             for key, value in sorted(self.iteritems()):
                 key = u'{0}{1}'.format(key, ' ' * (l - len(key)))
                 out.append(u'{0}\t{1} => {2},'.format(tab_params,
-                                                     key,
-                                                     self._dumps(value)))
+                                                      key,
+                                                      self._dumps(value)))
 
             # Close the resource as the style dictates.
             if self.COMPLETE == self.style:
