@@ -43,7 +43,7 @@ class Script(object):
         if 0 != len(self.sources):
             os.mkdir(self.name)
             filename = os.path.join(self.name, 'bootstrap.sh')
-            f = codecs.open(filename, 'w', encodin='utf-8')
+            f = codecs.open(filename, 'w', encoding='utf-8')
         elif gzip:
             filename = '{0}.sh.gz'.format(self.name)
             f = gziplib.open(filename, 'w')
