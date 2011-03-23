@@ -17,7 +17,7 @@ import subprocess
 # The default list of ignore patterns.
 #
 # XXX Update `blueprintignore`(5) if you make changes here.
-IGNORE = ('*.*.dpkg-dist',
+IGNORE = ('*.dpkg-dist',
           '*.dpkg-old',
           '/etc/.git',
           '/etc/.pwd.lock',
