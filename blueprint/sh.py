@@ -2,6 +2,7 @@
 Shell code generator.
 """
 
+import codecs
 import gzip as gziplib
 import os
 import os.path
@@ -25,7 +26,7 @@ class Script(object):
         if 'raw' in kwargs:
             self.out.append(kwargs['raw'])
         else:
-            self.out.append('{0}\n'.format(s).format(*args))
+            self.out.append(u'{0}\n'.format(s).format(*args))
         for filename, content in kwargs.get('sources', {}).iteritems():
             self.sources[filename] = content
 
@@ -42,17 +43,17 @@ class Script(object):
         if 0 != len(self.sources):
             os.mkdir(self.name)
             filename = os.path.join(self.name, 'bootstrap.sh')
-            f = open(filename, 'w')
+            f = codecs.open(filename, 'w', encodin='utf-8')
         elif gzip:
             filename = '{0}.sh.gz'.format(self.name)
             f = gziplib.open(filename, 'w')
         else:
             filename = '{0}.sh'.format(self.name)
-            f = open(filename, 'w')
+            f = codecs.open(filename, 'w', encoding='utf-8')
         f.write(self.comment)
         f.write('cd "$(dirname "$0")"\n')
         for filename2, content in sorted(self.sources.iteritems()):
-            f2 = open(os.path.join(self.name, filename2), 'w')
+            f2 = codecs.open(os.path.join(self.name, filename2), 'w', encoding='utf-8')
             f2.write(content)
             f2.close()
         for out in self.out:
