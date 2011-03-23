@@ -1,0 +1,273 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINTIGNORE" "5" "March 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprintignore\fR \- ignore specific files when creating blueprints
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+/etc/foo
+!foo/bar
+baz*
+.
+.fi
+.
+.SH "DESCRIPTION"
+Lines in \fB~/\.blueprintignore\fR are interpreted as in \fBgitignore\fR(5)\. Blank lines and lines that begin with a \fB#\fR will be ignored\. Patterns that begin with a \fB!\fR are negated\. As files are considered for inclusion in a blueprint, the last matching line in \fB~/\.blueprintignore\fR wins\.
+.
+.P
+Patterns that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
+.
+.P
+As part of \fBblueprint\-create\fR(1), the \fB~/\.blueprintignore\fR file that was used to create the blueprint is stored as \fB\.gitignore\fR in the local blueprint repository\.
+.
+.P
+The following files and directories are part of the default ignore list\. They can be negated using \fB!\fR just like any other pattern\.
+.
+.IP "\(bu" 4
+\fB/etc/\.pwd\.lock\fR
+.
+.IP "\(bu" 4
+\fB/etc/alternatives\fR
+.
+.IP "\(bu" 4
+\fB/etc/apparmor\fR
+.
+.IP "\(bu" 4
+\fB/etc/apparmor\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/ca\-certificates\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/dpkg/origins/default\fR
+.
+.IP "\(bu" 4
+\fB/etc/fstab\fR
+.
+.IP "\(bu" 4
+\fB/etc/group\-\fR
+.
+.IP "\(bu" 4
+\fB/etc/group\fR
+.
+.IP "\(bu" 4
+\fB/etc/gshadow\-\fR
+.
+.IP "\(bu" 4
+\fB/etc/gshadow\fR
+.
+.IP "\(bu" 4
+\fB/etc/hostname\fR
+.
+.IP "\(bu" 4
+\fB/etc/init\.d/\.legacy\-bootordering\fR
+.
+.IP "\(bu" 4
+\fB/etc/initramfs\-tools/conf\.d/resume\fR
+.
+.IP "\(bu" 4
+\fB/etc/ld\.so\.cache\fR
+.
+.IP "\(bu" 4
+\fB/etc/localtime\fR
+.
+.IP "\(bu" 4
+\fB/etc/mailcap\fR
+.
+.IP "\(bu" 4
+\fB/etc/mtab\fR
+.
+.IP "\(bu" 4
+\fB/etc/modules\fR
+.
+.IP "\(bu" 4
+\fB/etc/motd\fR
+.
+.IP "\(bu" 4
+\fB/etc/network/interfaces\fR
+.
+.IP "\(bu" 4
+\fB/etc/passwd\-\fR
+.
+.IP "\(bu" 4
+\fB/etc/passwd\fR
+.
+.IP "\(bu" 4
+\fB/etc/popularity\-contest\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/resolv\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc0\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc1\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc2\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc3\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc4\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc5\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc6\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/rcS\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/shadow\-\fR
+.
+.IP "\(bu" 4
+\fB/etc/shadow\fR
+.
+.IP "\(bu" 4
+\fB/etc/ssl/certs\fR
+.
+.IP "\(bu" 4
+\fB/etc/timezone\fR
+.
+.IP "\(bu" 4
+\fB/etc/udev/rules\.d/70\-persistent\-*\.rules\fR
+.
+.IP "" 0
+.
+.P
+The following files are ignored if their content matches an expected hash\. They can be negated using \fB!\fR just like any other pattern\. These comparisions are made to augment searching files from packages to handle files that are part of packages but are not explicitly listed\.
+.
+.IP "\(bu" 4
+\fB/etc/adduser\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/apparmor\.d/tunables/home\.d/ubuntu\fR
+.
+.IP "\(bu" 4
+\fB/etc/chatscripts/provider\fR
+.
+.IP "\(bu" 4
+\fB/etc/default/console\-setup\fR
+.
+.IP "\(bu" 4
+\fB/etc/default/grub\fR
+.
+.IP "\(bu" 4
+\fB/etc/default/irqbalance\fR
+.
+.IP "\(bu" 4
+\fB/etc/default/locale\fR
+.
+.IP "\(bu" 4
+\fB/etc/default/rcS\fR
+.
+.IP "\(bu" 4
+\fB/etc/environment\fR
+.
+.IP "\(bu" 4
+\fB/etc/hosts\.allow\fR
+.
+.IP "\(bu" 4
+\fB/etc/hosts\.deny\fR
+.
+.IP "\(bu" 4
+\fB/etc/initramfs\-tools/modules\fR
+.
+.IP "\(bu" 4
+\fB/etc/inputrc\fR
+.
+.IP "\(bu" 4
+\fB/etc/iscsi/iscsid\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/kernel\-img\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/ld\.so\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/networks\fR
+.
+.IP "\(bu" 4
+\fB/etc/nsswitch\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/ppp/chap\-secrets\fR
+.
+.IP "\(bu" 4
+\fB/etc/ppp/pap\-secrets\fR
+.
+.IP "\(bu" 4
+\fB/etc/ppp/peers/provider\fR
+.
+.IP "\(bu" 4
+\fB/etc/profile\fR
+.
+.IP "\(bu" 4
+\fB/etc/python/debian_config\fR
+.
+.IP "\(bu" 4
+\fB/etc/rc\.local\fR
+.
+.IP "\(bu" 4
+\fB/etc/rsyslog\.d/50\-default\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/security/opasswd\fR
+.
+.IP "\(bu" 4
+\fB/etc/sgml/xml\-core\.cat\fR
+.
+.IP "\(bu" 4
+\fB/etc/shells\fR
+.
+.IP "\(bu" 4
+\fB/etc/ssh/sshd_config\fR
+.
+.IP "\(bu" 4
+\fB/etc/sudoers\fR
+.
+.IP "\(bu" 4
+\fB/etc/ufw/after\.rules\fR
+.
+.IP "\(bu" 4
+\fB/etc/ufw/after6\.rules\fR
+.
+.IP "\(bu" 4
+\fB/etc/ufw/before\.rules\fR
+.
+.IP "\(bu" 4
+\fB/etc/ufw/before6\.rules\fR
+.
+.IP "\(bu" 4
+\fB/etc/ufw/ufw\.conf\fR
+.
+.IP "" 0
+.
+.P
+These defaults are not meant to be an exhuastive list of exceptions and edge cases found on Debian/Ubuntu systems\. Rather, they\'re meant to cover the base installation without hassle\.
+.
+.SH "FILES"
+.
+.TP
+\fB~/\.blueprints\.git\fR
+The local repsitory where blueprints are stored, each on its own branch\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.SH "SEE ALSO"
+\fBblueprint\fR(1)\.

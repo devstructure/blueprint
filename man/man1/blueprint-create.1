@@ -1,0 +1,70 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\-CREATE" "1" "February 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\-create\fR \- create a blueprint
+.
+.SH "SYNOPSIS"
+\fBblueprint create\fR [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR] [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIname\fR
+.
+.SH "DESCRIPTION"
+\fBblueprint\-create\fR creates a list of all installed packages and modified configuration files and stores it in the branch \fIname\fR in the local blueprint repository with the commit \fImessage\fR (if given)\.
+.
+.P
+If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, or \fB\-\-sh\fR is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated and its filename will be printed to \fBstdout\fR\.
+.
+.P
+Debian packages, Ruby gems, Python packages, and PHP PEAR/PECL packages are enumerated in the blueprint\. Debian packages that are listed as \fBessential\fR, \fBimportant\fR, \fBrequired\fR, or \fBstandard\fR and those that are depended upon by \fBubuntu\-minimal\fR, \fBubuntu\-standard\fR, or \fBubuntu\-desktop\fR are ignored\.
+.
+.P
+The contents of system configuration files in \fB/etc\fR that have been created or modified from their packaged versions will be included in the blueprint\. \fBblueprintignore\fR(5) provides means for ignoring specific files\.
+.
+.P
+Anything installed in \fB/usr/local\fR will be archived and included in the blueprint, tagged with the architecture (\fIamd64\fR or \fIi386\fR) of the server\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-P\fR, \fB\-\-puppet\fR
+Generate a Puppet module\.
+.
+.TP
+\fB\-C\fR, \fB\-\-chef\fR
+Generate a Chef cookbook\.
+.
+.TP
+\fB\-S\fR, \fB\-\-sh\fR
+Generate POSIX shell code\.
+.
+.TP
+\fB\-m\fR \fImessage\fR, \fB\-\-message=\fR\fImessage\fR
+Commit message\.
+.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Operate quietly\.
+.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show a help message\.
+.
+.SH "FILES"
+.
+.TP
+\fB~/\.blueprints\.git\fR
+The local repsitory where blueprints are stored, each on its own branch\.
+.
+.TP
+\fB~/\.blueprintignore\fR
+A list of filename patterns to be ignored when creating blueprints\. See \fBblueprintignore\fR(5)\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.

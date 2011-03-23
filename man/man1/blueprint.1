@@ -1,0 +1,61 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT" "1" "February 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\fR \- reverse engineer server configuration
+.
+.SH "SYNOPSIS"
+\fBblueprint\fR [\fIcommand\fR] [\fIoptions\fR][\fI\.\.\.\fR]
+.
+.SH "DESCRIPTION"
+\fBblueprint\fR programs track packages and system files in Git\. Use stored blueprints to build new environments anytime\. Blueprints can be used to generate Puppet modules, Chef cookbooks, or POSIX shell code\.
+.
+.TP
+\fBblueprint\-list\fR(1)
+List all blueprints\.
+.
+.TP
+\fBblueprint\-create\fR(1)
+Create a blueprint\.
+.
+.TP
+\fBblueprint\-show\fR(1)
+Generate code from a blueprint\.
+.
+.TP
+\fBblueprint\-apply\fR(1)
+Run a blueprint\'s generated shell code\.
+.
+.TP
+\fBblueprint\-destroy\fR(1)
+Destroy a blueprint\.
+.
+.TP
+\fBblueprint\fR(5)
+Blueprint JSON format\.
+.
+.TP
+\fBblueprintignore\fR(5)
+Ignore specific files when creating blueprints\.
+.
+.TP
+\fBblueprint\fR(7)
+Blueprint Python library\.
+.
+.SH "FILES"
+.
+.TP
+\fB~/\.blueprints\.git\fR
+The local repsitory where blueprints are stored, each on its own branch\.
+.
+.TP
+\fB~/\.blueprintignore\fR
+A list of filename patterns to be ignored when creating blueprints\. See \fBblueprintignore\fR(5)\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR

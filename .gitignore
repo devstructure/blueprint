@@ -1,7 +1,6 @@
 *.swp
 *.pyc
 *.pyo
-*.[12345678]
 *.html
 *.deb
 *.egg
