@@ -53,7 +53,7 @@ class Script(object):
         f.write(self.comment)
         f.write('cd "$(dirname "$0")"\n')
         for filename2, content in sorted(self.sources.iteritems()):
-            f2 = codecs.open(os.path.join(self.name, filename2), 'w', encoding='utf-8')
+            f2 = open(os.path.join(self.name, filename2), 'w')
             f2.write(content)
             f2.close()
         for out in self.out:
