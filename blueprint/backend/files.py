@@ -154,21 +154,22 @@ def files(b):
             # Ignore files that are from the `base-files` package (which
             # doesn't include MD5 sums for every file for some reason),
             # unchanged from their packaged version, or match in `MD5SUMS`.
-            package = _dpkg_query_S(pathname)
-            if 'base-files' == package:
+            packages = _dpkg_query_S(pathname)
+            if 'base-files' in packages:
                 continue
-            if package is not None:
-                md5sum = _dpkg_md5sum(package, pathname)
+            if 0 < len(packages):
+                md5sums = [_dpkg_md5sum(package, pathname)
+                           for package in packages]
             elif pathname in MD5SUMS:
-                md5sum = MD5SUMS[pathname]
-                if '/' == md5sum[0]:
+                if '/' == MD5SUMS[pathname][0]:
                     try:
-                        md5sum = hashlib.md5(open(md5sum).read()).hexdigest()
+                        md5sums = [hashlib.md5(open(
+                            MD5SUMS[pathname]).read()).hexdigest()]
                     except IOError:
-                        md5sum = None
-            else:
-                md5sum = None
-            if hashlib.md5(content).hexdigest() == md5sum:
+                        md5sums = []
+                else:
+                    md5sums = [MD5SUMS[pathname]]
+            if hashlib.md5(content).hexdigest() in md5sums:
                 if _ignore(filename, pathname, ignored=True):
                     continue
 
@@ -282,7 +283,8 @@ def _ignore(filename, pathname, ignored=False):
 
 def _dpkg_query_S(pathname):
     """
-    Return the name of the package that contains `pathname` or `None`.
+    Return a list of package names that contain `pathname` or `[]`.  This
+    really can be a list thanks to `dpkg-divert`(1).
     """
     p = subprocess.Popen(['dpkg-query', '-S', pathname],
                          close_fds=True,
@@ -298,9 +300,17 @@ def _dpkg_query_S(pathname):
             return _dpkg_query_S(os.readlink(pathname))
 
         except OSError:
-            return None
-    package, _ = stdout.split(':')
-    return package
+            return []
+    packages = []
+    for line in stdout.splitlines():
+        if line.startswith('diversion '):
+            continue
+        try:
+            p, _ = line.split(':')
+            packages.extend([package.strip() for package in p.split(',')])
+        except ValueError:
+            pass
+    return packages
 
 
 def _dpkg_md5sum(package, pathname):
