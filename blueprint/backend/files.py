@@ -215,13 +215,21 @@ def files(b):
                                 ''.format(pathname))
                 continue
 
-            pw = pwd.getpwuid(s.st_uid)
-            gr = grp.getgrgid(s.st_gid)
+            try:
+                pw = pwd.getpwuid(s.st_uid)
+                owner = pw.pw_name
+            except KeyError:
+                owner = s.st_uid
+            try:
+                gr = grp.getgrgid(s.st_gid)
+                group = gr.gr_name
+            except KeyError:
+                group = s.st_gid
             b.files[pathname] = dict(content=content,
                                      encoding=encoding,
-                                     group=gr.gr_name,
+                                     group=group,
                                      mode='{0:o}'.format(s.st_mode),
-                                     owner=pw.pw_name)
+                                     owner=owner)
 
 
 def _ignore(filename, pathname, ignored=False):
