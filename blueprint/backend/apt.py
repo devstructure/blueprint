@@ -3,10 +3,12 @@ Search for `apt` packages to include in the blueprint.
 """
 
 import logging
+import os
 import re
 import subprocess
 
-CACHE = '/tmp/blueprint-exclusions'
+CACHE = '/tmp/blueprint-apt-exclusions'
+OLDCACHE = '/tmp/blueprint-exclusions'
 
 
 def apt(b):
@@ -30,7 +32,12 @@ def exclusions():
     they're already guaranteed (to some degree) to be there.
     """
 
-    # Read from a cached copy.
+    # Read from a cached copy.  Move the old cache location to the new one
+    # if necessary.
+    try:
+        os.rename(OLDCACHE, CACHE)
+    except OSError:
+        pass
     try:
         return set([line.rstrip() for line in open(CACHE)])
     except IOError:
