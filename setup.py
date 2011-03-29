@@ -27,4 +27,4 @@ setup(name='blueprint',
                'bin/blueprint-list',
                'bin/blueprint-show'],
       license='BSD',
-      zip_safe=True)
+      zip_safe=False)
