@@ -73,6 +73,10 @@ def sources(b):
                 open(pathname).read()):
                 continue
 
+            # Exclude share/applications/mimeinfo.cache, whatever that is.
+            if '/usr/local/share/applications/mimeinfo.cache' == pathname:
+                continue
+
             # Hard link this file into the shallow copy.  Suggest running as
             # `root` if this doesn't work though in practice the check above
             # will have already caught this problem.
