@@ -306,7 +306,7 @@ def _dpkg_query_S(pathname):
         if line.startswith('diversion '):
             continue
         try:
-            p, _ = line.split(':')
+            p, _ = line.split(':', 1)
             packages.extend([package.strip() for package in p.split(',')])
         except ValueError:
             pass
