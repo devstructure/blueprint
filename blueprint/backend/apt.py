@@ -14,10 +14,17 @@ OLDCACHE = '/tmp/blueprint-exclusions'
 def apt(b):
     logging.info('searching for apt packages')
 
-    p = subprocess.Popen(['dpkg-query',
-                          '-f=${Package} ${Version}\n',
-                          '-W'],
-                         close_fds=True, stdout=subprocess.PIPE)
+    # Try for the full list of packages.  If this fails, don't even
+    # bother with the rest because this is probably a Yum/RPM-based
+    # system.
+    try:
+        p = subprocess.Popen(['dpkg-query',
+                              '-f=${Package} ${Version}\n',
+                              '-W'],
+                             close_fds=True, stdout=subprocess.PIPE)
+    except OSError:
+        return
+
     s = exclusions()
     for line in p.stdout:
         package, version = line.strip().split()

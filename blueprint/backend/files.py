@@ -287,10 +287,13 @@ def _dpkg_query_S(pathname):
     """
     Return the name of the package that contains `pathname` or `None`.
     """
-    p = subprocess.Popen(['dpkg-query', '-S', pathname],
-                         close_fds=True,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
+    try:
+        p = subprocess.Popen(['dpkg-query', '-S', pathname],
+                             close_fds=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+    except OSError:
+        return None
     stdout, stderr = p.communicate()
     if 0 != p.returncode:
 
