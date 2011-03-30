@@ -32,7 +32,7 @@ class Manager(dict):
         if match is not None:
             return 'easy_install-{0} {1}'.format(match.group(1), package)
         if 'pip' == self.name or 'python-pip' == self.name:
-            return 'pip install {0}'.format(package)
+            return 'pip install {0}=={1}'.format(package, version)
 
         if 'php-pear' == self.name:
             return 'pear install {0}-{1}'.format(package, version)
