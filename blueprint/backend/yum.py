@@ -26,6 +26,8 @@ def yum(b):
     s = exclusions()
     for line in p.stdout:
         package, group, epoch, version = line.strip().split('\x1E')
+        if package in s:
+            continue
         if '(none)' != epoch:
             version = '{0}:{1}'.format(epoch, version)
         b.packages['yum'][package].append(version)
