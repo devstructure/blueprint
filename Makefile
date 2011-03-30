@@ -3,7 +3,7 @@ VERSION=3.0.2
 prefix=/usr/local
 bindir=${prefix}/bin
 libdir=${prefix}/lib
-pydir=${libdir}/python2.6/dist-packages
+pydir=$(shell python pydir.py ${libdir})
 mandir=${prefix}/share/man
 sysconfdir=${prefix}/etc
 
