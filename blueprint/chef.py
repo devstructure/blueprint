@@ -32,11 +32,11 @@ class Cookbook(object):
         """
         self.resources.append(resource)
 
-    def apt_package(self, name, **kwargs):
+    def package(self, name, **kwargs):
         """
-        Create a package resource provided by APT.
+        Create a package resource provided by the default provider.
         """
-        self.add(Resource('apt_package', name, **kwargs))
+        self.add(Resource('package', name, **kwargs))
 
     def gem_package(self, name, **kwargs):
         """
