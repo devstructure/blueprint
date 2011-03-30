@@ -158,8 +158,6 @@ class Resource(dict):
             return 'false'
         elif 0 < len(value) and ':' == value[0]:
             return value
-        elif isinstance(value, basestring):
-            return value
         return repr(value)
 
     def dumps(self, inline=False):

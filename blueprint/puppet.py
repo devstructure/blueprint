@@ -262,8 +262,6 @@ class Resource(dict):
             return value
         if isinstance(value, BareString):
             return value
-        if isinstance(value, basestring):
-            return value
         return repr(value)
 
     def dumps(self, inline=False, tab=''):
