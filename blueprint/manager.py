@@ -18,6 +18,8 @@ class Manager(dict):
 
         if 'apt' == self.name:
             return 'apt-get -y install {0}={1}'.format(package, version)
+        if 'yum' == self.name:
+            return 'yum -y install {0}-{1}'.format(package, version)
 
         match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)', self.name)
         if match is not None:

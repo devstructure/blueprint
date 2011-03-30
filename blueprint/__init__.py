@@ -565,7 +565,10 @@ class Blueprint(dict):
             self.walk('yum', **kwargs)
             return
 
-        manager = Manager(managername, self.packages[managername])
+        # Get the full manager from its name.  Watch out for KeyError (by
+        # using dict.get instead of dict.__get__), which means the manager
+        # isn't part of this blueprint.
+        manager = Manager(managername, self.packages.get(managername, {}))
 
         # Give the manager a chance to setup for its dependencies.
         callable = getattr(kwargs.get('before', None), '__call__', None)
