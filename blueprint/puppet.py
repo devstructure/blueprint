@@ -161,7 +161,10 @@ class Manifest(object):
             except OSError as e:
                 if errno.EEXIST != e.errno:
                     raise e
-            f = open(pathname, 'w')
+            if isinstance(content, unicode):
+                f = codecs.open(pathname, 'w', encoding='utf-8')
+            else:
+                f = open(pathname, 'w')
             f.write(content)
             f.close()
         if gzip:

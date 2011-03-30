@@ -114,7 +114,10 @@ class Cookbook(object):
             except OSError as e:
                 if errno.EEXIST != e.errno:
                     raise e
-            f = open(pathname, 'w')
+            if isinstance(resource.content, unicode):
+                f = codecs.open(pathname, 'w', encoding='utf-8')
+            else:
+                f = open(pathname, 'w')
             f.write(resource.content)
             f.close()
         if gzip:
