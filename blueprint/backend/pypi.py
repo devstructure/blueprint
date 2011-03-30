@@ -41,35 +41,78 @@ def pypi(b):
                 match = pattern.match(entry)
                 if match is None:
                     continue
-                package, version = match.group(1), match.group(2)
+                package, version = match.group(1, 2)
 
-                # This package was installed via `easy_install`.  Make sure
-                # its version of Python is in the blueprint so it can be
-                # used as a package manager.
-                if pattern_egg.search(entry):
-                    p = subprocess.Popen(['dpkg-query',
-                                          '-f=${Version}',
-                                          '-W',
-                                          manager],
-                                         close_fds=True,
-                                         stdout=subprocess.PIPE)
-                    stdout, stderr = p.communicate()
-                    if 0 != p.returncode:
-                        continue
-                    versions = b.packages['apt'][manager]
-                    if stdout not in versions:
-                        versions.append(stdout)
-                    b.packages[manager][package].append(version)
+                # Assume this is a Debian-based system and let `OSError`
+                # looking for `dpkg-query` prove this is RPM-based.  In
+                # that case, the dependencies get a bit simpler.
+                try:
 
-                # This package was installed via `pip`.  Figure out how `pip`
-                # was installed and use that as this package's manager.
-                elif pattern_egginfo.search(entry):
-                    p = subprocess.Popen(['dpkg-query', '-W', 'python-pip'],
-                                         close_fds=True,
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE)
-                    p.communicate()
-                    if 0 != p.returncode:
-                        b.packages['pip'][package].append(version)
-                    else:
-                        b.packages['python-pip'][package].append(version)
+                    # This package was installed via `easy_install`.  Make
+                    # sure its version of Python is in the blueprint so it
+                    # can be used as a package manager.
+                    if pattern_egg.search(entry):
+                        p = subprocess.Popen(['dpkg-query',
+                                              '-f=${Version}',
+                                              '-W',
+                                              manager],
+                                             close_fds=True,
+                                             stdout=subprocess.PIPE)
+                        stdout, stderr = p.communicate()
+                        if 0 != p.returncode:
+                            continue
+                        versions = b.packages['apt'][manager]
+                        if stdout not in versions:
+                            versions.append(stdout)
+                        b.packages[manager][package].append(version)
+
+                    # This package was installed via `pip`.  Figure out how
+                    # `pip` was installed and use that as this package's
+                    # manager.
+                    elif pattern_egginfo.search(entry):
+                        p = subprocess.Popen(['dpkg-query',
+                                              '-W',
+                                              'python-pip'],
+                                             close_fds=True,
+                                             stdout=subprocess.PIPE,
+                                             stderr=subprocess.PIPE)
+                        p.communicate()
+                        if 0 != p.returncode:
+                            b.packages['pip'][package].append(version)
+                        else:
+                            b.packages['python-pip'][package].append(version)
+
+                except OSError:
+
+                    # This package was installed via `easy_install`.  Make
+                    # sure Python is in the blueprint so it can be used as
+                    # a package manager.
+                    if pattern_egg.search(entry):
+                        p = subprocess.Popen(
+                            ['rpm',
+                             '-q',
+                             '--qf=%{VERSION}-%{RELEASE}.%{ARCH}',
+                             'python'],
+                            close_fds=True, stdout=subprocess.PIPE)
+                        stdout, stderr = p.communicate()
+                        if 0 != p.returncode:
+                            continue
+                        versions = b.packages['yum'][manager]
+                        if stdout not in versions:
+                            versions.append(stdout)
+                        b.packages['python'][package].append(version)
+
+                    # This package was installed via `pip`.  Figure out how
+                    # `pip` was installed and use that as this package's
+                    # manager.
+                    elif pattern_egginfo.search(entry):
+                        p = subprocess.Popen(
+                            ['rpm', '-q', 'python-pip'],
+                            close_fds=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+                        p.communicate()
+                        if 0 != p.returncode:
+                            b.packages['pip'][package].append(version)
+                        else:
+                            b.packages['python-pip'][package].append(version)
