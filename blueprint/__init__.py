@@ -137,12 +137,15 @@ class Blueprint(dict):
             if manager.name not in b.packages:
                 return
 
-            # TODO Add equivalent RPM names to these lists.
             deps = {r'^python(\d+(?:\.\d+)?)$': ['python{0}',
-                                                 'python{0}-dev'],
+                                                 'python{0}-dev',
+                                                 'python',
+                                                 'python-devel'],
                     r'^ruby(\d+\.\d+(?:\.\d+)?)$': ['ruby{0}-dev'],
                     r'^rubygems(\d+\.\d+(?:\.\d+)?)$': ['ruby{0}',
-                                                        'ruby{0}-dev']}
+                                                        'ruby{0}-dev',
+                                                        'ruby',
+                                                        'ruby-devel']}
 
             for pattern, packages in deps.iteritems():
                 match = re.search(pattern, manager.name)
