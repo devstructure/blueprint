@@ -28,7 +28,9 @@ def pypi(b):
     # figure out what packages were `easy_install`ed.  If `VIRTUAL_ENV`
     # appears in the environment, treat the directory it names just like
     # the global package directories.
-    globnames = ['/usr/local/lib/python*/dist-packages',
+    globnames = ['/usr/lib/python*/dist-packages',
+                 '/usr/lib/python*/site-packages',
+                 '/usr/local/lib/python*/dist-packages',
                  '/usr/local/lib/python*/site-packages']
     virtualenv = os.getenv('VIRTUAL_ENV')
     if virtualenv is not None:
@@ -42,11 +44,22 @@ def pypi(b):
                 if match is None:
                     continue
                 package, version = match.group(1, 2)
+                pathname = os.path.join(dirname, entry)
 
                 # Assume this is a Debian-based system and let `OSError`
                 # looking for `dpkg-query` prove this is RPM-based.  In
                 # that case, the dependencies get a bit simpler.
                 try:
+
+                    # If this Python package is actually part of a system
+                    # package, abandon it.
+                    p = subprocess.Popen(['dpkg-query', '-S', pathname],
+                                         close_fds=True,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.PIPE)
+                    p.communicate()
+                    if 0 == p.returncode:
+                        continue
 
                     # This package was installed via `easy_install`.  Make
                     # sure its version of Python is in the blueprint so it
@@ -83,6 +96,16 @@ def pypi(b):
                             b.packages['python-pip'][package].append(version)
 
                 except OSError:
+
+                    # If this Python package is actually part of a system
+                    # package, abandon it.
+                    p = subprocess.Popen(['rpm', '-qf', pathname],
+                                         close_fds=True,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.PIPE)
+                    p.communicate()
+                    if 0 == p.returncode:
+                        continue
 
                     # This package was installed via `easy_install`.  Make
                     # sure Python is in the blueprint so it can be used as
