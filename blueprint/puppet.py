@@ -255,7 +255,8 @@ class Resource(dict):
             return 'true'
         elif False == value:
             return 'false'
-        elif bare and re.match(r'^[a-z]+$', u'{0}\n'.format(value)) is not None:
+        elif bare and re.match(r'^[0-9a-zA-Z]+$', u'{0}'.format(
+            value)) is not None:
             return value
         elif hasattr(value, 'bare'):
             return value
