@@ -416,7 +416,7 @@ class Blueprint(dict):
         for pathname, f in sorted(self.files.iteritems()):
             c.directory(os.path.dirname(pathname),
                         group='root',
-                        mode='755',
+                        mode='0755',
                         owner='root',
                         recursive=True)
             if '120000' == f['mode'] or '120777' == f['mode']:
