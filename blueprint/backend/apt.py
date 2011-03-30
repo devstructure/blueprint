@@ -49,6 +49,7 @@ def exclusions():
         return set([line.rstrip() for line in open(CACHE)])
     except IOError:
         pass
+    logging.info('searching for apt packages to exclude')
 
     # Start with the root package for the various Ubuntu installations.
     s = set(['ubuntu-minimal', 'ubuntu-standard', 'ubuntu-desktop'])
@@ -95,6 +96,7 @@ def exclusions():
         s |= new_s
 
     # Write to a cache.
+    logging.info('caching excluded apt packages')
     f = open(CACHE, 'w')
     for package in sorted(s):
         f.write('{0}\n'.format(package))
