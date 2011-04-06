@@ -63,7 +63,7 @@ def tree(commit):
     """
     Return the tree in the given commit or None.
     """
-    status, stdout = git('show', '--format=%T', commit)
+    status, stdout = git('show', '--pretty=format:%T', commit)
     if 0 != status:
         return None
     return stdout[0:40]
