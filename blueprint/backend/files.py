@@ -297,7 +297,7 @@ def _dpkg_query_S(pathname):
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
     except OSError:
-        return None
+        return []
     stdout, stderr = p.communicate()
     if 0 != p.returncode:
 
