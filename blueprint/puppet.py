@@ -261,11 +261,9 @@ class Resource(dict):
         elif bare and re.match(r'^[0-9a-zA-Z]+$', u'{0}'.format(
             value)) is not None:
             return value
-        elif hasattr(value, 'bare'):
-            return value
-        if isinstance(value, BareString):
-            return value
-        return repr(value)
+        elif hasattr(value, 'bare') or isinstance(value, BareString):
+            return value.replace(u'$', u'\\$')
+        return repr(value).replace(u'$', u'\\$')
 
     def dumps(self, inline=False, tab=''):
         """

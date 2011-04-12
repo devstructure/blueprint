@@ -161,7 +161,7 @@ class Resource(dict):
             return 'false'
         elif 0 < len(value) and ':' == value[0]:
             return value
-        return repr(value)
+        return repr(value.replace(u'#{', u'\\#{'))
 
     def dumps(self, inline=False):
         """
