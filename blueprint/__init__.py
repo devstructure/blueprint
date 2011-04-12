@@ -319,7 +319,6 @@ class Blueprint(dict):
         deps = []
 
         def before(manager):
-            deps.append(manager)
             if 0 == len(manager):
                 return
             if 1 == len(manager) and manager.name in manager:
@@ -330,6 +329,7 @@ class Blueprint(dict):
             elif 'yum' == manager.name:
                 m['packages'].add(puppet.Exec('yum makecache',
                                               before=puppet.Class.ref('yum')))
+            deps.append(manager)
 
         def package(manager, package, version):
 
