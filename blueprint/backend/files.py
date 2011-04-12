@@ -45,6 +45,7 @@ IGNORE = ('*.dpkg-*',
           '/etc/passwd-',
           '/etc/passwd',
           '/etc/popularity-contest.conf',
+          '/etc/prelink.cache',
           '/etc/resolv.conf',  # Most people use the defaults.
           '/etc/rc0.d',
           '/etc/rc1.d',
@@ -57,6 +58,7 @@ IGNORE = ('*.dpkg-*',
           '/etc/shadow-',
           '/etc/shadow',
           '/etc/ssl/certs',
+          '/etc/sysconfig/network',
           '/etc/timezone',
           '/etc/udev/rules.d/70-persistent-*.rules')
 

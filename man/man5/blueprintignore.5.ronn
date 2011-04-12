@@ -43,6 +43,7 @@ The following files and directories are part of the default ignore list.  They c
 * `/etc/passwd-`
 * `/etc/passwd`
 * `/etc/popularity-contest.conf`
+* `/etc/prelink.cache`
 * `/etc/resolv.conf`
 * `/etc/rc0.d`
 * `/etc/rc1.d`
@@ -55,6 +56,7 @@ The following files and directories are part of the default ignore list.  They c
 * `/etc/shadow-`
 * `/etc/shadow`
 * `/etc/ssl/certs`
+* `/etc/sysconfig/network`
 * `/etc/timezone`
 * `/etc/udev/rules.d/70-persistent-*.rules`
 
