@@ -38,6 +38,7 @@ install-lib:
 		blueprint/manager.py \
 		blueprint/puppet.py \
 		blueprint/sh.py \
+		blueprint/util.py \
 		$(DESTDIR)$(pydir)/blueprint/
 	install -d $(DESTDIR)$(pydir)/blueprint/backend/
 	install -m644 \
@@ -103,6 +104,8 @@ uninstall-lib:
 		$(DESTDIR)$(pydir)/blueprint/puppet.pyc \
 		$(DESTDIR)$(pydir)/blueprint/sh.py \
 		$(DESTDIR)$(pydir)/blueprint/sh.pyc \
+		$(DESTDIR)$(pydir)/blueprint/util.py \
+		$(DESTDIR)$(pydir)/blueprint/util.pyc \
 		$(DESTDIR)$(pydir)/blueprint/backend/apt.py \
 		$(DESTDIR)$(pydir)/blueprint/backend/apt.pyc \
 		$(DESTDIR)$(pydir)/blueprint/backend/files.py \
