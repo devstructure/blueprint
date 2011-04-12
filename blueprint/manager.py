@@ -28,6 +28,8 @@ class Manager(dict):
                                                      package,
                                                      version)
 
+        if 'python' == self.name:
+            return 'easy_install {0}'.format(package)
         match = re.match(r'^python(\d+\.\d+)', self.name)
         if match is not None:
             return 'easy_install-{0} {1}'.format(match.group(1), package)
