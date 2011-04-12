@@ -8,7 +8,7 @@ import os
 import re
 import subprocess
 
-import blueprint
+from blueprint import util
 
 
 def gem(b):
@@ -30,11 +30,11 @@ def gem(b):
             # `rubygems1.9.1` package as virtual.  So for Maverick and
             # newer, the manager is actually `ruby1.9.1`.
             match = pattern.search(dirname)
-            if '1.9.1' == match.group(1) and blueprint.rubygems_virtual():
+            if '1.9.1' == match.group(1) and util.rubygems_virtual():
                 manager = 'ruby{0}'.format(match.group(1))
 
             # RPM-based distros just have one RubyGems package.
-            elif blueprint.lsb_release_codename() is None:
+            elif util.lsb_release_codename() is None:
                 manager = 'rubygems'
 
             # Debian-based distros qualify the package name with the version
