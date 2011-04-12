@@ -120,7 +120,7 @@ def pypi(b):
                         stdout, stderr = p.communicate()
                         if 0 != p.returncode:
                             continue
-                        versions = b.packages['yum'][manager]
+                        versions = b.packages['yum']['python']
                         if stdout not in versions:
                             versions.append(stdout)
                         b.packages['python'][package].append(version)
