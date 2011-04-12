@@ -16,9 +16,9 @@ def yum(b):
     # system.
     try:
         p = subprocess.Popen(['rpm',
-                              '-qa',
                               '--qf=%{NAME}\x1E%{GROUP}\x1E%{EPOCH}' # No ,
-                              '\x1E%{VERSION}-%{RELEASE}.%{ARCH}\n'],
+                              '\x1E%{VERSION}-%{RELEASE}.%{ARCH}\n',
+                              '-qa'],
                              close_fds=True, stdout=subprocess.PIPE)
     except OSError:
         return
