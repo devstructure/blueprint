@@ -11,6 +11,7 @@ import hashlib
 import logging
 import os.path
 import pwd
+import re
 import stat
 import subprocess
 
@@ -151,8 +152,8 @@ def files(b):
 
             # Ignore files that are from the `base-files` package (which
             # doesn't include MD5 sums for every file for some reason),
-            # unchanged from their packaged version, or match in `MD5SUMS`.
-            packages = _dpkg_query_S(pathname)
+            # are unchanged from their packaged version, or match in `MD5SUMS`.
+            packages = _dpkg_query_S(pathname) + _rpm_qf(pathname)
             if 'base-files' in packages:
                 continue
             if 0 < len(packages):
@@ -169,9 +170,13 @@ def files(b):
                     md5sums = [MD5SUMS[pathname]]
             else:
                 md5sums = []
-            if hashlib.md5(content).hexdigest() in md5sums:
-                if _ignore(pathname, ignored=True):
-                    continue
+            if 0 < len(md5sums) \
+                and hashlib.md5(content).hexdigest() in md5sums \
+                and _ignore(pathname, True):
+                continue
+            if True in [_rpm_V(package, pathname) and _ignore(pathname, True)
+                        for package in packages]:
+                continue
 
             # Don't store DevStructure's default `/etc/fuse.conf`.  (This is
             # a legacy condition.)
@@ -339,3 +344,43 @@ def _dpkg_md5sum(package, pathname):
     except IOError:
         pass
     return None
+
+
+def _rpm_qf(pathname):
+    """
+    Return a list of package names that contain `pathname` or `[]`.  RPM
+    might not actually support a single pathname being claimed by more
+    than one package but `dpkg` does so the interface is maintained.
+    """
+    try:
+        p = subprocess.Popen(['rpm', '--qf=%{NAME}\n', '-qf', pathname],
+                             close_fds=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+    except OSError:
+        return []
+    stdout, stderr = p.communicate()
+    if 0 != p.returncode:
+        return []
+    return [stdout.rstrip()]
+
+def _rpm_V(package, pathname):
+    """
+    Return `True` if the given file has not been modified from its
+    packaged state.
+    """
+    try:
+        p = subprocess.Popen(['rpm', '-V', package],
+                             close_fds=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+    except OSError:
+        return True
+    stdout, stderr = p.communicate()
+    if 0 == p.returncode:
+        return True
+    pattern = re.compile(r'^..5......  . {0}$'.format(pathname))
+    for line in stdout.splitlines():
+        if pattern.match(line) is not None:
+            return False
+    return True
