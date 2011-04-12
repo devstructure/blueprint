@@ -87,10 +87,7 @@ def exclusions():
 
     # Now that the tree has been walked, discard the version-qualified names,
     # leaving just the package names.
-    import pprint
-    pprint.pprint(repr(s))
     s = set([package for package, spec in s])
-    pprint.pprint(repr(s))
 
     # Write to a cache.
     logging.info('caching excluded yum packages')
