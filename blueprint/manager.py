@@ -21,6 +21,8 @@ class Manager(dict):
         if 'yum' == self.name:
             return 'yum -y install {0}-{1}'.format(package, version)
 
+        if 'rubygems' == self.name:
+            return 'gem install {0} -v{1}'.format(package, version)
         match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)', self.name)
         if match is not None:
             # FIXME PATH might have a thing to say about this.
