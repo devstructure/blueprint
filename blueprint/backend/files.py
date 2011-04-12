@@ -138,7 +138,7 @@ def files(b):
             # share their ctime with other files in the directory.  This
             # is a very strong indication that the file is original to
             # the system and should be ignored.
-            if _ignore(pathname, ignored=ignored or 1 < ctimes[s.st_ctime]):
+            if _ignore(pathname, ignored or 1 < ctimes[s.st_ctime]):
                 continue
 
             # The content is used even for symbolic links to determine whether
@@ -178,7 +178,7 @@ def files(b):
             if '/etc/fuse.conf' == pathname:
                 try:
                     if 'user_allow_other\n' == open(pathname).read():
-                        if _ignore(pathname, ignored=True):
+                        if _ignore(pathname, True):
                             continue
                 except IOError:
                     pass
