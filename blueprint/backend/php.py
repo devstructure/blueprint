@@ -6,6 +6,8 @@ import logging
 import re
 import subprocess
 
+import blueprint
+
 
 def php(b):
     logging.info('searching for PEAR/PECL packages')
@@ -16,8 +18,12 @@ def php(b):
     # PEAR packages are managed by `php-pear` (obviously).  PECL packages
     # are managed by `php5-dev` because they require development headers
     # (less obvious but still makes sense).
+    if blueprint.lsb_release_codename() is None:
+        pecl_manager = 'php-devel'
+    else:
+        pecl_manager = 'php5-dev'
     for manager, progname in (('php-pear', 'pear'),
-                              ('php5-dev', 'pecl')):
+                              (pecl_manager, 'pecl')):
 
         try:
             p = subprocess.Popen([progname, 'list'],

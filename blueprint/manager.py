@@ -40,7 +40,7 @@ class Manager(dict):
 
         if 'php-pear' == self.name:
             return 'pear install {0}-{1}'.format(package, version)
-        if 'php5-dev' == self.name:
+        if self.name in ('php5-dev', 'php-devel'):
             return 'pecl install {0}-{1}'.format(package, version)
 
         return ': unknown manager {0} for {1} {2}'.format(self.name,
