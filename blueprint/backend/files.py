@@ -47,6 +47,7 @@ IGNORE = ('*.dpkg-*',
           '/etc/popularity-contest.conf',
           '/etc/prelink.cache',
           '/etc/resolv.conf',  # Most people use the defaults.
+          '/etc/rc.d',
           '/etc/rc0.d',
           '/etc/rc1.d',
           '/etc/rc2.d',
