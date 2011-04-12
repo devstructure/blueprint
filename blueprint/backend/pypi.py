@@ -113,8 +113,8 @@ def pypi(b):
                     if pattern_egg.search(entry):
                         p = subprocess.Popen(
                             ['rpm',
-                             '-q',
                              '--qf=%{VERSION}-%{RELEASE}.%{ARCH}',
+                             '-q',
                              'python'],
                             close_fds=True, stdout=subprocess.PIPE)
                         stdout, stderr = p.communicate()
