@@ -354,8 +354,9 @@ class Blueprint(dict):
                         require=puppet.Package.ref(package)))
 
             # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
-            # built in provider.
-            elif 'rubygems1.8' == manager.name:
+            # built in provider.  This is called simply "rubygems" on
+            # RPM-based distros.
+            elif manager.name in ('rubygems', 'rubygems1.8'):
                 m['packages'][manager].add(puppet.Package(package,
                     ensure=version,
                     provider='gem'))
@@ -464,6 +465,8 @@ class Blueprint(dict):
                               'which update_rubygems)"'.format(match.group(1)))
 
             # All types of gems get to have package resources.
+            elif 'rubygems' == manager.name:
+                c.gem_package(package, version=version)
             elif re.search(r'ruby', manager.name) is not None:
                 match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
                                  manager.name)

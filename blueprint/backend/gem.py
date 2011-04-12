@@ -32,6 +32,13 @@ def gem(b):
             match = pattern.search(dirname)
             if '1.9.1' == match.group(1) and blueprint.rubygems_virtual():
                 manager = 'ruby{0}'.format(match.group(1))
+
+            # RPM-based distros just have one RubyGems package.
+            elif blueprint.lsb_release_codename() is None:
+                manager = 'rubygems'
+
+            # Debian-based distros qualify the package name with the version
+            # of Ruby it will use.
             else:
                 manager = 'rubygems{0}'.format(match.group(1))
 
