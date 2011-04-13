@@ -49,21 +49,22 @@ footer {
 </header>
 <section>
 	<h1>Installation</h1>
-	<p>From source on Debian, Ubuntu, and Fedora:</p>
+	<h2>From source on Debian, Ubuntu, and Fedora</h2>
 	<pre>git clone git://github.com/devstructure/blueprint.git
 cd blueprint
 make &amp;&amp; sudo make install</pre>
-	<p>From source on CentOS and RHEL:</p>
+	<h2>From source on CentOS and RHEL</h2>
 	<pre>rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
 yum install python26
 make &amp;&amp; sudo make install PYTHON=/usr/bin/python26</pre>
 	<p>This installs Python 2.6 side-by-side with Python 2.4 and so won&#8217;t break <code>yum</code>.</p>
-	<p>From DevStructure&#8217;s Debian archive:</p>
-	<pre>echo "deb http://packages.devstructure.com/ maverick main" | sudo tee /etc/apt/sources.list.d/devstructure.list
+	<h2>From DevStructure&#8217;s Debian archive</h2>
+	<pre>echo "deb http://packages.devstructure.com/ maverick main" \
+	| sudo tee /etc/apt/sources.list.d/devstructure.list
 wget -O - http://packages.devstructure.com/keyring.gpg | sudo apt-key add -
 sudo apt-get update
 sudo apt-get -y install blueprint</pre>
-	<p>From PyPI:</p>
+	<h2>From PyPI</h2>
 	<pre>pip install blueprint</pre>
 </section>
 <section>
