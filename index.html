@@ -66,6 +66,8 @@ make &amp;&amp; sudo make install</pre>
 	<h2>From source on CentOS and RHEL</h2>
 	<pre>rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
 yum install python26
+git clone git://github.com/devstructure/blueprint.git
+cd blueprint
 make &amp;&amp; sudo make install PYTHON=/usr/bin/python26</pre>
 	<p>This installs Python 2.6 from <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> side-by-side with Python 2.4 and so won&#8217;t break <code>yum</code>.</p>
 	<h2>From DevStructure&#8217;s Debian archive</h2>
