@@ -146,8 +146,8 @@ class Resource(dict):
         self.type = type
         self.name = name
 
-    @staticmethod
-    def _dumps(value):
+    @classmethod
+    def _dumps(cls, value):
         """
         Return a value as it should be written.  If the value starts with
         a ':', it will be written as-is.  Otherwise, it will be written as
@@ -161,7 +161,9 @@ class Resource(dict):
             return 'false'
         elif 0 < len(value) and ':' == value[0]:
             return value
-        return repr(value.replace(u'#{', u'\\#{'))
+        elif isinstance(value, cls):
+            return repr(value)
+        return repr(unicode(value).replace(u'#{', u'\\#{'))[1:]
 
     def dumps(self, inline=False):
         """

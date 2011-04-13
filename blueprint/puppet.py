@@ -247,8 +247,8 @@ class Resource(dict):
         """
         return self._type
 
-    @staticmethod
-    def _dumps(value, bare=True):
+    @classmethod
+    def _dumps(cls, value, bare=True):
         """
         Return a value as it should be written.
         """
@@ -263,7 +263,9 @@ class Resource(dict):
             return value
         elif hasattr(value, 'bare') or isinstance(value, BareString):
             return value.replace(u'$', u'\\$')
-        return repr(value).replace(u'$', u'\\$')
+        elif isinstance(value, cls):
+            return repr(value)
+        return repr(unicode(value).replace(u'$', u'\\$'))[1:]
 
     def dumps(self, inline=False, tab=''):
         """
