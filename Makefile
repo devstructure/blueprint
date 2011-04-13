@@ -1,9 +1,11 @@
 VERSION=3.0.2
 
+PYTHON=$(shell which python)
+
 prefix=/usr/local
 bindir=${prefix}/bin
 libdir=${prefix}/lib
-pydir=$(shell python pydir.py ${libdir})
+pydir=$(shell ${PYTHON} pydir.py ${libdir})
 mandir=${prefix}/share/man
 sysconfdir=${prefix}/etc
 
@@ -19,14 +21,20 @@ install: install-bin install-lib install-man install-sysconf
 
 install-bin:
 	install -d $(DESTDIR)$(bindir)
-	install \
-		bin/blueprint \
-		bin/blueprint-apply \
-		bin/blueprint-create \
-		bin/blueprint-destroy \
-		bin/blueprint-list \
-		bin/blueprint-show \
-		$(DESTDIR)$(bindir)/
+	install bin/blueprint $(DESTDIR)$(bindir)/
+	for PROGNAME in \
+		blueprint-apply \
+		blueprint-create \
+		blueprint-destroy \
+		blueprint-list \
+		blueprint-show \
+	; do \
+		{ \
+			echo "#!$(PYTHON)"; \
+			tail -n+2 bin/$$PROGNAME; \
+		} >$(DESTDIR)$(bindir)/$$PROGNAME; \
+		chmod 755 $(DESTDIR)$(bindir)/$$PROGNAME; \
+	done
 
 install-lib:
 	install -d $(DESTDIR)$(pydir)/blueprint/
@@ -50,7 +58,7 @@ install-lib:
 		blueprint/backend/pypi.py \
 		blueprint/backend/sources.py \
 		$(DESTDIR)$(pydir)/blueprint/backend/
-	PYTHONPATH=$(DESTDIR)$(pydir) python -mcompileall \
+	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall \
 		$(DESTDIR)$(pydir)/blueprint
 
 install-man:
@@ -157,12 +165,12 @@ deb:
 	debra destroy debian
 
 pypi:
-	python setup.py bdist_egg
+	$(PYTHON) setup.py bdist_egg
 
 deploy:
 	scp -i ~/production.pem blueprint_$(VERSION)-1_all.deb ubuntu@packages.devstructure.com:
 	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-1_all.deb apt/lucid apt/maverick && rm blueprint_$(VERSION)-1_all.deb && sudo freight cache apt/lucid apt/maverick"
-	python setup.py sdist upload
+	$(PYTHON) setup.py sdist upload
 
 man:
 	find man -name \*.ronn | xargs -n1 ronn \
