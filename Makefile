@@ -1,4 +1,5 @@
 VERSION=3.0.3
+BUILD=2
 
 PYTHON=$(shell which python)
 
@@ -157,19 +158,23 @@ build:
 
 deb:
 	[ "$$(whoami)" = "root" ] || false
-	m4 -D__VERSION__=$(VERSION)-1 control.m4 >control
+	m4 -D__VERSION__=$(VERSION)-$(BUILD) control.m4 >control
 	debra create debian control
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	chown -R root:root debian
-	debra build debian blueprint_$(VERSION)-1_all.deb
+	debra build debian blueprint_$(VERSION)-$(BUILD)_all.deb
 	debra destroy debian
 
 pypi:
 	$(PYTHON) setup.py bdist_egg
 
-deploy:
-	scp -i ~/production.pem blueprint_$(VERSION)-1_all.deb ubuntu@packages.devstructure.com:
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-1_all.deb apt/lucid apt/maverick && rm blueprint_$(VERSION)-1_all.deb && sudo freight cache apt/lucid apt/maverick"
+deploy: deploy-deb deploy-pypi
+
+deploy-deb:
+	scp -i ~/production.pem blueprint_$(VERSION)-$(BUILD)_all.deb ubuntu@packages.devstructure.com:
+	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)_all.deb apt/lucid apt/maverick apt/natty apt/squeeze && rm blueprint_$(VERSION)-$(BUILD)_all.deb && sudo freight cache apt/lucid apt/maverick apt/natty apt/squeeze"
+
+deploy-pypi:
 	$(PYTHON) setup.py sdist upload
 
 man:
