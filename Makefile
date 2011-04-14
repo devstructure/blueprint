@@ -1,7 +1,7 @@
 VERSION=3.0.3
 BUILD=2
 
-PYTHON=$(shell which python)
+PYTHON=$(shell which python2.7 || which python27 || which python2.6 || which python26 || which python)
 
 prefix=/usr/local
 bindir=${prefix}/bin
