@@ -14,7 +14,7 @@
 	cd blueprint
 	make && sudo make install
 
-Not sure what to do next?  The [tutorial](http://devstructure.com/tutorial.html) will take you from setup all the way to production with a simple web application.
+Not sure what to do next?  Take a peek at our [install documentation](http://devstructure.github.com/blueprint/) or try this [tutorial](http://devstructure.com/tutorial.html) that takes you from setup to production with a simple web application.
 
 ## Contribute
 
