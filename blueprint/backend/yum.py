@@ -49,9 +49,13 @@ def exclusions():
     # Start with a few groups that install common packages.
     s = set()
     pattern = re.compile(r'^   (\S+)')
-    p = subprocess.Popen(['yum', 'groupinfo',
-                          'core','base', 'gnome-desktop'],
-                         close_fds=True, stdout=subprocess.PIPE)
+    try:
+        p = subprocess.Popen(['yum', 'groupinfo',
+                              'core','base', 'gnome-desktop'],
+                             close_fds=True, stdout=subprocess.PIPE)
+    except OSError:
+        open(CACHE, 'w').close()
+        return s
     for line in p.stdout:
         match = pattern.match(line)
         if match is None:
