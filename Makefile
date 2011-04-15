@@ -16,7 +16,7 @@ clean:
 	rm -f \
 		control \
 		blueprint/**.pyc \
-		man/man*/*.[12345678] man/man*/*.html
+		man/man*/*.html
 
 install: install-bin install-lib install-man install-sysconf
 
