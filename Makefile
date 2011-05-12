@@ -2,6 +2,7 @@ VERSION=3.0.3
 BUILD=2
 
 PYTHON=$(shell which python2.7 || which python27 || which python2.6 || which python26 || which python)
+PYTHON_VERSION=$(shell ${PYTHON} -c "from distutils.sysconfig import get_python_version; print(get_python_version())")
 
 prefix=/usr/local
 bindir=${prefix}/bin
@@ -162,7 +163,7 @@ deb:
 	debra create debian control
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	chown -R root:root debian
-	debra build debian blueprint_$(VERSION)-$(BUILD)_all.deb
+	debra build debian blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb
 	debra destroy debian
 
 pypi:
@@ -171,8 +172,15 @@ pypi:
 deploy: deploy-deb deploy-pypi
 
 deploy-deb:
-	scp -i ~/production.pem blueprint_$(VERSION)-$(BUILD)_all.deb ubuntu@packages.devstructure.com:
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)_all.deb apt/lucid apt/maverick apt/natty apt/squeeze && rm blueprint_$(VERSION)-$(BUILD)_all.deb && sudo freight cache apt/lucid apt/maverick apt/natty apt/squeeze"
+	scp -i ~/production.pem blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb ubuntu@packages.devstructure.com:
+	make deploy-deb-$(PYTHON_VERSION)
+	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "rm blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb"
+
+deploy-deb-2.6:
+	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/lucid apt/maverick apt/squeeze && sudo freight cache apt/lucid apt/maverick apt/squeeze"
+
+deploy-deb-2.7:
+	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/natty && sudo freight cache apt/natty"
 
 deploy-pypi:
 	$(PYTHON) setup.py sdist upload
