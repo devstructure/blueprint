@@ -10,6 +10,10 @@ import subprocess
 import time
 import urllib
 
+# This must be called early - before the rest of the blueprint library loads.
+logging.basicConfig(format='# [blueprint] %(message)s',
+                    level=logging.INFO)
+
 import backend
 import chef
 import context_managers
@@ -18,9 +22,6 @@ from manager import Manager
 import puppet
 import sh
 import util
-
-logging.basicConfig(format='# [blueprint] %(message)s',
-                    level=logging.INFO)
 
 
 class Blueprint(dict):
