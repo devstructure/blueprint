@@ -49,7 +49,10 @@ except KeyError:
     sys.exit(1)
 
 if options.generate is None:
-    print(b.dumps())
+    try:
+        print(b.dumps())
+    except IOError:
+        pass
 else:
     try:
         filename = getattr(b, options.generate)().dumpf()
