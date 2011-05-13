@@ -275,6 +275,9 @@ def file(pathname, ignored=False):
 
 def package(manager, package, ignored=False):
     """
+    Iterate over package exclusion rules looking for exact matches.  As with
+    files, search for a negated rule after finding a match.  Return True to
+    indicate the package should be ignored.
     """
     for m, p, negate in _cache['packages']:
         if ignored != negate or manager != m or package != p:
