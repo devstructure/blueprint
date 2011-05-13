@@ -214,24 +214,45 @@ _cache = {
 try:
     for pattern in open(os.path.expanduser('~/.blueprintignore')):
         pattern = pattern.rstrip()
+
+        # Comments and blank lines.
         if '' == pattern or '#' == pattern[0]:
             continue
+
+        # Negated lines.
         if '!' == pattern[0]:
             pattern = pattern[1:]
             ignored = True
         else:
             ignored = False
+
+        # Normalize file resources, which don't need the : and type qualifier,
+        # into the same format as others, like packages.
         if ':' == pattern[0]:
-            parts = pattern[1:].split('/')
-            if 2 > len(parts):
+            try:
+                restype, pattern = pattern[1:].split(':', 2)
+            except ValueError:
                 continue
-            restype = parts.pop(0)
-            if restype not in _cache:
-                continue
-            parts.append(False)
-            _cache[restype].append(tuple(parts))
         else:
+            restype = 'files'
+        if restype not in _cache:
+            continue
+
+        if 'files' == restype:
             _cache['files'].append((pattern, ignored))
+
+        elif 'packages' == restype:
+            try:
+                manager, package = pattern.split('/')
+            except ValueError:
+                logging.warning('invalid package ignore "{0}"'.format(pattern))
+                continue
+            _cache['packages'].append((manager, package, False))
+
+        else:
+            logging.warning('unrecognized ignore type "{0}"'.format(restype))
+            continue
+
 except IOError:
     pass
 
