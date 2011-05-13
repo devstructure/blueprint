@@ -8,6 +8,8 @@ import glob
 import os.path
 import sys
 
+import blueprint
+
 __all__ = [os.path.basename(filename)[:-3]
            for filename in glob.glob(os.path.join(os.path.dirname(__file__),
                                                   '[!_]*.py'))]
