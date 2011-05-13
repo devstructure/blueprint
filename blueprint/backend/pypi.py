@@ -46,6 +46,11 @@ def pypi(b):
                 package, version = match.group(1, 2)
                 pathname = os.path.join(dirname, entry)
 
+                # Symbolic links indicate this is actually a system package
+                # that injects files into the PYTHONPATH.
+                if os.path.islink(pathname):
+                    continue
+
                 # Assume this is a Debian-based system and let `OSError`
                 # looking for `dpkg-query` prove this is RPM-based.  In
                 # that case, the dependencies get a bit simpler.
@@ -82,7 +87,8 @@ def pypi(b):
                     # This package was installed via `pip`.  Figure out how
                     # `pip` was installed and use that as this package's
                     # manager.
-                    elif pattern_egginfo.search(entry):
+                    elif pattern_egginfo.search(entry) and os.path.exists(
+                        os.path.join(pathname, 'installed-files.txt')):
                         p = subprocess.Popen(['dpkg-query',
                                               '-W',
                                               'python-pip'],
@@ -128,7 +134,8 @@ def pypi(b):
                     # This package was installed via `pip`.  Figure out how
                     # `pip` was installed and use that as this package's
                     # manager.
-                    elif pattern_egginfo.search(entry):
+                    elif pattern_egginfo.search(entry) and os.path.exists(
+                        os.path.join(pathname, 'installed-files.txt')):
                         p = subprocess.Popen(
                             ['rpm', '-q', 'python-pip'],
                             close_fds=True,
