@@ -8,6 +8,8 @@ import os
 import re
 import subprocess
 
+from blueprint import ignore
+
 
 def pypi(b):
     logging.info('searching for Python packages')

@@ -13,7 +13,7 @@ import re
 import stat
 import subprocess
 
-from blueprint.ignore import ignore
+from blueprint import ignore
 
 
 # An extra list of pathnames and MD5 sums that will be checked after no
@@ -71,7 +71,7 @@ def files(b):
     for dirpath, dirnames, filenames in os.walk('/etc'):
 
         # Determine if this entire directory should be ignored by default.
-        ignored = ignore(dirpath)
+        ignored = ignore.file(dirpath)
 
         # Track the ctime of each file in this directory.  Weed out false
         # positives by ignoring files with common ctimes.
@@ -95,7 +95,7 @@ def files(b):
             # share their ctime with other files in the directory.  This
             # is a very strong indication that the file is original to
             # the system and should be ignored.
-            if ignore(pathname, ignored or 1 < ctimes[s.st_ctime]):
+            if ignore.file(pathname, ignored or 1 < ctimes[s.st_ctime]):
                 continue
 
             # The content is used even for symbolic links to determine whether
@@ -128,9 +128,10 @@ def files(b):
                 md5sums = []
             if 0 < len(md5sums) \
                 and hashlib.md5(content).hexdigest() in md5sums \
-                and ignore(pathname, True):
+                and ignore.file(pathname, True):
                 continue
-            if True in [_rpm_V(package, pathname) and ignore(pathname, True)
+            if True in [_rpm_V(package, pathname) and ignore.file(pathname,
+                                                                  True)
                         for package in packages]:
                 continue
 
@@ -139,7 +140,7 @@ def files(b):
             if '/etc/fuse.conf' == pathname:
                 try:
                     if 'user_allow_other\n' == open(pathname).read():
-                        if ignore(pathname, True):
+                        if ignore.file(pathname, True):
                             continue
                 except IOError:
                     pass

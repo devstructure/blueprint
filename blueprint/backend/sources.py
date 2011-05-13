@@ -12,6 +12,8 @@ import re
 import stat
 import tarfile
 
+from blueprint import ignore
+
 
 def sources(b):
     logging.info('searching for software built from source')

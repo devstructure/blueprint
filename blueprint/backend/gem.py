@@ -9,6 +9,7 @@ import re
 import subprocess
 
 from blueprint import util
+from blueprint import ignore
 
 
 def gem(b):
