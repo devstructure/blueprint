@@ -6,14 +6,20 @@ blueprintignore(5) -- ignore specific files when creating blueprints
 	/etc/foo
 	!foo/bar
 	baz*
+	:files:/etc/foobar
+	:packages:apt/build-essential
 
 ## DESCRIPTION
 
-Lines in `~/.blueprintignore` are interpreted as in `gitignore`(5).  Blank lines and lines that begin with a `#` will be ignored.  Patterns that begin with a `!` are negated.  As files are considered for inclusion in a blueprint, the last matching line in `~/.blueprintignore` wins.
+Lines in `~/.blueprintignore` are interpreted as in `gitignore`(5).  Blank lines and lines that begin with a `#` will be ignored.  Patterns that begin with a `!` are negated.  As resources are considered for inclusion in a blueprint, the last matching line in `~/.blueprintignore` wins.
 
-Patterns that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
+The general form of each line is `:`_type_`:`_resource_, where _type_ is one of `files` or `packages`.  The `files` type is assumed and typically seen without the full `:`-prefixed form.  Resources with type `packages` are of the format _manager_`/`_package_.
+
+File patterns that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
 
 As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to create the blueprint is stored as `.gitignore` in the local blueprint repository.
+
+All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.
 
 The following files and directories are part of the default ignore list.  They can be negated using `!` just like any other pattern.
 
