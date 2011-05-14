@@ -169,7 +169,9 @@ _cache = {
 
 # Cache the patterns stored in the `~/.blueprintignore` file.
 try:
-    for pattern in open(os.path.expanduser('~/.blueprintignore')):
+    f = open(os.path.expanduser('~/.blueprintignore'))
+    logging.info('parsing ~/.blueprintignore')
+    for pattern in f:
         pattern = pattern.rstrip()
 
         # Comments and blank lines.
@@ -205,6 +207,8 @@ try:
                 logging.warning('invalid package ignore "{0}"'.format(pattern))
                 continue
             _cache['package'].append((manager, package, False))
+            for dep in getattr(deps, manager, lambda(s): [])(package):
+                _cache['package'].append((manager, dep, False))
 
         else:
             logging.warning('unrecognized ignore type "{0}"'.format(restype))
