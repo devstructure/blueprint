@@ -185,9 +185,9 @@ try:
         # Negated lines.
         if '!' == pattern[0]:
             pattern = pattern[1:]
-            ignored = True
+            negate = True
         else:
-            ignored = False
+            negate = False
 
         # Normalize file resources, which don't need the : and type qualifier,
         # into the same format as others, like packages.
@@ -201,19 +201,26 @@ try:
         if restype not in _cache:
             continue
 
+        # Ignore or unignore a file, glob, or directory tree.
         if 'file' == restype:
-            _cache['file'].append((pattern, ignored))
+            _cache['file'].append((pattern, negate))
 
+        # Ignore a package and its dependencies or unignore a single package.
+        # Empirically, the best balance of power and granularity comes from
+        # this arrangement.  Take build-esseantial's mutual dependence with
+        # dpkg-dev as an example of why.
         elif 'package' == restype:
             try:
                 manager, package = pattern.split('/')
             except ValueError:
                 logging.warning('invalid package ignore "{0}"'.format(pattern))
                 continue
-            _cache['package'].append((manager, package, ignored))
-            for dep in getattr(deps, manager, lambda(s): [])(package):
-                _cache['package'].append((manager, dep, ignored))
+            _cache['package'].append((manager, package, negate))
+            if not negate:
+                for dep in getattr(deps, manager, lambda(s): [])(package):
+                    _cache['package'].append((manager, dep, negate))
 
+        # Swing and a miss.
         else:
             logging.warning('unrecognized ignore type "{0}"'.format(restype))
             continue
