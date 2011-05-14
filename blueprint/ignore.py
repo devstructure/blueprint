@@ -79,7 +79,11 @@ def apt_exclusions():
     logging.info('searching for APT packages to exclude')
 
     # Start with the root package for the various Ubuntu installations.
-    s = set(['ubuntu-minimal', 'ubuntu-standard', 'ubuntu-desktop'])
+    s = set(['linux-generic-pae',
+             'linux-server',
+             'ubuntu-desktop',
+             'ubuntu-minimal',
+             'ubuntu-standard'])
 
     # Find the essential and required packages.  Every server's got 'em, no
     # one wants to muddle their blueprint with 'em.
