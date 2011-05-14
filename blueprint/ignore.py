@@ -205,8 +205,8 @@ def yum_exclusions():
 
 # Cache things that are ignored by default first.
 _cache = {
-    'files': [(pattern, False) for pattern in IGNORE],
-    'packages': [('apt', package, False) for package in apt_exclusions()] +
+    'file': [(pattern, False) for pattern in IGNORE],
+    'package': [('apt', package, False) for package in apt_exclusions()] +
                 [('yum', package, False) for package in yum_exclusions()],
 }
 
@@ -234,20 +234,20 @@ try:
             except ValueError:
                 continue
         else:
-            restype = 'files'
+            restype = 'file'
         if restype not in _cache:
             continue
 
-        if 'files' == restype:
-            _cache['files'].append((pattern, ignored))
+        if 'file' == restype:
+            _cache['file'].append((pattern, ignored))
 
-        elif 'packages' == restype:
+        elif 'package' == restype:
             try:
                 manager, package = pattern.split('/')
             except ValueError:
                 logging.warning('invalid package ignore "{0}"'.format(pattern))
                 continue
-            _cache['packages'].append((manager, package, False))
+            _cache['package'].append((manager, package, False))
 
         else:
             logging.warning('unrecognized ignore type "{0}"'.format(restype))
@@ -283,7 +283,7 @@ def file(pathname, ignored=False):
     # include the file.  If only an exclusion rule matches, exclude the
     # file.  If an inclusion rule also matches, include the file.
     filename = os.path.basename(pathname)
-    for pattern, negate in _cache['files']:
+    for pattern, negate in _cache['file']:
         if ignored != negate or not match(filename, pathname, pattern):
             continue
         if ignored:
@@ -300,7 +300,7 @@ def package(manager, package, ignored=False):
     files, search for a negated rule after finding a match.  Return True to
     indicate the package should be ignored.
     """
-    for m, p, negate in _cache['packages']:
+    for m, p, negate in _cache['package']:
         if ignored != negate or manager != m or package != p and '*' != p:
             continue
         if ignored:

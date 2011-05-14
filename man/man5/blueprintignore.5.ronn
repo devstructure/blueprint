@@ -1,19 +1,19 @@
-blueprintignore(5) -- ignore specific files when creating blueprints
-====================================================================
+blueprintignore(5) -- ignore specific resources when creating blueprints
+========================================================================
 
 ## SYNOPSIS
 
 	/etc/foo
 	!foo/bar
 	baz*
-	:files:/etc/foobar
-	:packages:apt/build-essential
+	:file:/etc/foobar
+	:package:apt/build-essential
 
 ## DESCRIPTION
 
 Lines in `~/.blueprintignore` are interpreted as in `gitignore`(5).  Blank lines and lines that begin with a `#` will be ignored.  Patterns that begin with a `!` are negated.  As resources are considered for inclusion in a blueprint, the last matching line in `~/.blueprintignore` wins.
 
-The general form of each line is `:`_type_`:`_resource_, where _type_ is one of `files` or `packages`.  The `files` type is assumed and typically seen without the full `:`-prefixed form.  Resources with type `packages` are of the format _manager_`/`_package_.
+The general form of each line is `:`_type_`:`_resource_, where _type_ is one of `file` or `package`.  The `file` type is assumed and typically seen without the full `:`-prefixed form.  Resources with type `packages` are of the format _manager_`/`_package_.
 
 File patterns that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
 
