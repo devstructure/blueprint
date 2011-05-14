@@ -301,7 +301,7 @@ def package(manager, package, ignored=False):
     indicate the package should be ignored.
     """
     for m, p, negate in _cache['packages']:
-        if ignored != negate or manager != m or package != p:
+        if ignored != negate or manager != m or package != p and '*' != p:
             continue
         if ignored:
             return False
