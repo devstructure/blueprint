@@ -367,7 +367,7 @@ class File(Resource):
                 self['content'] = self.content
                 del self.content
         else:
-            if self.content is not None:
+            if self.content is not None and 'source' not in self:
                 self['content'] = BareString(u'template("{0}/{1}")'.format(
                     self.modulename,
                     self.name[1:]))
