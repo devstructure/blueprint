@@ -277,8 +277,8 @@ class Blueprint(dict):
                 owner='root',
                 group='root',
                 mode='0644',
-                source='puppet:///{0}/{1}'.format(self.name,
-                                                  pathname[1:])))
+                source='puppet:///modules/{0}/{1}'.format(self.name,
+                                                          pathname[1:])))
             m['sources'].add(puppet.Exec(
                 'tar xf {0}'.format(pathname),
                 cwd=dirname,
