@@ -14,13 +14,9 @@ import urllib
 logging.basicConfig(format='# [blueprint] %(message)s',
                     level=logging.INFO)
 
-import backend
-import chef
 import context_managers
 import git
 from manager import Manager
-import puppet
-import sh
 import util
 
 
@@ -65,6 +61,7 @@ class Blueprint(dict):
         # Create a new blueprint object and populate it based on this server.
         if create:
             super(Blueprint, self).__init__()
+            import backend
             for funcname in backend.__all__:
                 getattr(backend, funcname)(self)
 
@@ -260,6 +257,7 @@ class Blueprint(dict):
         """
         Generate Puppet code.
         """
+        import puppet
         m = puppet.Manifest(self.name, comment=self.DISCLAIMER)
 
         # Set the default `PATH` for exec resources.
@@ -401,6 +399,7 @@ class Blueprint(dict):
         """
         Generate Chef code.
         """
+        import chef
         c = chef.Cookbook(self.name, comment=self.DISCLAIMER)
 
         # Extract source tarballs.
@@ -488,6 +487,7 @@ class Blueprint(dict):
         """
         Generate shell code.
         """
+        import sh
         s = sh.Script(self.name, comment=self.DISCLAIMER)
 
         # Extract source tarballs.
