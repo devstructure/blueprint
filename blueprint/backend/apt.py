@@ -10,7 +10,7 @@ from blueprint import ignore
 
 
 def apt(b):
-    logging.info('searching for apt packages')
+    logging.info('searching for APT packages')
 
     # Try for the full list of packages.  If this fails, don't even
     # bother with the rest because this is probably a Yum/RPM-based

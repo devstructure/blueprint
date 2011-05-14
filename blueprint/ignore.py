@@ -107,7 +107,7 @@ def apt_exclusions():
         return set([line.rstrip() for line in open(CACHE)])
     except IOError:
         pass
-    logging.info('searching for apt packages to exclude')
+    logging.info('searching for APT packages to exclude')
 
     # Start with the root package for the various Ubuntu installations.
     s = set(['ubuntu-minimal', 'ubuntu-standard', 'ubuntu-desktop'])
@@ -131,7 +131,7 @@ def apt_exclusions():
     s = apt_deps(s)
 
     # Write to a cache.
-    logging.info('caching excluded apt packages')
+    logging.info('caching excluded APT packages')
     f = open(CACHE, 'w')
     for package in sorted(s):
         f.write('{0}\n'.format(package))
@@ -184,7 +184,7 @@ def yum_exclusions():
         return set([line.rstrip() for line in open(CACHE)])
     except IOError:
         pass
-    logging.info('searching for yum packages to exclude')
+    logging.info('searching for Yum packages to exclude')
 
     # Start with a few groups that install common packages.
     s = set()
@@ -212,7 +212,7 @@ def yum_exclusions():
     s = yum_deps(s)
 
     # Write to a cache.
-    logging.info('caching excluded yum packages')
+    logging.info('caching excluded Yum packages')
     f = open(CACHE, 'w')
     for package in sorted(s):
         f.write('{0}\n'.format(package))

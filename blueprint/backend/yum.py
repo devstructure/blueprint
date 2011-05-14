@@ -6,7 +6,7 @@ import logging
 import subprocess
 
 def yum(b):
-    logging.info('searching for yum packages')
+    logging.info('searching for Yum packages')
 
     # Try for the full list of packages.  If this fails, don't even
     # bother with the rest because this is probably a Debian-based
