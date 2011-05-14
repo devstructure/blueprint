@@ -210,9 +210,9 @@ try:
             except ValueError:
                 logging.warning('invalid package ignore "{0}"'.format(pattern))
                 continue
-            _cache['package'].append((manager, package, False))
+            _cache['package'].append((manager, package, ignored))
             for dep in getattr(deps, manager, lambda(s): [])(package):
-                _cache['package'].append((manager, dep, False))
+                _cache['package'].append((manager, dep, ignored))
 
         else:
             logging.warning('unrecognized ignore type "{0}"'.format(restype))
