@@ -251,10 +251,7 @@ def file(pathname, ignored=False):
     for pattern, negate in _cache['file']:
         if ignored != negate or not match(filename, pathname, pattern):
             continue
-        if ignored:
-            return False
-        else:
-            ignored = True
+        ignored = not ignored
 
     return ignored
 
@@ -268,8 +265,5 @@ def package(manager, package, ignored=False):
     for m, p, negate in _cache['package']:
         if ignored != negate or manager != m or package != p and '*' != p:
             continue
-        if ignored:
-            return False
-        else:
-            ignored = True
+        ignored = not ignored
     return ignored
