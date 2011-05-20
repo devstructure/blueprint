@@ -24,44 +24,51 @@ from blueprint import ignore
 # `/usr/share` in the `postinst` program.
 #
 # XXX Update `blueprintignore`(5) if you make changes here.
-MD5SUMS = {'/etc/adduser.conf': '/usr/share/adduser/adduser.conf',
+MD5SUMS = {'/etc/adduser.conf': ['/usr/share/adduser/adduser.conf'],
            '/etc/apparmor.d/tunables/home.d/ubuntu':
-               '2a88811f7b763daa96c20b20269294a4',
-           '/etc/chatscripts/provider': '/usr/share/ppp/provider.chatscript',
-           '/etc/default/console-setup': '0fb6cec686d0410993bdf17192bee7d6',
-           '/etc/default/grub': 'ee9df6805efb2a7d1ba3f8016754a119',
-           '/etc/default/irqbalance': '7e10d364b9f72b11d7bf7bd1cfaeb0ff',
-           '/etc/default/locale': '164aba1ef1298affaa58761647f2ceba',
-           '/etc/default/rcS': '/usr/share/initscripts/default.rcS',
-           '/etc/environment': '44ad415fac749e0c39d6302a751db3f2',
-           '/etc/hosts.allow': '8c44735847c4f69fb9e1f0d7a32e94c1',
-           '/etc/hosts.deny': '92a0a19db9dc99488f00ac9e7b28eb3d',
+               ['2a88811f7b763daa96c20b20269294a4'],
+           '/etc/chatscripts/provider': ['/usr/share/ppp/provider.chatscript'],
+           '/etc/default/console-setup':
+               ['0fb6cec686d0410993bdf17192bee7d6',
+                'b684fd43b74ac60c6bdafafda8236ed3',
+                '/usr/share/console-setup/console-setup'],
+           '/etc/default/grub': ['ee9df6805efb2a7d1ba3f8016754a119',
+                                 'ad9283019e54cedfc1f58bcc5e615dce'],
+           '/etc/default/irqbalance': ['7e10d364b9f72b11d7bf7bd1cfaeb0ff'],
+           '/etc/default/keyboard': ['06d66484edaa2fbf89aa0c1ec4989857'],
+           '/etc/default/locale': ['164aba1ef1298affaa58761647f2ceba',
+                                   '7c32189e775ac93487aa4a01dffbbf76'],
+           '/etc/default/rcS': ['/usr/share/initscripts/default.rcS'],
+           '/etc/environment': ['44ad415fac749e0c39d6302a751db3f2'],
+           '/etc/hosts.allow': ['8c44735847c4f69fb9e1f0d7a32e94c1'],
+           '/etc/hosts.deny': ['92a0a19db9dc99488f00ac9e7b28eb3d'],
            '/etc/initramfs-tools/modules':
-                '/usr/share/initramfs-tools/modules',
-           '/etc/inputrc': '/usr/share/readline/inputrc',
-           '/etc/iscsi/iscsid.conf': '6c6fd718faae84a4ab1b276e78fea471',
-           '/etc/kernel-img.conf': 'f1ed9c3e91816337aa7351bdf558a442',
-           '/etc/ld.so.conf': '4317c6de8564b68d628c21efa96b37e4',
-           '/etc/networks': '/usr/share/base-files/networks',
-           '/etc/nsswitch.conf': '/usr/share/base-files/nsswitch.conf',
-           '/etc/ppp/chap-secrets': 'faac59e116399eadbb37644de6494cc4',
-           '/etc/ppp/pap-secrets': '698c4d412deedc43dde8641f84e8b2fd',
-           '/etc/ppp/peers/provider': '/usr/share/ppp/provider.peer',
-           '/etc/profile': '/usr/share/base-files/profile',
-           '/etc/python/debian_config': '7f4739eb8858d231601a5ed144099ac8',
-           '/etc/rc.local': '10fd9f051accb6fd1f753f2d48371890',
+                ['/usr/share/initramfs-tools/modules'],
+           '/etc/inputrc': ['/usr/share/readline/inputrc'],
+           '/etc/iscsi/iscsid.conf': ['6c6fd718faae84a4ab1b276e78fea471'],
+           '/etc/kernel-img.conf': ['f1ed9c3e91816337aa7351bdf558a442'],
+           '/etc/ld.so.conf': ['4317c6de8564b68d628c21efa96b37e4'],
+           '/etc/networks': ['/usr/share/base-files/networks'],
+           '/etc/nsswitch.conf': ['/usr/share/base-files/nsswitch.conf'],
+           '/etc/ppp/chap-secrets': ['faac59e116399eadbb37644de6494cc4'],
+           '/etc/ppp/pap-secrets': ['698c4d412deedc43dde8641f84e8b2fd'],
+           '/etc/ppp/peers/provider': ['/usr/share/ppp/provider.peer'],
+           '/etc/profile': ['/usr/share/base-files/profile'],
+           '/etc/python/debian_config': ['7f4739eb8858d231601a5ed144099ac8'],
+           '/etc/rc.local': ['10fd9f051accb6fd1f753f2d48371890'],
            '/etc/rsyslog.d/50-default.conf':
-                '/usr/share/rsyslog/50-default.conf',
-           '/etc/security/opasswd': 'd41d8cd98f00b204e9800998ecf8427e',
-           '/etc/sgml/xml-core.cat': 'bcd454c9bf55a3816a134f9766f5928f',
-           '/etc/shells': '0e85c87e09d716ecb03624ccff511760',
-           '/etc/ssh/sshd_config': 'e24f749808133a27d94fda84a89bb27b',
-           '/etc/sudoers': '02f74ccbec48997f402a063a172abb48',
-           '/etc/ufw/after.rules': '/usr/share/ufw/after.rules',
-           '/etc/ufw/after6.rules': '/usr/share/ufw/after6.rules',
-           '/etc/ufw/before.rules': '/usr/share/ufw/before.rules',
-           '/etc/ufw/before6.rules': '/usr/share/ufw/before6.rules',
-           '/etc/ufw/ufw.conf': '/usr/share/ufw/ufw.conf'}
+                ['/usr/share/rsyslog/50-default.conf'],
+           '/etc/security/opasswd': ['d41d8cd98f00b204e9800998ecf8427e'],
+           '/etc/sgml/xml-core.cat': ['bcd454c9bf55a3816a134f9766f5928f'],
+           '/etc/shells': ['0e85c87e09d716ecb03624ccff511760'],
+           '/etc/ssh/sshd_config': ['e24f749808133a27d94fda84a89bb27b',
+                                    '8caefdd9e251b7cc1baa37874149a870'],
+           '/etc/sudoers': ['02f74ccbec48997f402a063a172abb48'],
+           '/etc/ufw/after.rules': ['/usr/share/ufw/after.rules'],
+           '/etc/ufw/after6.rules': ['/usr/share/ufw/after6.rules'],
+           '/etc/ufw/before.rules': ['/usr/share/ufw/before.rules'],
+           '/etc/ufw/before6.rules': ['/usr/share/ufw/before6.rules'],
+           '/etc/ufw/ufw.conf': ['/usr/share/ufw/ufw.conf']}
 
 
 def files(b):
@@ -115,15 +122,17 @@ def files(b):
             if 0 < len(packages):
                 md5sums = [_dpkg_md5sum(package, pathname)
                            for package in packages]
+                # TODO Equivalent checksumming for RPMs.
             elif pathname in MD5SUMS:
-                if '/' == MD5SUMS[pathname][0]:
+                md5sums = MD5SUMS[pathname]
+                for i in range(len(md5sums)):
+                    if '/' != md5sums[i][0]:
+                        continue
                     try:
-                        md5sums = [hashlib.md5(open(
-                            MD5SUMS[pathname]).read()).hexdigest()]
+                        md5sums[i] = hashlib.md5(open(
+                            md5sums[i]).read()).hexdigest()
                     except IOError:
-                        md5sums = []
-                else:
-                    md5sums = [MD5SUMS[pathname]]
+                        pass
             else:
                 md5sums = []
             if 0 < len(md5sums) \

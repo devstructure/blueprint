@@ -28,10 +28,12 @@ The following files and directories are part of the default ignore list.  They c
 * `*.dpkg-*`
 * `/etc/.git`
 * `/etc/.pwd.lock`
+* `/etc/X11/default-display-manager`
 * `/etc/alternatives`
 * `/etc/apparmor`
 * `/etc/apparmor.d`
 * `/etc/ca-certificates.conf`
+* `/etc/console-setup`
 * `/etc/dpkg/origins/default`
 * `/etc/fstab`
 * `/etc/group-`
@@ -64,6 +66,7 @@ The following files and directories are part of the default ignore list.  They c
 * `/etc/rcS.d`
 * `/etc/shadow-`
 * `/etc/shadow`
+* `/etc/ssh/ssh_host_*_key*`
 * `/etc/ssl/certs`
 * `/etc/sysconfig/network`
 * `/etc/timezone`
@@ -77,6 +80,7 @@ The following files are ignored if their content matches an expected hash.  They
 * `/etc/default/console-setup`
 * `/etc/default/grub`
 * `/etc/default/irqbalance`
+* `/etc/default/keyboard`
 * `/etc/default/locale`
 * `/etc/default/rcS`
 * `/etc/environment`
