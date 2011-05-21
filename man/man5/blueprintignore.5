@@ -1,10 +1,10 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINTIGNORE" "5" "April 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINTIGNORE" "5" "May 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
-\fBblueprintignore\fR \- ignore specific files when creating blueprints
+\fBblueprintignore\fR \- ignore specific resources when creating blueprints
 .
 .SH "SYNOPSIS"
 .
@@ -13,17 +13,28 @@
 /etc/foo
 !foo/bar
 baz*
+:file:/etc/foobar
+:package:apt/build\-essential
 .
 .fi
 .
 .SH "DESCRIPTION"
-Lines in \fB~/\.blueprintignore\fR are interpreted as in \fBgitignore\fR(5)\. Blank lines and lines that begin with a \fB#\fR will be ignored\. Patterns that begin with a \fB!\fR are negated\. As files are considered for inclusion in a blueprint, the last matching line in \fB~/\.blueprintignore\fR wins\.
+Lines in \fB~/\.blueprintignore\fR are interpreted as in \fBgitignore\fR(5)\. Blank lines and lines that begin with a \fB#\fR will be ignored\. Patterns that begin with a \fB!\fR are negated\. As resources are considered for inclusion in a blueprint, the last matching line in \fB~/\.blueprintignore\fR wins\.
 .
 .P
-Patterns that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
+The general form of each line is \fB:\fR\fItype\fR\fB:\fR\fIresource\fR, where \fItype\fR is one of \fBfile\fR or \fBpackage\fR\. The \fBfile\fR type is assumed and typically seen without the full \fB:\fR\-prefixed form\.
+.
+.P
+Resources with type \fBpackages\fR are of the format \fImanager\fR\fB/\fR\fIpackage\fR\. Ignored packages implicitly ignore their dependencies as well\. Unignored packages (that is, package resources prefixed with \fB!\fR) affect only themselves and not their dependencies\.
+.
+.P
+File patterns that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
 .
 .P
 As part of \fBblueprint\-create\fR(1), the \fB~/\.blueprintignore\fR file that was used to create the blueprint is stored as \fB\.gitignore\fR in the local blueprint repository\.
+.
+.P
+All APT\- or Yum\-managed packages considered essential to the system are part of the default ignore list\.
 .
 .P
 The following files and directories are part of the default ignore list\. They can be negated using \fB!\fR just like any other pattern\.
@@ -38,6 +49,9 @@ The following files and directories are part of the default ignore list\. They c
 \fB/etc/\.pwd\.lock\fR
 .
 .IP "\(bu" 4
+\fB/etc/X11/default\-display\-manager\fR
+.
+.IP "\(bu" 4
 \fB/etc/alternatives\fR
 .
 .IP "\(bu" 4
@@ -48,6 +62,9 @@ The following files and directories are part of the default ignore list\. They c
 .
 .IP "\(bu" 4
 \fB/etc/ca\-certificates\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/console\-setup\fR
 .
 .IP "\(bu" 4
 \fB/etc/dpkg/origins/default\fR
@@ -146,6 +163,9 @@ The following files and directories are part of the default ignore list\. They c
 \fB/etc/shadow\fR
 .
 .IP "\(bu" 4
+\fB/etc/ssh/ssh_host_*_key*\fR
+.
+.IP "\(bu" 4
 \fB/etc/ssl/certs\fR
 .
 .IP "\(bu" 4
@@ -179,6 +199,9 @@ The following files are ignored if their content matches an expected hash\. They
 .
 .IP "\(bu" 4
 \fB/etc/default/irqbalance\fR
+.
+.IP "\(bu" 4
+\fB/etc/default/keyboard\fR
 .
 .IP "\(bu" 4
 \fB/etc/default/locale\fR
