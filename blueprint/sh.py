@@ -24,7 +24,9 @@ class Script(object):
 
     def add(self, s='', *args, **kwargs):
         if 'raw' in kwargs:
-            self.out.append(kwargs['raw'].replace(u'$', u'\\$'))
+            self.out.append(kwargs['raw'].
+                replace(u'$', u'\\$').
+                replace(u'`', u'\\`'))
         else:
             self.out.append(u'{0}\n'.format(s).format(*args))
         for filename, content in kwargs.get('sources', {}).iteritems():
