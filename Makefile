@@ -43,7 +43,9 @@ install-lib:
 	install -m644 \
 		blueprint/chef.py \
 		blueprint/context_managers.py \
+		blueprint/deps.py \
 		blueprint/git.py \
+		blueprint/ignore.py \
 		blueprint/__init__.py \
 		blueprint/manager.py \
 		blueprint/puppet.py \
@@ -104,8 +106,12 @@ uninstall-lib:
 		$(DESTDIR)$(pydir)/blueprint/chef.pyc \
 		$(DESTDIR)$(pydir)/blueprint/context_managers.py \
 		$(DESTDIR)$(pydir)/blueprint/context_managers.pyc \
+		$(DESTDIR)$(pydir)/blueprint/deps.py \
+		$(DESTDIR)$(pydir)/blueprint/deps.pyc \
 		$(DESTDIR)$(pydir)/blueprint/git.py \
 		$(DESTDIR)$(pydir)/blueprint/git.pyc \
+		$(DESTDIR)$(pydir)/blueprint/ignore.py \
+		$(DESTDIR)$(pydir)/blueprint/ignore.pyc \
 		$(DESTDIR)$(pydir)/blueprint/__init__.py \
 		$(DESTDIR)$(pydir)/blueprint/__init__.pyc \
 		$(DESTDIR)$(pydir)/blueprint/manager.py \
