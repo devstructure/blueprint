@@ -1,6 +1,7 @@
 import fnmatch
 import glob
 import logging
+import os
 import os.path
 import re
 import subprocess
@@ -60,6 +61,14 @@ IGNORE = ('*.dpkg-*',
           '/etc/udev/rules.d/70-persistent-*.rules')
 
 
+def _cache_open(pathname, mode):
+    f = open(pathname, mode)
+    if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
+        uid = int(os.environ['SUDO_UID'])
+        gid = int(os.environ['SUDO_GID'])
+        os.fchown(f.fileno(), uid, gid)
+    return f
+
 def apt_exclusions():
     """
     Return the set of packages that should never appear in a blueprint because
@@ -97,10 +106,14 @@ def apt_exclusions():
     # Find the essential and required packages.  Every server's got 'em, no
     # one wants to muddle their blueprint with 'em.
     for field in ('Essential', 'Priority'):
-        p = subprocess.Popen(['dpkg-query',
-                              '-f=${{Package}} ${{{0}}}\n'.format(field),
-                              '-W'],
-                             close_fds=True, stdout=subprocess.PIPE)
+        try:
+            p = subprocess.Popen(['dpkg-query',
+                                  '-f=${{Package}} ${{{0}}}\n'.format(field),
+                                  '-W'],
+                                 close_fds=True, stdout=subprocess.PIPE)
+        except OSError:
+            _cache_open(CACHE, 'w').close()
+            return s
         for line in p.stdout:
             try:
                 package, property = line.rstrip().split()
@@ -114,7 +127,7 @@ def apt_exclusions():
 
     # Write to a cache.
     logging.info('caching excluded APT packages')
-    f = open(CACHE, 'w')
+    f = _cache_open(CACHE, 'w')
     for package in sorted(s):
         f.write('{0}\n'.format(package))
     f.close()
@@ -146,7 +159,7 @@ def yum_exclusions():
                               'core','base', 'gnome-desktop'],
                              close_fds=True, stdout=subprocess.PIPE)
     except OSError:
-        open(CACHE, 'w').close()
+        _cache_open(CACHE, 'w').close()
         return s
     for line in p.stdout:
         match = pattern.match(line)
@@ -165,7 +178,7 @@ def yum_exclusions():
 
     # Write to a cache.
     logging.info('caching excluded Yum packages')
-    f = open(CACHE, 'w')
+    f = _cache_open(CACHE, 'w')
     for package in sorted(s):
         f.write('{0}\n'.format(package))
     f.close()

@@ -1,3 +1,4 @@
+import os
 import os.path
 import subprocess
 import sys
@@ -5,6 +6,19 @@ import sys
 
 class GitError(EnvironmentError):
     pass
+
+
+def unroot():
+    """
+    Drop privileges gained through sudo(1).
+    """
+    if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
+        uid = int(os.environ['SUDO_UID'])
+        gid = int(os.environ['SUDO_GID'])
+        os.setgid(gid)
+        os.setegid(gid)
+        os.setuid(uid)
+        os.seteuid(uid)
 
 
 def init():
@@ -17,7 +31,9 @@ def init():
     except OSError:
         pass
     p = subprocess.Popen(['git', '--git-dir', repo(), 'init', '--bare'],
-                         close_fds=True, stdout=sys.stderr)
+                         close_fds=True,
+                         preexec_fn=unroot,
+                         stdout=sys.stderr)
     p.communicate()
     if 0 != p.returncode:
         #sys.exit(p.returncode)
@@ -33,6 +49,7 @@ def git(*args, **kwargs):
                           '--git-dir', repo(),
                           '--work-tree', os.getcwd()] + list(args),
                          close_fds=True,
+                         preexec_fn=unroot,
                          stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE)
     stdout, stderr = p.communicate(kwargs.get('stdin'))
