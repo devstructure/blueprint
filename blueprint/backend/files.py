@@ -144,16 +144,6 @@ def files(b):
                         for package in packages]:
                 continue
 
-            # Don't store DevStructure's default `/etc/fuse.conf`.  (This is
-            # a legacy condition.)
-            if '/etc/fuse.conf' == pathname:
-                try:
-                    if 'user_allow_other\n' == open(pathname).read():
-                        if ignore.file(pathname, True):
-                            continue
-                except IOError:
-                    pass
-
             # A symbolic link's content is the link target.
             if stat.S_ISLNK(s.st_mode):
                 content = os.readlink(pathname)
