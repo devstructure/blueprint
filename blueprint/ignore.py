@@ -81,12 +81,18 @@ def apt_exclusions():
         pass
     logging.info('searching for APT packages to exclude')
 
-    # Start with the root package for the various Ubuntu installations.
-    s = set(['linux-generic-pae',
+    # Start with the root packages for the various Ubuntu installations.
+    s = set(['grub-pc',
+             'installation-report',
+             'language-pack-en',
+             'language-pack-gnome-en',
+             'linux-generic-pae',
              'linux-server',
+             'os-prober',
              'ubuntu-desktop',
              'ubuntu-minimal',
-             'ubuntu-standard'])
+             'ubuntu-standard',
+             'wireless-crda'])
 
     # Find the essential and required packages.  Every server's got 'em, no
     # one wants to muddle their blueprint with 'em.
