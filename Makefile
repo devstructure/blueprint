@@ -206,4 +206,4 @@ gh-pages: man
 	git push origin gh-pages
 	git checkout -q master
 
-.PHONY: all clean install install-bin install-lib install-man install-sysconf uninstall uninstall-bin uninstall-lib uninstall-man uninstall-sysconf deb deploy man gh-pages
+.PHONY: all build clean install install-bin install-lib install-man install-sysconf uninstall uninstall-bin uninstall-lib uninstall-man uninstall-sysconf deb deploy deploy-deb deploy-deb-2.6 deploy-deb-2.7 deploy-pypi man gh-pages
