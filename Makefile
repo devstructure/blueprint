@@ -14,10 +14,11 @@ sysconfdir=${prefix}/etc
 all:
 
 clean:
-	rm -f \
-		control \
+	rm -rf \
+		control *.deb \
+		setup.py build dist *.egg *.egg-info \
 		blueprint/**.pyc \
-		man/man*/*.html
+		man/man*/*.htm
 
 install: install-bin install-lib install-man install-sysconf
 
@@ -165,14 +166,20 @@ build:
 
 deb:
 	[ "$$(whoami)" = "root" ] || false
-	m4 -D__VERSION__=$(VERSION)-$(BUILD) control.m4 >control
+	m4 \
+		-D__PYTHON__=python$(PYTHON_VERSION) \
+		-D__VERSION__=$(VERSION)-$(BUILD) \
+		control.m4 >control
 	debra create debian control
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	chown -R root:root debian
 	debra build debian blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb
 	debra destroy debian
 
-pypi:
+setup.py:
+	m4 -D__VERSION__=$(VERSION) setup.py.m4 >setup.py
+
+pypi: setup.py
 	$(PYTHON) setup.py bdist_egg
 
 deploy: deploy-deb deploy-pypi
