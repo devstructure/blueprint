@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import re
 
 setup(name='blueprint',
       version='__VERSION__',
