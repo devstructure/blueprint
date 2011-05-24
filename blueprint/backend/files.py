@@ -4,6 +4,7 @@ Search for configuration files to include in the blueprint.
 
 import base64
 from collections import defaultdict
+import errno
 import grp
 import hashlib
 import logging
@@ -90,9 +91,9 @@ def files(b):
             pathname = os.path.join(dirpath, filename)
             try:
                 files.append((pathname, os.lstat(pathname)))
-            except OSError:
-                logging.warning('{0} caused EPERM - try running as root'
-                                ''.format(pathname))
+            except OSError as e:
+                logging.warning('{0} caused {1} - try running as root'
+                                ''.format(pathname, errno.errorcode[e.errno]))
 
         # Map the ctimes of each directory entry.
         for pathname, s in files:
