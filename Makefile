@@ -62,6 +62,7 @@ install-lib:
 		blueprint/backend/php.py \
 		blueprint/backend/pypi.py \
 		blueprint/backend/sources.py \
+		blueprint/backend/yum.py \
 		$(DESTDIR)$(pydir)/blueprint/backend/
 	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall \
 		$(DESTDIR)$(pydir)/blueprint
