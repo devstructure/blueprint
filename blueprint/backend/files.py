@@ -85,15 +85,23 @@ def files(b):
         ctimes = defaultdict(lambda: 0)
 
         # Collect up the full pathname to each file and `lstat` them all.
-        files = [(pathname, os.lstat(pathname))
-                 for pathname in [os.path.join(dirpath, filename)
-                                  for filename in filenames]]
+        files = []
+        for filename in filenames:
+            pathname = os.path.join(dirpath, filename)
+            try:
+                files.append((pathname, os.lstat(pathname)))
+            except OSError:
+                logging.warning('{0} caused EPERM - try running as root'
+                                ''.format(pathname))
 
         # Map the ctimes of each directory entry.
         for pathname, s in files:
             ctimes[s.st_ctime] += 1
         for dirname in dirnames:
-            ctimes[os.lstat(os.path.join(dirpath, dirname)).st_ctime] += 1
+            try:
+                ctimes[os.lstat(os.path.join(dirpath, dirname)).st_ctime] += 1
+            except OSError:
+                pass
 
         for pathname, s in files:
 
