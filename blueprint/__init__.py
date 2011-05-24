@@ -483,7 +483,7 @@ class Blueprint(dict):
 
         return c
 
-    def sh(self):
+    def sh(self, secret=None):
         """
         Generate shell code.
         """
@@ -491,14 +491,24 @@ class Blueprint(dict):
         s = sh.Script(self.name, comment=self.DISCLAIMER)
 
         # Extract source tarballs.
-        tree = git.tree(self._commit)
-        for dirname, filename in sorted(self.sources.iteritems()):
-            blob = git.blob(tree, filename)
-            content = git.content(blob)
-            s.add('tar xf "{0}" -C "{1}"',
-                  filename,
-                  dirname,
-                  sources={filename: content})
+        if secret is not None:
+            for dirname, filename in sorted(self.sources.iteritems()):
+                s.add('wget https://devstructure.com/{0}/{1}/{2}',
+                      secret,
+                      self.name,
+                      filename)
+                s.add('tar xf "{0}" -C "{1}"',
+                      filename,
+                      dirname)
+        else:
+            tree = git.tree(self._commit)
+            for dirname, filename in sorted(self.sources.iteritems()):
+                blob = git.blob(tree, filename)
+                content = git.content(blob)
+                s.add('tar xf "{0}" -C "{1}"',
+                      filename,
+                      dirname,
+                      sources={filename: content})
 
         # Place files.
         for pathname, f in sorted(self.files.iteritems()):

@@ -4,7 +4,9 @@ Search for `yum` packages to include in the blueprint.
 
 import logging
 import subprocess
+
 from blueprint import ignore
+
 
 def yum(b):
     logging.info('searching for Yum packages')

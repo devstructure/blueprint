@@ -137,7 +137,9 @@ uninstall-lib:
 		$(DESTDIR)$(pydir)/blueprint/backend/pypi.py \
 		$(DESTDIR)$(pydir)/blueprint/backend/pypi.pyc \
 		$(DESTDIR)$(pydir)/blueprint/backend/sources.py \
-		$(DESTDIR)$(pydir)/blueprint/backend/sources.pyc
+		$(DESTDIR)$(pydir)/blueprint/backend/sources.pyc \
+		$(DESTDIR)$(pydir)/blueprint/backend/yum.py \
+		$(DESTDIR)$(pydir)/blueprint/backend/yum.pyc
 	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(pydir)/blueprint/backend
 
 uninstall-man:
