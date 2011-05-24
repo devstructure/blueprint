@@ -28,6 +28,10 @@ def init():
     dirname = repo()
     try:
         os.makedirs(dirname)
+        if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
+            uid = int(os.environ['SUDO_UID'])
+            gid = int(os.environ['SUDO_GID'])
+            os.chown(dirname, uid, gid)
     except OSError:
         pass
     p = subprocess.Popen(['git', '--git-dir', repo(), 'init', '--bare'],
