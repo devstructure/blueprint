@@ -1,5 +1,6 @@
 import fnmatch
 import glob
+import json
 import logging
 import os
 import os.path
@@ -61,6 +62,9 @@ IGNORE = ('*.dpkg-*',
           '/etc/udev/rules.d/70-persistent-*.rules')
 
 
+CACHE = '/tmp/blueprintignore'
+
+
 def _cache_open(pathname, mode):
     f = open(pathname, mode)
     if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
@@ -68,6 +72,7 @@ def _cache_open(pathname, mode):
         gid = int(os.environ['SUDO_GID'])
         os.fchown(f.fileno(), uid, gid)
     return f
+
 
 def apt_exclusions():
     """
@@ -179,69 +184,95 @@ def yum_exclusions():
     return s
 
 
-# Cache things that are ignored by default first.
-_cache = {
-    'file': [(pattern, False) for pattern in IGNORE],
-    'package': [('apt', package, False) for package in apt_exclusions()] +
-                [('yum', package, False) for package in yum_exclusions()],
-}
+def _mtime(pathname):
+    try:
+        return os.stat(pathname).st_mtime
+    except OSError:
+        return 0
 
-# Cache the patterns stored in the `~/.blueprintignore` file.
-try:
-    f = open(os.path.expanduser('~/.blueprintignore'))
-    logging.info('parsing ~/.blueprintignore')
-    for pattern in f:
-        pattern = pattern.rstrip()
 
-        # Comments and blank lines.
-        if '' == pattern or '#' == pattern[0]:
-            continue
+# Check for a fresh cache of the complete blueprintignore(5) rules.
+_cache = None
+if _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE):
+    try:
+        _cache = json.load(open(CACHE))
+        logging.info('using cached blueprintignore rules')
+    except (OSError, ValueError):
+        pass
 
-        # Negated lines.
-        if '!' == pattern[0]:
-            pattern = pattern[1:]
-            negate = True
-        else:
-            negate = False
+# Build and cache the complete blueprintignore(5) rules.
+if _cache is None:
 
-        # Normalize file resources, which don't need the : and type qualifier,
-        # into the same format as others, like packages.
-        if ':' == pattern[0]:
-            try:
-                restype, pattern = pattern[1:].split(':', 2)
-            except ValueError:
+    # Cache things that are ignored by default first.
+    _cache = {
+        'file': [(pattern, False) for pattern in IGNORE],
+        'package': [('apt', package, False) for package in apt_exclusions()] +
+                   [('yum', package, False) for package in yum_exclusions()],
+    }
+
+    # Cache the patterns stored in the `~/.blueprintignore` file.
+    try:
+        f = open(os.path.expanduser('~/.blueprintignore'))
+        logging.info('parsing ~/.blueprintignore')
+        for pattern in f:
+            pattern = pattern.rstrip()
+
+            # Comments and blank lines.
+            if '' == pattern or '#' == pattern[0]:
                 continue
-        else:
-            restype = 'file'
-        if restype not in _cache:
-            continue
 
-        # Ignore or unignore a file, glob, or directory tree.
-        if 'file' == restype:
-            _cache['file'].append((pattern, negate))
+            # Negated lines.
+            if '!' == pattern[0]:
+                pattern = pattern[1:]
+                negate = True
+            else:
+                negate = False
 
-        # Ignore a package and its dependencies or unignore a single package.
-        # Empirically, the best balance of power and granularity comes from
-        # this arrangement.  Take build-esseantial's mutual dependence with
-        # dpkg-dev as an example of why.
-        elif 'package' == restype:
-            try:
-                manager, package = pattern.split('/')
-            except ValueError:
-                logging.warning('invalid package ignore "{0}"'.format(pattern))
+            # Normalize file resources, which don't need the : and type
+            # qualifier, into the same format as others, like packages.
+            if ':' == pattern[0]:
+                try:
+                    restype, pattern = pattern[1:].split(':', 2)
+                except ValueError:
+                    continue
+            else:
+                restype = 'file'
+            if restype not in _cache:
                 continue
-            _cache['package'].append((manager, package, negate))
-            if not negate:
-                for dep in getattr(deps, manager, lambda(s): [])(package):
-                    _cache['package'].append((manager, dep, negate))
 
-        # Swing and a miss.
-        else:
-            logging.warning('unrecognized ignore type "{0}"'.format(restype))
-            continue
+            # Ignore or unignore a file, glob, or directory tree.
+            if 'file' == restype:
+                _cache['file'].append((pattern, negate))
 
-except IOError:
-    pass
+            # Ignore a package and its dependencies or unignore a single
+            # package.  Empirically, the best balance of power and granularity
+            # comes from this arrangement.  Take build-esseantial's mutual
+            # dependence with dpkg-dev as an example of why.
+            elif 'package' == restype:
+                try:
+                    manager, package = pattern.split('/')
+                except ValueError:
+                    logging.warning('invalid package ignore "{0}"'
+                                    ''.format(pattern))
+                    continue
+                _cache['package'].append((manager, package, negate))
+                if not negate:
+                    for dep in getattr(deps, manager, lambda(s): [])(package):
+                        _cache['package'].append((manager, dep, negate))
+
+            # Swing and a miss.
+            else:
+                logging.warning('unrecognized ignore type "{0}"'
+                                ''.format(restype))
+                continue
+
+    except IOError:
+        pass
+
+    # Store the cache to disk.
+    f = _cache_open(CACHE, 'w')
+    json.dump(_cache, f, indent=2, sort_keys=True)
+    f.close()
 
 
 def file(pathname, ignored=False):
