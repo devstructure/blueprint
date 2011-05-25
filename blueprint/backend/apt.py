@@ -23,7 +23,6 @@ def apt(b):
     except OSError:
         return
 
-    s = ignore.apt_exclusions()
     for line in p.stdout:
         package, version = line.strip().split()
         if ignore.package('apt', package):
