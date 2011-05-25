@@ -44,13 +44,14 @@ if options.quiet:
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
-if re.search(r'[/ \t\r\n]', args[0]):
-    logging.error('invalid blueprint name')
-    sys.exit(1)
 name = args[0]
 
 with context_managers.mkdtemp():
-    b = blueprint.Blueprint(name=name, create=True)
+    try:
+        b = blueprint.Blueprint(name=name, create=True)
+    except ValueError:
+        logging.error('invalid blueprint name')
+        sys.exit(1)
     b.commit(options.message or '')
 
 if options.generate is not None:

@@ -55,7 +55,12 @@ class Blueprint(dict):
         Construct a blueprint in the new format in a backwards-compatible
         manner.
         """
+
+        # Validate the blueprint name.
+        if re.search(r'[/ \t\r\n]', name):
+            raise ValueError('invalid blueprint name')
         self.name = name
+
         self._commit = commit
 
         # Create a new blueprint object and populate it based on this server.

@@ -21,13 +21,13 @@ if options.quiet:
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
-if re.search(r'[/ \t\r\n]', args[0]):
-    logging.error('invalid blueprint name')
-    sys.exit(1)
 name = args[0]
 
 try:
     blueprint.Blueprint.destroy(name)
 except KeyError:
     logging.error('blueprint {0} does not exist'.format(name))
+    sys.exit(1)
+except ValueError:
+    logging.error('invalid blueprint name')
     sys.exit(1)
