@@ -5,6 +5,7 @@ Search for configuration files to include in the blueprint.
 import base64
 from collections import defaultdict
 import errno
+import glob
 import grp
 import hashlib
 import logging
@@ -208,34 +209,29 @@ def _dpkg_query_S(pathname):
     Return a list of package names that contain `pathname` or `[]`.  This
     really can be a list thanks to `dpkg-divert`(1).
     """
+
+    # Cache the pathname-to-package mapping.
+    if not hasattr(_dpkg_query_S, '_cache'):
+        _dpkg_query_S._cache = defaultdict(set)
+        cache_ref = _dpkg_query_S._cache
+        for listname in glob.iglob('/var/lib/dpkg/info/*.list'):
+            package = os.path.splitext(os.path.basename(listname))[0]
+            for line in open(listname):
+                cache_ref[line.rstrip()].add(package)
+
+    # Return the list of packages that contain this file, if any.
+    if pathname in _dpkg_query_S._cache:
+        return list(_dpkg_query_S._cache[pathname])
+
+    # If `pathname` isn't in a package but is a symbolic link, see if the
+    # symbolic link is in a package.  `postinst` programs commonly display
+    # this pattern.
     try:
-        p = subprocess.Popen(['dpkg-query', '-S', pathname],
-                             close_fds=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+        return _dpkg_query_S(os.readlink(pathname))
     except OSError:
-        return []
-    stdout, stderr = p.communicate()
-    if 0 != p.returncode:
+        pass
 
-        # If `pathname` isn't in a package but is a symbolic link, see if
-        # the symbolic link is in a package.  `postinst` programs commonly
-        # display this pattern.
-        try:
-            return _dpkg_query_S(os.readlink(pathname))
-
-        except OSError:
-            return []
-    packages = []
-    for line in stdout.splitlines():
-        if line.startswith('diversion '):
-            continue
-        try:
-            p, _ = line.split(':', 1)
-            packages.extend([package.strip() for package in p.split(',')])
-        except ValueError:
-            pass
-    return packages
+    return []
 
 
 def _dpkg_md5sum(package, pathname):
