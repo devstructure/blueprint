@@ -243,18 +243,46 @@ def _dpkg_md5sum(package, pathname):
     Find the MD5 sum of the packaged version of pathname or `None` if the
     `pathname` does not come from a Debian package.
     """
+
+    # Cache the MD5 sums for files in this package.
+    if not hasattr(_dpkg_md5sum, '_cache'):
+        _dpkg_md5sum._cache = defaultdict(dict)
+    if package not in _dpkg_md5sum._cache:
+        cache_ref = _dpkg_md5sum._cache[package]
+        try:
+            for line in open('/var/lib/dpkg/info/{0}.md5sums'.format(package)):
+                md5sum, rel_pathname = line.split(None, 1)
+                cache_ref['/{0}'.format(rel_pathname)] = md5sum
+        except IOError:
+            pass
+
+    # Return this file's MD5 sum, if it can be found.
     try:
-        for line in open('/var/lib/dpkg/info/{0}.md5sums'.format(package)):
-            if line.endswith('{0}\n'.format(pathname[1:])):
-                return line[0:32]
-    except IOError:
+        return _dpkg_md5sum._cache[package][pathname]
+    except KeyError:
         pass
+
+    # Cache any MD5 sums stored in the status file.  These are typically
+    # conffiles and the like.
+    if not hasattr(_dpkg_md5sum, '_status_cache'):
+        _dpkg_md5sum._status_cache = {}
+        cache_ref = _dpkg_md5sum._status_cache
+        try:
+            pattern = re.compile(r'^ (\S+) ([0-9a-f]{32})')
+            for line in open('/var/lib/dpkg/status'):
+                match = pattern.match(line)
+                if not match:
+                    continue
+                cache_ref[match.group(1)] = match.group(2)
+        except IOError:
+            pass
+
+    # Return this file's MD5 sum, if it can be found.
     try:
-        for line in open('/var/lib/dpkg/status'):
-            if line.startswith(' {0} '.format(pathname)):
-                return line[-33:-1]
-    except IOError:
+        return _dpkg_md5sum._status_cache[pathname]
+    except KeyError:
         pass
+
     return None
 
 
