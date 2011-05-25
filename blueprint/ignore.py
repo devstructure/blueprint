@@ -76,14 +76,8 @@ def apt_exclusions():
     """
 
     CACHE = '/tmp/blueprint-apt-exclusions'
-    OLDCACHE = '/tmp/blueprint-exclusions'
 
-    # Read from a cached copy.  Move the old cache location to the new one
-    # if necessary.
-    try:
-        os.rename(OLDCACHE, CACHE)
-    except OSError:
-        pass
+    # Read from a cached copy.
     try:
         return set([line.rstrip() for line in open(CACHE)])
     except IOError:
@@ -143,8 +137,7 @@ def yum_exclusions():
 
     CACHE = '/tmp/blueprint-yum-exclusions'
 
-    # Read from a cached copy.  Move the old cache location to the new one
-    # if necessary.
+    # Read from a cached copy.
     try:
         return set([line.rstrip() for line in open(CACHE)])
     except IOError:
