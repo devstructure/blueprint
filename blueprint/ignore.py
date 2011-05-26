@@ -324,3 +324,15 @@ def package(manager, package, ignored=False):
             continue
         ignored = not ignored
     return ignored
+
+
+class Rules(object):
+
+    def __init__(self, content):
+        self.content = content
+
+    def dumps(self):
+        return self.content
+
+    def dumpf(self, gzip=False):
+        raise NotImplementedError()

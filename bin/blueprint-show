@@ -8,7 +8,7 @@ import sys
 
 import blueprint
 
-parser = optparse.OptionParser('Usage: %prog [-P|-C|-S] [-q] <name>')
+parser = optparse.OptionParser('Usage: %prog [-P|-C|-S|-I] [-q] <name>')
 parser.add_option('-P', '--puppet',
                   dest='generate',
                   action='store_const',
@@ -24,6 +24,11 @@ parser.add_option('-S', '--sh',
                   action='store_const',
                   const='sh',
                   help='generate POSIX shell code')
+parser.add_option('-I', '--ignore',
+                  dest='generate',
+                  action='store_const',
+                  const='ignore',
+                  help='show the blueprint\'s ~/.blueprintignore')
 parser.add_option('-q', '--quiet',
                   dest='quiet',
                   default=False,
@@ -48,17 +53,19 @@ except ValueError:
     logging.error('invalid blueprint name')
     sys.exit(1)
 
-if options.generate is None:
-    try:
+try:
+    if options.generate is None:
         print(b.dumps())
-    except IOError:
-        pass
-else:
-    try:
-        filename = getattr(b, options.generate)().dumpf()
-    except OSError as e:
-        if errno.EEXIST == e.errno:
-            logging.error('{0} already exists'.format(name))
-        sys.exit(1)
-    if not options.quiet:
-        print(filename)
+    elif 'ignore' == options.generate:
+        sys.stdout.write(b.blueprintignore().dumps())
+    else:
+        try:
+            filename = getattr(b, options.generate)().dumpf()
+        except OSError as e:
+            if errno.EEXIST == e.errno:
+                logging.error('{0} already exists'.format(name))
+            sys.exit(1)
+        if not options.quiet:
+            print(filename)
+except IOError:
+    pass

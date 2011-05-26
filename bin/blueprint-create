@@ -11,7 +11,7 @@ import blueprint
 from blueprint import context_managers
 
 parser = optparse.OptionParser(
-    'Usage: %prog [-P|-C|-S] [-m <message>] [-q] <name>')
+    'Usage: %prog [-P|-C|-S|-I] [-m <message>] [-q] <name>')
 parser.add_option('-P', '--puppet',
                   dest='generate',
                   action='store_const',
@@ -27,6 +27,11 @@ parser.add_option('-S', '--sh',
                   action='store_const',
                   const='sh',
                   help='generate POSIX shell code')
+parser.add_option('-I', '--ignore',
+                  dest='generate',
+                  action='store_const',
+                  const='ignore',
+                  help='show the blueprint\'s ~/.blueprintignore')
 parser.add_option('-m', '--message',
                   dest='message',
                   default=None,
@@ -54,12 +59,19 @@ with context_managers.mkdtemp():
         sys.exit(1)
     b.commit(options.message or '')
 
-if options.generate is not None:
-    try:
-        filename = getattr(b, options.generate)().dumpf()
-    except OSError as e:
-        if errno.EEXIST == e.errno:
-            logging.error('{0} already exists'.format(name))
-        sys.exit(1)
-    if not options.quiet:
-        print(filename)
+try:
+    if options.generate is None:
+        pass
+    elif 'ignore' == options.generate:
+        sys.stdout.write(b.blueprintignore().dumps())
+    else:
+        try:
+            filename = getattr(b, options.generate)().dumpf()
+        except OSError as e:
+            if errno.EEXIST == e.errno:
+                logging.error('{0} already exists'.format(name))
+            sys.exit(1)
+        if not options.quiet:
+            print(filename)
+except IOError:
+    pass

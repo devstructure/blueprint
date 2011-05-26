@@ -16,6 +16,7 @@ logging.basicConfig(format='# [blueprint] %(message)s',
 
 import context_managers
 import git
+import ignore
 from manager import Manager
 import util
 
@@ -232,10 +233,15 @@ class Blueprint(dict):
         for filename in self.sources.itervalues():
             git.git('update-index', '--add', os.path.abspath(filename))
 
-        # Add the `.blueprintignore` file to the index as `.gitignore`.
+        # Add the `.blueprintignore` file to the index.  Since adding extra
+        # syntax to this file, it no longer makes sense to store it as
+        # `.gitignore`.
         try:
-            os.link(os.path.expanduser('~/.blueprintignore'), '.gitignore')
-            git.git('update-index', '--add', os.path.abspath('.gitignore'))
+            os.link(os.path.expanduser('~/.blueprintignore'),
+                    '.blueprintignore')
+            git.git('update-index',
+                    '--add',
+                    os.path.abspath('.blueprintignore'))
         except OSError:
             pass
 
@@ -566,6 +572,22 @@ class Blueprint(dict):
         self.walk(before=before, package=package)
 
         return s
+
+    def blueprintignore(self):
+        """
+        Return the blueprint's ~/.blueprintignore file.  Prior to v3.0.4
+        this file was stored as .gitignore in the repository.
+        """
+        tree = git.tree(self._commit)
+        blob = git.blob(tree, '.blueprintignore')
+        if blob is None:
+            blob = git.blob(tree, '.gitignore')
+        if blob is None:
+            return ignore.Rules('')
+        content = git.content(blob)
+        if content is None:
+            return ignore.Rules('')
+        return ignore.Rules(content)
 
     def walk(self, managername=None, **kwargs):
         """
