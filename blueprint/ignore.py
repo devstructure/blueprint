@@ -10,56 +10,60 @@ import subprocess
 from blueprint import deps
 
 
-# The default list of ignore patterns.
+# The default list of ignore patterns.  Typically, the value of each key
+# will be False.  Providing True will negate the meaning of the pattern
+# and cause matching files to be included in blueprints.
 #
 # XXX Update `blueprintignore`(5) if you make changes here.
-IGNORE = ('*.dpkg-*',
-          '/etc/.git',
-          '/etc/.pwd.lock',
-          '/etc/X11/default-display-manager',
-          '/etc/alternatives',
-          '/etc/apparmor',
-          '/etc/apparmor.d',
-          '/etc/ca-certificates.conf',
-          '/etc/console-setup',
+IGNORE = {'*.dpkg-*': False,
+          '/etc/.git': False,
+          '/etc/.pwd.lock': False,
+          '/etc/X11/default-display-manager': False,
+          '/etc/alternatives': False,
+          '/etc/apparmor': False,
+          '/etc/apparmor.d': False,
+          '/etc/ca-certificates.conf': False,
+          '/etc/console-setup': False,
           # TODO Only if it's a symbolic link to ubuntu.
-          '/etc/dpkg/origins/default',
-          '/etc/fstab',
-          '/etc/group-',
-          '/etc/group',
-          '/etc/gshadow-',
-          '/etc/gshadow',
-          '/etc/hostname',
-          '/etc/init.d/.legacy-bootordering',
-          '/etc/initramfs-tools/conf.d/resume',
-          '/etc/ld.so.cache',
-          '/etc/localtime',
-          '/etc/mailcap',
-          '/etc/mtab',
-          '/etc/modules',
-          '/etc/motd',  # TODO Only if it's a symbolic link to /var/run/motd.
-          '/etc/network/interfaces',
-          '/etc/passwd-',
-          '/etc/passwd',
-          '/etc/popularity-contest.conf',
-          '/etc/prelink.cache',
-          '/etc/resolv.conf',  # Most people use the defaults.
-          '/etc/rc.d',
-          '/etc/rc0.d',
-          '/etc/rc1.d',
-          '/etc/rc2.d',
-          '/etc/rc3.d',
-          '/etc/rc4.d',
-          '/etc/rc5.d',
-          '/etc/rc6.d',
-          '/etc/rcS.d',
-          '/etc/shadow-',
-          '/etc/shadow',
-          '/etc/ssh/ssh_host_*_key*',
-          '/etc/ssl/certs',
-          '/etc/sysconfig/network',
-          '/etc/timezone',
-          '/etc/udev/rules.d/70-persistent-*.rules')
+          '/etc/dpkg/origins/default': False,
+          '/etc/fstab': False,
+          '/etc/group-': False,
+          '/etc/group': False,
+          '/etc/gshadow-': False,
+          '/etc/gshadow': False,
+          '/etc/hostname': False,
+          '/etc/init.d/.legacy-bootordering': False,
+          '/etc/initramfs-tools/conf.d/resume': False,
+          '/etc/ld.so.cache': False,
+          '/etc/localtime': False,
+          '/etc/mailcap': False,
+          '/etc/mtab': False,
+          '/etc/modules': False,
+          '/etc/motd': False,  # TODO Only if it's a symbolic link to /var/run/motd.
+          '/etc/network/interfaces': False,
+          '/etc/passwd-': False,
+          '/etc/passwd': False,
+          '/etc/pki/rpm-gpg': True,
+          '/etc/popularity-contest.conf': False,
+          '/etc/prelink.cache': False,
+          '/etc/resolv.conf': False,  # Most people use the defaults.
+          '/etc/rc.d': False,
+          '/etc/rc0.d': False,
+          '/etc/rc1.d': False,
+          '/etc/rc2.d': False,
+          '/etc/rc3.d': False,
+          '/etc/rc4.d': False,
+          '/etc/rc5.d': False,
+          '/etc/rc6.d': False,
+          '/etc/rcS.d': False,
+          '/etc/shadow-': False,
+          '/etc/shadow': False,
+          '/etc/ssh/ssh_host_*_key*': False,
+          '/etc/ssl/certs': False,
+          '/etc/sysconfig/network': False,
+          '/etc/timezone': False,
+          '/etc/udev/rules.d/70-persistent-*.rules': False,
+          '/etc/yum.repos.d': True}
 
 
 CACHE = '/tmp/blueprintignore'
@@ -152,7 +156,7 @@ def yum_exclusions():
     logging.info('searching for Yum packages to exclude')
 
     # Start with a few groups that install common packages.
-    s = set()
+    s = set(['gpg-pubkey'])
     pattern = re.compile(r'^   (\S+)')
     try:
         p = subprocess.Popen(['yum', 'groupinfo',
@@ -209,7 +213,7 @@ if _cache is None:
 
     # Cache things that are ignored by default first.
     _cache = {
-        'file': [(pattern, False) for pattern in IGNORE],
+        'file': IGNORE.items(),
         'package': [('apt', package, False) for package in apt_exclusions()] +
                    [('yum', package, False) for package in yum_exclusions()],
     }
