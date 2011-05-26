@@ -156,7 +156,7 @@ def yum_exclusions():
     logging.info('searching for Yum packages to exclude')
 
     # Start with a few groups that install common packages.
-    s = set()
+    s = set(['gpg-pubkey'])
     pattern = re.compile(r'^   (\S+)')
     try:
         p = subprocess.Popen(['yum', 'groupinfo',
