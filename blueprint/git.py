@@ -36,7 +36,9 @@ def init():
         pass
     p = subprocess.Popen(['git', '--git-dir', repo(), 'init', '--bare'],
                          close_fds=True,
-                         preexec_fn=unroot)
+                         preexec_fn=unroot,
+                         stdout=sys.stderr,
+                         stderr=sys.stderr)
     p.communicate()
     if 0 != p.returncode:
         #sys.exit(p.returncode)

@@ -109,7 +109,9 @@ def apt_exclusions():
             p = subprocess.Popen(['dpkg-query',
                                   '-f=${{Package}} ${{{0}}}\n'.format(field),
                                   '-W'],
-                                 close_fds=True, stdout=subprocess.PIPE)
+                                 close_fds=True,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
         except OSError:
             _cache_open(CACHE, 'w').close()
             return s
@@ -155,7 +157,9 @@ def yum_exclusions():
     try:
         p = subprocess.Popen(['yum', 'groupinfo',
                               'core','base', 'gnome-desktop'],
-                             close_fds=True, stdout=subprocess.PIPE)
+                             close_fds=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
     except OSError:
         _cache_open(CACHE, 'w').close()
         return s
