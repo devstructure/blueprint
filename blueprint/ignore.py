@@ -43,6 +43,7 @@ IGNORE = {'*.dpkg-*': False,
           '/etc/network/interfaces': False,
           '/etc/passwd-': False,
           '/etc/passwd': False,
+          '/etc/pki/rpm-gpg': True,
           '/etc/popularity-contest.conf': False,
           '/etc/prelink.cache': False,
           '/etc/resolv.conf': False,  # Most people use the defaults.
@@ -61,7 +62,8 @@ IGNORE = {'*.dpkg-*': False,
           '/etc/ssl/certs': False,
           '/etc/sysconfig/network': False,
           '/etc/timezone': False,
-          '/etc/udev/rules.d/70-persistent-*.rules': False}
+          '/etc/udev/rules.d/70-persistent-*.rules': False,
+          '/etc/yum.repos.d': True}
 
 
 CACHE = '/tmp/blueprintignore'
