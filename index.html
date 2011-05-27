@@ -72,11 +72,12 @@ cd blueprint
 make &amp;&amp; sudo make install PYTHON=/usr/bin/python26</pre>
 	<p>This installs Python 2.6 from <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> side-by-side with Python 2.4 and so won&#8217;t break <code>yum</code>.</p>
 	<h2>From DevStructure&#8217;s Debian archive</h2>
-	<pre>echo "deb http://packages.devstructure.com/ maverick main" \
+	<pre>echo "deb http://packages.devstructure.com/<em>distro</em> <em>release</em> main" \
 	| sudo tee /etc/apt/sources.list.d/devstructure.list
 wget -O - http://packages.devstructure.com/keyring.gpg | sudo apt-key add -
 sudo apt-get update
 sudo apt-get -y install blueprint</pre>
+	<p>Replace <code><em>distro</em></code> with &#8220;<code>debian</code>&#8221; or &#8220;<code>ubuntu</code>&#8221; and <code><em>release</em></code> with &#8220;<code>lenny</code>&#8221;, &#8220;<code>squeeze</code>&#8221;, &#8220;<code>lucid</code>&#8221;, &#8220;<code>maverick</code>&#8221;, or &#8220;<code>natty</code>&#8221; as your situation requires.</p>
 	<h2>From PyPI</h2>
 	<pre>pip install blueprint</pre>
 	<p>Make sure <code>pip</code> is using Python 2.6 or higher, otherwise the installation will succeed but <code>blueprint</code> will not run.</p>
