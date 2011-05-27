@@ -1,5 +1,5 @@
 VERSION=3.0.4
-BUILD=1
+BUILD=2
 
 PYTHON=$(shell which python2.7 || which python27 || which python2.6 || which python26 || which python)
 PYTHON_VERSION=$(shell ${PYTHON} -c "from distutils.sysconfig import get_python_version; print(get_python_version())")
@@ -167,20 +167,23 @@ build:
 	sudo make deb
 	make pypi
 
-deb:
-	[ "$$(whoami)" = "root" ] || false
+
+control: control.m4
 	m4 \
 		-D__PYTHON__=python$(PYTHON_VERSION) \
-		-D__VERSION__=$(VERSION)-$(BUILD) \
-		control.m4 >control
+		-D__VERSION__=$(VERSION)-$(BUILD)py$(PYTHON_VERSION) \
+		$< >$@
+
+deb: control
+	[ "$$(whoami)" = "root" ] || false
 	debra create debian control
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	chown -R root:root debian
 	debra build debian blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb
 	debra destroy debian
 
-setup.py:
-	m4 -D__VERSION__=$(VERSION) setup.py.m4 >setup.py
+setup.py: setup.py.m4
+	m4 -D__VERSION__=$(VERSION) $< >$@
 
 pypi: setup.py
 	$(PYTHON) setup.py bdist_egg
