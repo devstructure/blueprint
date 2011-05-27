@@ -1,5 +1,5 @@
 VERSION=3.0.4
-BUILD=2
+BUILD=3
 
 PYTHON=$(shell which python2.7 || which python27 || which python2.6 || which python26 || which python)
 PYTHON_VERSION=$(shell ${PYTHON} -c "from distutils.sysconfig import get_python_version; print(get_python_version())")
