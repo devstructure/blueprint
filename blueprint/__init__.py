@@ -58,7 +58,7 @@ class Blueprint(dict):
         """
 
         # Validate the blueprint name.
-        if re.search(r'[/ \t\r\n]', name):
+        if name is not None and re.search(r'[/ \t\r\n]', name):
             raise ValueError('invalid blueprint name')
         self.name = name
 
