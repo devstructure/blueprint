@@ -6,7 +6,7 @@
 * Generate configurations for Puppet or Chef.
 * Audit your infrastructure.
 
-`blueprint` is DevStructure's workhorse tool that looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source to generate Puppet, Chef, or shell code.  Everything blueprint sees is stored in Git to be diffed and pushed.  It runs on Debian and RPM based distros with Python 2.6.
+`blueprint` is DevStructure's workhorse tool that looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source to generate Puppet, Chef, or shell code.  Everything blueprint sees is stored in Git to be diffed and pushed.  It runs on Debian and RPM based distros with Python >= 2.6.
 
 ## Try it now!
 
