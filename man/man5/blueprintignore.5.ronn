@@ -52,6 +52,7 @@ The following files and directories are part of the default ignore list.  They c
 * `/etc/network/interfaces`
 * `/etc/passwd-`
 * `/etc/passwd`
+* `/etc/pki/rpm-gpg`
 * `/etc/popularity-contest.conf`
 * `/etc/prelink.cache`
 * `/etc/resolv.conf`
@@ -71,6 +72,7 @@ The following files and directories are part of the default ignore list.  They c
 * `/etc/sysconfig/network`
 * `/etc/timezone`
 * `/etc/udev/rules.d/70-persistent-*.rules`
+* `/etc/yum.repos.d`
 
 The following files are ignored if their content matches an expected hash.  They can be negated using `!` just like any other pattern.  These comparisions are made to augment searching files from packages to handle files that are part of packages but are not explicitly listed.
 
