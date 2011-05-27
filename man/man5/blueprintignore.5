@@ -31,7 +31,7 @@ Resources with type \fBpackages\fR are of the format \fImanager\fR\fB/\fR\fIpack
 File patterns that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
 .
 .P
-As part of \fBblueprint\-create\fR(1), the \fB~/\.blueprintignore\fR file that was used to create the blueprint is stored as \fB\.gitignore\fR in the local blueprint repository\.
+As part of \fBblueprint\-create\fR(1), the \fB~/\.blueprintignore\fR file that was used to create the blueprint is stored in the local blueprint repository\.
 .
 .P
 All APT\- or Yum\-managed packages considered essential to the system are part of the default ignore list\.

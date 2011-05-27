@@ -19,7 +19,7 @@ Resources with type `packages` are of the format _manager_`/`_package_.  Ignored
 
 File patterns that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
 
-As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to create the blueprint is stored as `.gitignore` in the local blueprint repository.
+As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to create the blueprint is stored in the local blueprint repository.
 
 All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.
 
