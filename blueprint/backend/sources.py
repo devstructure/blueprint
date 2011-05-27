@@ -10,6 +10,7 @@ import os
 import os.path
 import re
 import stat
+import subprocess
 import tarfile
 
 from blueprint import ignore
@@ -37,11 +38,20 @@ def sources(b):
         os.mkdir(dirpath2)
         s = os.lstat(dirpath)
         try:
-            os.lchown(dirpath2, s.st_uid, s.st_gid)
+            try:
+                os.lchown(dirpath2, s.st_uid, s.st_gid)
+            except OverflowError:
+                logging.warning('{0} has uid:gid {1}:{2} - using chown(1)'
+                                ''.format(dirpath, s.st_uid, s.st_gid))
+                p = subprocess.Popen(['chown',
+                                      '{0}:{1}'.format(s.st_uid, s.st_gid),
+                                      dirpath2],
+                                     close_fds=True)
+                p.communicate()
             os.chmod(dirpath2, s.st_mode)
         except OSError as e:
             logging.warning('{0} caused {1} - try running as root'
-                ''.format(dirpath, errno.errorcode[e.errno]))
+                            ''.format(dirpath, errno.errorcode[e.errno]))
             return
 
         for filename in filenames:
