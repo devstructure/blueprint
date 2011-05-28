@@ -172,7 +172,7 @@ deb:
 	m4 \
 		-D__PYTHON__=python$(PYTHON_VERSION) \
 		-D__VERSION__=$(VERSION)-$(BUILD)py$(PYTHON_VERSION) \
-		$< >$@
+		control.m4 >control
 	debra create debian control
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	chown -R root:root debian
@@ -180,7 +180,7 @@ deb:
 	debra destroy debian
 
 pypi:
-	m4 -D__VERSION__=$(VERSION) $< >$@
+	m4 -D__VERSION__=$(VERSION) setup.py.m4 >setup.py
 	$(PYTHON) setup.py bdist_egg
 
 deploy: deploy-deb deploy-pypi
