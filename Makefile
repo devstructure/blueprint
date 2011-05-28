@@ -167,25 +167,20 @@ build:
 	sudo make deb
 	make pypi
 
-
-control: control.m4
+deb:
+	[ "$$(whoami)" = "root" ] || false
 	m4 \
 		-D__PYTHON__=python$(PYTHON_VERSION) \
 		-D__VERSION__=$(VERSION)-$(BUILD)py$(PYTHON_VERSION) \
 		$< >$@
-
-deb: control
-	[ "$$(whoami)" = "root" ] || false
 	debra create debian control
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	chown -R root:root debian
 	debra build debian blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb
 	debra destroy debian
 
-setup.py: setup.py.m4
+pypi:
 	m4 -D__VERSION__=$(VERSION) $< >$@
-
-pypi: setup.py
 	$(PYTHON) setup.py bdist_egg
 
 deploy: deploy-deb deploy-pypi
