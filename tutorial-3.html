@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint</title>
+<style type="text/css">
+html { text-align: center; }
+body {
+	font-size: 16px;
+	margin: 0 auto;
+	text-align: left;
+	width: 80%;
+}
+body, h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue", Helvetica, sans-serif; }
+a, a:link, a:hover, a:active, a:visited { color: #0040c5; }
+p, pre {
+	margin: 1.5em 0;
+	line-height: 1.5em;
+}
+h1 {
+	margin: 1em 0;
+	font-size: 1.5em;
+	line-height: 1em;
+}
+h2 {
+	margin: 1em 0;
+	font-size: 1.25em;
+	line-height: 1.2em;
+}
+ul, ol, dl {
+	margin: 1.5em 0;
+	padding: 0;
+}
+ul, ol { margin-left: 1.5em; }
+li, dt, dd {
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+dd { margin: 0 0 0 1.5em; }
+header { text-align: center; }
+footer {
+	background: url(logo.png) no-repeat center bottom;
+	padding-bottom: 136px;
+	margin-bottom: 1.5em;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<header>
+	<h1>Tutorial, part 3 &mdash; deploy your blueprint</h1>
+</header>
+
+<p>The simplest way to deploy a blueprint is to run the generated shell script on your production server.&nbsp; We like to use Capistrano to automate that process.&nbsp; The <code>:configure</code> task in this <code>Capfile</code> will configure the server and the <code>:deploy</code> task will upload your application and restart Unicorn.</p>
+<pre># Capfile
+task :configure do
+&nbsp; system "blueprint show tutorial -S"
+&nbsp; upload "tutorial.sh", "/tmp/tutorial.sh"
+&nbsp; run "sudo sh /tmp/tutorial.sh"
+end
+task :deploy do
+&nbsp; upload "config.ru", "/var/www/config.ru"
+&nbsp; upload "app.rb", "/var/www/app.rb"
+&nbsp; run "sudo restart tutorial"
+end</pre>
+<p>Invoke Capistrano using the <code>cap</code> command.</p>
+<pre><strong>cap configure</strong>
+<strong>cap deploy</strong></pre>
+<p>Now our application is on a production server with all its dependencies, no manual labor required!</p>
+
+<h2>Puppet and Chef</h2>
+<p>Of course, sending shell scripts around is not exactly state-of-the-art systems administration.&nbsp; Puppet and Chef have recently become very popular for managing the configurations of many servers all together.&nbsp; The <code>-P</code> and <code>-C</code> options to <a href="blueprint-create.1.html"><code>blueprint-create</code>(1)</a> and <a href="blueprint-show.1.html"><code>blueprint-show</code>(1)</a> generate Puppet or Chef code suitable for uploading to a Puppet master or Chef server.</p>
+
+<hr />
+<p>That&#8217;s it!&nbsp; If you feel the need to dive deeper, the <a href="/blueprint/"><code>blueprint</code>(1)</a> documentation is available online and as manual pages.</p>
+<ul>
+	<li><a href="tutorial.html">Tutorial, part 1 &mdash; getting started</a></li>
+	<li><a href="tutorial-2.html">Tutorial, part 2 &mdash; your first blueprint</a></li>
+	<li><a href="tutorial-3.html">Tutorial, part 3 &mdash; deploy your blueprint</a></li>
+</ul>
+
+<footer>
+	<p>&copy; 2010 <a href="http://devstructure.com/">DevStructure</a>, LLC.&nbsp; <a href="https://github.com/devstructure/blueprint/blob/master/LICENSE"><code>LICENSE</code></a></p>
+</footer>
+</body>
+</html>

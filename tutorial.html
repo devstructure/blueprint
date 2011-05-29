@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint</title>
+<style type="text/css">
+html { text-align: center; }
+body {
+	font-size: 16px;
+	margin: 0 auto;
+	text-align: left;
+	width: 80%;
+}
+body, h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue", Helvetica, sans-serif; }
+a, a:link, a:hover, a:active, a:visited { color: #0040c5; }
+p, pre {
+	margin: 1.5em 0;
+	line-height: 1.5em;
+}
+h1 {
+	margin: 1em 0;
+	font-size: 1.5em;
+	line-height: 1em;
+}
+h2 {
+	margin: 1em 0;
+	font-size: 1.25em;
+	line-height: 1.2em;
+}
+ul, ol, dl {
+	margin: 1.5em 0;
+	padding: 0;
+}
+ul, ol { margin-left: 1.5em; }
+li, dt, dd {
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+dd { margin: 0 0 0 1.5em; }
+header { text-align: center; }
+footer {
+	background: url(logo.png) no-repeat center bottom;
+	padding-bottom: 136px;
+	margin-bottom: 1.5em;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<header>
+	<h1>Tutorial part 1 &mdash; getting started</h1>
+</header>
+
+<p>First things first.&nbsp; You need to install <code>blueprint</code> before it can reverse engineer your server.&nbsp; <code>blueprint</code> runs on any Debian or RPM based distribution with Python &gt;= 2.6 and Git &gt;= 1.7.</p>
+<p>You can start with a dedicated Linux server, a virtual instance running on your local machine via <a href="http://www.virtualbox.org/">Virtualbox</a>, <a href="http://www.vmware.com/products/fusion/overview.html">VMWare Fusion</a> or <a href="http://www.parallels.com/">Parallels</a> or a hosted instance from one of these providers:
+	<ul> 
+		<li><a href="http://aws.amazon.com/ec2">Amazon EC2</a></li> 
+		<li><a href="http://www.rackspacecloud.com/cloud_hosting_products/servers">Rackspace Cloud</a></li> 
+		<li><a href="http://slicehost.com/">Slicehost</a></li>
+		<li><a href="http://linode.com/">Linode</a></li> 
+	</ul>
+</p>
+<p>Once you&#8217;ve got a running server, <code>ssh</code> in and choose the appropriate installation method:</p>
+
+<h2>From source on Debian, Ubuntu, and Fedora</h2>
+<pre>git clone git://github.com/devstructure/blueprint.git
+cd blueprint
+make &amp;&amp; sudo make install</pre>
+
+<h2>From source on CentOS and RHEL</h2>
+<pre>rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+yum install python26
+git clone git://github.com/devstructure/blueprint.git
+cd blueprint
+make &amp;&amp; sudo make install PYTHON=/usr/bin/python26</pre>
+<p>This installs Python 2.6 from <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> side-by-side with Python 2.4 and so won&#8217;t break <code>yum</code>.</p>
+
+<h2>From DevStructure&#8217;s Debian archive</h2>
+<pre>echo "deb http://packages.devstructure.com/<em>distro</em> <em>release</em> main" \
+	| sudo tee /etc/apt/sources.list.d/devstructure.list
+wget -O - http://packages.devstructure.com/keyring.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install blueprint</pre>
+<p>Replace <code><em>distro</em></code> with &#8220;<code>debian</code>&#8221; or &#8220;<code>ubuntu</code>&#8221; and <code><em>release</em></code> with &#8220;<code>lenny</code>&#8221;, &#8220;<code>squeeze</code>&#8221;, &#8220;<code>lucid</code>&#8221;, &#8220;<code>maverick</code>&#8221;, or &#8220;<code>natty</code>&#8221; as your situation requires.</p>
+
+<h2>From PyPI</h2>
+<pre>pip install blueprint</pre>
+<p>Make sure <code>pip</code> is using Python &gt;= 2.6, otherwise the installation will succeed but <code>blueprint</code> will not run.</p>
+
+<hr />
+<p>In <a href="tutorial-2.html">part 2</a> we&#8217;ll cowboy up our server and learn about the <code>blueprint</code> tool.</p>
+
+<footer>
+	<p>&copy; 2010 <a href="http://devstructure.com/">DevStructure</a>, LLC.&nbsp; <a href="https://github.com/devstructure/blueprint/blob/master/LICENSE"><code>LICENSE</code></a></p>
+</footer>
+</body>
+</html>
