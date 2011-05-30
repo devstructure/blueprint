@@ -59,7 +59,7 @@ footer {
 	<p>In this part of the tutorial, we&#8217;ll create a very simple Sinatra web application on an Ubuntu server, but this workflow applies equally well to your favorite language, framework and distribution.</p>
 	<h2>Install dependencies</h2>
 	<pre><strong>sudo apt-get -y install ruby rubygems</strong>
-	<strong>sudo gem install --no-rdoc --no-ri sinatra</strong></pre>
+<strong>sudo gem install --no-rdoc --no-ri sinatra</strong></pre>
 	<p>Notice how you didn&#8217;t have to write any special code.</p>
 	<h2>Hack</h2>
 	<p><code>blueprint</code> isn&#8217;t here to tell you how to write web apps &mdash; that&#8217;s your expertise and we&#8217;re going to get you back to it as quickly as possible.&nbsp; &#8220;Hello, world,&#8221; in <a href="http://www.sinatrarb.com/">Sinatra</a> is but four lines of Ruby.</p>
@@ -123,7 +123,7 @@ chdir /var/www
 exec unicorn</pre>
 	<p>With everything configured, let&#8217;s restart servers and test.&nbsp; Visit <code>http://<em>your-server</em>/hi</code> to be greeted by Sinatra via Nginx.</p>
 	<pre><strong>sudo start tutorial</strong>
-	<strong>sudo /etc/init.d/nginx reload</strong></pre>
+<strong>sudo /etc/init.d/nginx reload</strong></pre>
 	<p>This is a good approximation of a simple production setup that we&#8217;ve completely mocked in development.</p>
 	<h2>Update your blueprint</h2>
 	<p>After making these changes to your environment, run <code>blueprint create <em>tutorial</em> -S</code> again to create a new version of your blueprint that includes your production-ready configuration.</p>
