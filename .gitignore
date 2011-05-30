@@ -1,5 +1,7 @@
 *
 !.gitignore
+!Makefile
+!build.py
 !templates
 !*.html
 !*.png
