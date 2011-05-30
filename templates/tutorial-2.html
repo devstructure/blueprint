@@ -1,60 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Tutorial, part 2 &mdash; Blueprint</title>
-<style type="text/css">
-html { text-align: center; }
-body {
-	font-size: 16px;
-	margin: 0 auto;
-	text-align: left;
-	width: 80%;
-}
-body, h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue", Helvetica, sans-serif; }
-a, a:link, a:hover, a:active, a:visited { color: #0040c5; }
-p, pre {
-	margin: 1.5em 0;
-	line-height: 1.5em;
-}
-h1 {
-	margin: 1em 0;
-	font-size: 1.5em;
-	line-height: 1em;
-}
-h2 {
-	margin: 1em 0;
-	font-size: 1.25em;
-	line-height: 1.2em;
-}
-ul, ol, dl {
-	margin: 1.5em 0;
-	padding: 0;
-}
-ul, ol { margin-left: 1.5em; }
-li, dt, dd {
-	margin: 0;
-	font-size: 1em;
-	line-height: 1.5em;
-}
-dd { margin: 0 0 0 1.5em; }
-header { text-align: center; }
-footer {
-	background: url(logo.png) no-repeat center bottom;
-	padding-bottom: 136px;
-	margin-bottom: 1.5em;
-	text-align: center;
-}
-</style>
-</head>
-<body>
-<header>
-	<h1>Blueprint</h1>
-	<p>Reverse engineer server configuration</p>
-</header>
-
+{% block content %}
 <section>
-	<h1>Tutorial, part 2 &mdash; your first blueprint</h1>
+	<h1>{% block title %}Tutorial, part 2{% endblock %} &mdash; your first blueprint</h1>
 	<p>Use the tools you know and love like <code>apt-get</code>, <code>gem</code>, <code>yum</code> and <code>pip</code> to configure your server.&nbsp; When you're ready to deploy, <code>blueprint</code> generates code to recreate your environment on any hosting provider.</p>
 	<p>In this part of the tutorial, we&#8217;ll create a very simple Sinatra web application on an Ubuntu server, but this workflow applies equally well to your favorite language, framework and distribution.</p>
 	<h2>Install dependencies</h2>
@@ -178,10 +124,4 @@ $</pre>
 <nav>
 	<p>In <a href="tutorial-3.html">part 3</a> we&#8217;ll deploy to production.</p>
 </nav>
-
-<footer>
-	<p>&copy; 2010 <a href="http://devstructure.com/">DevStructure</a>, LLC.&nbsp; <a href="https://github.com/devstructure/blueprint/blob/master/LICENSE"><code>LICENSE</code></a></p>
-</footer>
-</body>
-</html>
-
+{% endblock %}

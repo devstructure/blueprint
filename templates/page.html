@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}Documentation{% endblock %} &mdash; Blueprint</title>
+<style type="text/css">
+html { text-align: center; }
+body {
+	font-size: 16px;
+	margin: 0 auto;
+	text-align: left;
+	width: 80%;
+}
+body, h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue", Helvetica, sans-serif; }
+a, a:link, a:hover, a:active, a:visited { color: #0040c5; }
+p, pre {
+	margin: 1.5em 0;
+	line-height: 1.5em;
+}
+h1 {
+	margin: 1em 0;
+	font-size: 1.5em;
+	line-height: 1em;
+}
+h2 {
+	margin: 1em 0;
+	font-size: 1.25em;
+	line-height: 1.2em;
+}
+ul, ol, dl {
+	margin: 1.5em 0;
+	padding: 0;
+}
+ul, ol { margin-left: 1.5em; }
+li, dt, dd {
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+dd { margin: 0 0 0 1.5em; }
+header { text-align: center; }
+footer {
+	background: url(logo.png) no-repeat center bottom;
+	padding-bottom: 136px;
+	margin-bottom: 1.5em;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<header>
+	<h1>Blueprint</h1>
+	<p>Reverse engineer server configuration</p>
+</header>
+{% block content %}{% endblock %}
+<footer>
+	<p>&copy; 2010 <a href="http://devstructure.com/">DevStructure</a>, LLC.&nbsp; <a href="https://github.com/devstructure/blueprint/blob/master/LICENSE"><code>LICENSE</code></a></p>
+</footer>
+</body>
+</html>
