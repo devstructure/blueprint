@@ -16,7 +16,6 @@ logging.basicConfig(format='# [blueprint] %(message)s',
 
 import context_managers
 import git
-import ignore
 from manager import Manager
 import util
 
@@ -582,6 +581,7 @@ class Blueprint(dict):
         blob = git.blob(tree, '.blueprintignore')
         if blob is None:
             blob = git.blob(tree, '.gitignore')
+        import ignore
         if blob is None:
             return ignore.Rules('')
         content = git.content(blob)
