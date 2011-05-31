@@ -15,6 +15,7 @@
 baz*
 :file:/etc/foobar
 :package:apt/build\-essential
+!:source:/opt
 .
 .fi
 .
@@ -22,13 +23,16 @@ baz*
 Lines in \fB~/\.blueprintignore\fR are interpreted as in \fBgitignore\fR(5)\. Blank lines and lines that begin with a \fB#\fR will be ignored\. Patterns that begin with a \fB!\fR are negated\. As resources are considered for inclusion in a blueprint, the last matching line in \fB~/\.blueprintignore\fR wins\.
 .
 .P
-The general form of each line is \fB:\fR\fItype\fR\fB:\fR\fIresource\fR, where \fItype\fR is one of \fBfile\fR or \fBpackage\fR\. The \fBfile\fR type is assumed and typically seen without the full \fB:\fR\-prefixed form\.
+The general form of each line is \fB:\fR\fItype\fR\fB:\fR\fIresource\fR, where \fItype\fR is one of \fBfile\fR, \fBpackage\fR, or \fBsource\fR\. The \fBfile\fR type is assumed and typically seen without the full \fB:\fR\-prefixed form\.
 .
 .P
-Resources with type \fBpackages\fR are of the format \fImanager\fR\fB/\fR\fIpackage\fR\. Ignored packages implicitly ignore their dependencies as well\. Unignored packages (that is, package resources prefixed with \fB!\fR) affect only themselves and not their dependencies\.
+File resources that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
 .
 .P
-File patterns that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
+Package resources are of the form \fB:package:\fR\fImanager\fR\fB/\fR\fIpackage\fR\. Ignored packages implicitly ignore their dependencies as well\. Unignored packages (that is, package resources prefixed with \fB!\fR) affect only themselves and not their dependencies\.
+.
+.P
+Source resources must use the full \fB:source:\fR\fIresource\fR format and must be fully\-qualified (that is, begin with a \fB/\fR)\. By default, all directories except \fB/usr/local\fR are ignored as source resources\. If it is necessary to build and install software from source in another directory, use a negated source resource such as \fI!:source:/opt\fR\.
 .
 .P
 As part of \fBblueprint\-create\fR(1), the \fB~/\.blueprintignore\fR file that was used to create the blueprint is stored in the local blueprint repository\.
@@ -299,13 +303,21 @@ The following files are ignored if their content matches an expected hash\. They
 .IP "" 0
 .
 .P
-These defaults are not meant to be an exhuastive list of exceptions and edge cases found on Debian/Ubuntu systems\. Rather, they\'re meant to cover the base installation without hassle\.
+These defaults are not meant to be an exhuastive list of exceptions and edge cases\. Rather, they\'re meant to cover typical base installations without hassle\.
 .
 .SH "FILES"
 .
 .TP
 \fB~/\.blueprints\.git\fR
 The local repsitory where blueprints are stored, each on its own branch\.
+.
+.TP
+\fB/tmp/blueprint\-apt\-exclusions\fR, \fB/tmp/blueprint\-yum\-exclusions\fR
+The lists APT\- and Yum\-managed packages considered essential\.
+.
+.TP
+\fB/tmp/blueprintignore\fR
+A cached copy of the complete list of ignore rules\.
 .
 .SH "THEME SONG"
 The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
