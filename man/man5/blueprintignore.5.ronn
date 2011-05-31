@@ -8,16 +8,19 @@ blueprintignore(5) -- ignore specific resources when creating blueprints
 	baz*
 	:file:/etc/foobar
 	:package:apt/build-essential
+	!:source:/opt
 
 ## DESCRIPTION
 
 Lines in `~/.blueprintignore` are interpreted as in `gitignore`(5).  Blank lines and lines that begin with a `#` will be ignored.  Patterns that begin with a `!` are negated.  As resources are considered for inclusion in a blueprint, the last matching line in `~/.blueprintignore` wins.
 
-The general form of each line is `:`_type_`:`_resource_, where _type_ is one of `file` or `package`.  The `file` type is assumed and typically seen without the full `:`-prefixed form.
+The general form of each line is `:`_type_`:`_resource_, where _type_ is one of `file`, `package`, or `source`.  The `file` type is assumed and typically seen without the full `:`-prefixed form.
 
-Resources with type `packages` are of the format _manager_`/`_package_.  Ignored packages implicitly ignore their dependencies as well.  Unignored packages (that is, package resources prefixed with `!`) affect only themselves and not their dependencies.
+File resources that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
 
-File patterns that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
+Package resources are of the form `:package:`_manager_`/`_package_.  Ignored packages implicitly ignore their dependencies as well.  Unignored packages (that is, package resources prefixed with `!`) affect only themselves and not their dependencies.
+
+Source resources must use the full `:source:`_resource_ format and must be fully-qualified (that is, begin with a `/`).  By default, all directories except `/usr/local` are ignored as source resources.  If it is necessary to build and install software from source in another directory, use a negated source resource such as _!:source:/opt_.
 
 As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to create the blueprint is stored in the local blueprint repository.
 
@@ -113,12 +116,16 @@ The following files are ignored if their content matches an expected hash.  They
 * `/etc/ufw/before6.rules`
 * `/etc/ufw/ufw.conf`
 
-These defaults are not meant to be an exhuastive list of exceptions and edge cases found on Debian/Ubuntu systems.  Rather, they're meant to cover the base installation without hassle.
+These defaults are not meant to be an exhuastive list of exceptions and edge cases.  Rather, they're meant to cover typical base installations without hassle.
 
 ## FILES
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
+* `/tmp/blueprint-apt-exclusions`, `/tmp/blueprint-yum-exclusions`:
+  The lists APT- and Yum-managed packages considered essential.
+* `/tmp/blueprintignore`:
+  A cached copy of the complete list of ignore rules.
 
 ## THEME SONG
 
