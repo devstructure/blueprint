@@ -278,7 +278,7 @@ if cache is None:
     f.close()
 
 
-def file(pathname, ignored=False):
+def _ignore_pathname(restype, dirname, pathname, ignored=False):
     """
     Return `True` if the `gitignore`(5)-style `~/.blueprintignore` file says
     the given file should be ignored.  The starting state of the file may be
@@ -294,7 +294,7 @@ def file(pathname, ignored=False):
             if fnmatch.fnmatch(filename, pattern):
                 return os.path.isdir(pathname) if dir_only else True
         else:
-            for p in glob.glob(os.path.join('/etc', pattern)):
+            for p in glob.glob(os.path.join(dirname, pattern)):
                 if pathname == p or pathname.startswith('{0}/'.format(p)):
                     return os.path.isdir(pathname) if dir_only else True
         return False
@@ -304,12 +304,19 @@ def file(pathname, ignored=False):
     # include the file.  If only an exclusion rule matches, exclude the
     # file.  If an inclusion rule also matches, include the file.
     filename = os.path.basename(pathname)
-    for pattern, negate in cache['file']:
+    for pattern, negate in cache[restype]:
         if ignored != negate or not match(filename, pathname, pattern):
             continue
         ignored = not ignored
 
     return ignored
+
+
+def file(pathname, ignored=False):
+    """
+    Return `True` if the given pathname should be ignored.
+    """
+    return _ignore_pathname('file', '/etc', pathname, ignored)
 
 
 def package(manager, package, ignored=False):
@@ -323,6 +330,15 @@ def package(manager, package, ignored=False):
             continue
         ignored = not ignored
     return ignored
+
+
+def source(pathname, ignored=False):
+    """
+    Return `True` if the given pathname should be ignored.  Negated rules
+    on directories will create new source tarballs.  Other rules will
+    ignore files within those tarballs.
+    """
+    return _ignore_pathname('source', '/', pathname, ignored)
 
 
 class Rules(object):

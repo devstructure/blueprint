@@ -16,9 +16,8 @@ import tarfile
 from blueprint import ignore
 
 
-def sources(b):
-    logging.info('searching for software built from source')
-    tmpname = os.path.join(os.getcwd(), 'usr-local')
+def _source(b, dirname):
+    tmpname = os.path.join(os.getcwd(), dirname[1:].replace('/', '-'))
 
     exclude = []
 
@@ -28,10 +27,14 @@ def sources(b):
         r'lib/python[^/]+/(?:dist|site)-packages/easy-install.pth$')
     pattern_bin = re.compile(r'EASY-INSTALL(?:-ENTRY)?-SCRIPT')
 
-    # Create a partial shallow copy of `/usr/local`.
-    for dirpath, dirnames, filenames in os.walk('/usr/local'):
+    # Create a partial shallow copy of the directory.
+    for dirpath, dirnames, filenames in os.walk(dirname):
+
+        # Determine if this entire directory should be ignored by default.
+        ignored = ignore.file(dirpath)
+
         dirpath2 = os.path.normpath(
-            os.path.join(tmpname, os.path.relpath(dirpath, '/usr/local')))
+            os.path.join(tmpname, os.path.relpath(dirpath, dirname)))
 
         # Create this directory in the shallow copy with matching mode, owner,
         # and owning group.  Suggest running as `root` if this doesn't work.
@@ -56,6 +59,10 @@ def sources(b):
 
         for filename in filenames:
             pathname = os.path.join(dirpath, filename)
+
+            if ignore.source(pathname, ignored):
+                continue
+
             pathname2 = os.path.join(dirpath2, filename)
 
             # Exclude files that are part of the RubyGems package.
@@ -109,8 +116,8 @@ def sources(b):
                 raise e
 
     # Clean up dangling symbolic links.  This makes the assumption that
-    # no one intends to leave dangling symbolic links hanging around
-    # `/usr/local`, which I think is a good assumption.
+    # no one intends to leave dangling symbolic links hanging around,
+    # which I think is a good assumption.
     for dirpath, dirnames, filenames in os.walk(tmpname):
         for filename in filenames:
             pathname = os.path.join(dirpath, filename)
@@ -123,27 +130,34 @@ def sources(b):
                         os.unlink(pathname)
 
     # Remove empty directories.  For any that hang around, match their
-    # access and modification times to the source in `/usr/local`, otherwise
-    # the hash of the tarball will not be deterministic.
+    # access and modification times to the source, otherwise the hash of
+    # the tarball will not be deterministic.
     for dirpath, dirnames, filenames in os.walk(tmpname, topdown=False):
         try:
             os.rmdir(dirpath)
         except OSError:
             os.utime(dirpath, (s.st_atime, s.st_mtime))
 
-    # If the shallow copy of `/usr/local` still exists, create a tarball
-    # named by its SHA1 sum and include it in the blueprint.
+    # If the shallow copy of still exists, create a tarball named by its
+    # SHA1 sum and include it in the blueprint.
     try:
-        tar = tarfile.open('usr-local.tar', 'w')
+        tar = tarfile.open('tmp.tar', 'w')
         tar.add(tmpname, '.')
     except OSError:
         return
     finally:
         tar.close()
     sha1 = hashlib.sha1()
-    f = open('usr-local.tar', 'r')
+    f = open('tmp.tar', 'r')
     [sha1.update(buf) for buf in iter(lambda: f.read(4096), '')]
     f.close()
     tarname = '{0}.tar'.format(sha1.hexdigest())
-    os.rename('usr-local.tar', tarname)
-    b.sources['/usr/local'] = tarname
+    os.rename('tmp.tar', tarname)
+    b.sources[dirname] = tarname
+
+
+def sources(b):
+    logging.info('searching for software built from source')
+    for pathname, negate in ignore.cache['source']:
+        if negate and os.path.isdir(pathname) and not ignore.source(pathname):
+            _source(b, pathname)
