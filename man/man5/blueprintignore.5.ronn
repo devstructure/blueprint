@@ -123,7 +123,7 @@ These defaults are not meant to be an exhuastive list of exceptions and edge cas
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
 * `/tmp/blueprint-apt-exclusions`, `/tmp/blueprint-yum-exclusions`:
-  The lists APT- and Yum-managed packages considered essential.
+  The lists of APT- and Yum-managed packages considered essential.
 * `/tmp/blueprintignore`:
   A cached copy of the complete list of ignore rules.
 
