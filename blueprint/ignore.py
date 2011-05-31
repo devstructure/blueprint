@@ -296,7 +296,7 @@ def file(pathname, ignored=False):
         else:
             for p in glob.glob(os.path.join('/etc', pattern)):
                 if pathname == p or pathname.startswith('{0}/'.format(p)):
-                    return True
+                    return os.path.isdir(pathname) if dir_only else True
         return False
 
     # Iterate over exclusion rules until a match is found.  Then iterate
