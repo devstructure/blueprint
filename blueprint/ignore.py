@@ -216,6 +216,8 @@ if _cache is None:
         'file': IGNORE.items(),
         'package': [('apt', package, False) for package in apt_exclusions()] +
                    [('yum', package, False) for package in yum_exclusions()],
+        'source': [('/', False),
+                   ('/usr/local', True)],
     }
 
     # Cache the patterns stored in the `~/.blueprintignore` file.
@@ -267,6 +269,11 @@ if _cache is None:
                 if not negate:
                     for dep in getattr(deps, manager, lambda(s): [])(package):
                         _cache['package'].append((manager, dep, negate))
+
+            # Ignore (or, more likely, unignore) a directory that would be
+            # managed as a source tarball.
+            elif 'source' == restype:
+                _cache['source'].append((pattern, negate))
 
             # Swing and a miss.
             else:
