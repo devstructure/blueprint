@@ -81,7 +81,7 @@ def sources(b):
                 continue
 
             # Exclude executable placed by Python packages.
-            if pathname.startswith('/usr/local/bin/') and pattern_bin.match(
+            if pathname.startswith('/usr/local/bin/') and pattern_bin.search(
                 open(pathname).read()):
                 continue
 
