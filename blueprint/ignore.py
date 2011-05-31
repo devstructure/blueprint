@@ -1,3 +1,4 @@
+from collections import defaultdict
 import fnmatch
 import glob
 import json
@@ -200,25 +201,25 @@ def _mtime(pathname):
 
 
 # Check for a fresh cache of the complete blueprintignore(5) rules.
-_cache = None
+cache = None
 if _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE):
     try:
-        _cache = json.load(open(CACHE))
+        cache = defaultdict(list, json.load(open(CACHE)))
         logging.info('using cached blueprintignore rules')
     except (OSError, ValueError):
         pass
 
 # Build and cache the complete blueprintignore(5) rules.
-if _cache is None:
+if cache is None:
 
     # Cache things that are ignored by default first.
-    _cache = {
+    cache = defaultdict(list, {
         'file': IGNORE.items(),
         'package': [('apt', package, False) for package in apt_exclusions()] +
                    [('yum', package, False) for package in yum_exclusions()],
         'source': [('/', False),
                    ('/usr/local', True)],
-    }
+    })
 
     # Cache the patterns stored in the `~/.blueprintignore` file.
     try:
@@ -247,46 +248,33 @@ if _cache is None:
                     continue
             else:
                 restype = 'file'
-            if restype not in _cache:
-                continue
-
-            # Ignore or unignore a file, glob, or directory tree.
-            if 'file' == restype:
-                _cache['file'].append((pattern, negate))
 
             # Ignore a package and its dependencies or unignore a single
             # package.  Empirically, the best balance of power and granularity
             # comes from this arrangement.  Take build-esseantial's mutual
             # dependence with dpkg-dev as an example of why.
-            elif 'package' == restype:
+            if 'package' == restype:
                 try:
                     manager, package = pattern.split('/')
                 except ValueError:
                     logging.warning('invalid package ignore "{0}"'
                                     ''.format(pattern))
                     continue
-                _cache['package'].append((manager, package, negate))
+                cache['package'].append((manager, package, negate))
                 if not negate:
                     for dep in getattr(deps, manager, lambda(s): [])(package):
-                        _cache['package'].append((manager, dep, negate))
+                        cache['package'].append((manager, dep, negate))
 
-            # Ignore (or, more likely, unignore) a directory that would be
-            # managed as a source tarball.
-            elif 'source' == restype:
-                _cache['source'].append((pattern, negate))
-
-            # Swing and a miss.
+            # Ignore or unignore a file, glob, or directory tree.
             else:
-                logging.warning('unrecognized ignore type "{0}"'
-                                ''.format(restype))
-                continue
+                cache[restype].append((pattern, negate))
 
     except IOError:
         pass
 
     # Store the cache to disk.
     f = _cache_open(CACHE, 'w')
-    json.dump(_cache, f, indent=2, sort_keys=True)
+    json.dump(cache, f, indent=2, sort_keys=True)
     f.close()
 
 
@@ -316,7 +304,7 @@ def file(pathname, ignored=False):
     # include the file.  If only an exclusion rule matches, exclude the
     # file.  If an inclusion rule also matches, include the file.
     filename = os.path.basename(pathname)
-    for pattern, negate in _cache['file']:
+    for pattern, negate in cache['file']:
         if ignored != negate or not match(filename, pathname, pattern):
             continue
         ignored = not ignored
@@ -330,7 +318,7 @@ def package(manager, package, ignored=False):
     files, search for a negated rule after finding a match.  Return True to
     indicate the package should be ignored.
     """
-    for m, p, negate in _cache['package']:
+    for m, p, negate in cache['package']:
         if ignored != negate or manager != m or package != p and '*' != p:
             continue
         ignored = not ignored
