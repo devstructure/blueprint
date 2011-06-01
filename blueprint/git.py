@@ -34,7 +34,7 @@ def init():
             os.chown(dirname, uid, gid)
     except OSError:
         pass
-    p = subprocess.Popen(['git', '--git-dir', repo(), 'init', '--bare'],
+    p = subprocess.Popen(['git', '--git-dir', repo(), 'init', '--bare', '-q'],
                          close_fds=True,
                          preexec_fn=unroot,
                          stdout=sys.stderr,
