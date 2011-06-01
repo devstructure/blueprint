@@ -55,12 +55,7 @@ class Blueprint(dict):
         Construct a blueprint in the new format in a backwards-compatible
         manner.
         """
-
-        # Validate the blueprint name.
-        if name is not None and re.search(r'[/ \t\r\n]', name):
-            raise ValueError('invalid blueprint name')
         self.name = name
-
         self._commit = commit
 
         # Create a new blueprint object and populate it based on this server.
@@ -164,6 +159,17 @@ class Blueprint(dict):
         other.walk(after=after)
 
         return b
+
+    def get_name(self):
+        return self._name
+    def set_name(self, name):
+        """
+        Validate and set the blueprint name.
+        """
+        if name is not None and re.search(r'[/ \t\r\n]', name):
+            raise ValueError('invalid blueprint name')
+        self._name = name
+    name = property(get_name, set_name)
 
     @property
     def arch(self):
