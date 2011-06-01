@@ -1,0 +1,36 @@
+blueprint-diff(1) -- save the difference between two blueprints
+===============================================================
+
+## SYNOPSIS
+
+`blueprint diff` [`-m` _message_] [`-q`] _minuend_ _subtrahend_ _difference_  
+
+## DESCRIPTION
+
+`blueprint-diff` saves the difference between the blueprints _minuend_ and _subtrahend_ as _difference_.  Files, package versions, and source tarballs in _minuend_ that either differ from their counterparts in _subtrahend_ or do not appear at all will be included in _difference_.
+
+## OPTIONS
+
+* `-m` _message_, `--message=`_message_:
+  Commit message.
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).
