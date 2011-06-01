@@ -34,7 +34,7 @@ parser.add_option('-q', '--quiet',
                   default=False,
                   action='store_true',
                   help='operate quietly')
-(options, args) = parser.parse_args()
+options, args = parser.parse_args()
 
 if options.quiet:
     logging.root.setLevel(logging.CRITICAL)
