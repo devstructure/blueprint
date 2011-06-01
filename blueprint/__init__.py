@@ -117,14 +117,19 @@ class Blueprint(dict):
         other.walk(package=package)
 
         # The second pass removes managers that manage no packages, a
-        # potential side-effect of the first pass.
+        # potential side-effect of the first pass.  This step must be
+        # applied repeatedly until the blueprint reaches a steady state.
         def package(manager, package, version):
             if package not in b.packages:
                 return
             if 0 == len(b.packages[package]):
                 del b.packages[package]
                 del b.packages[self.managers[package].name][package]
-        other.walk(package=package)
+        while 1:
+            l = len(b.packages)
+            other.walk(package=package)
+            if len(b.packages) == l:
+                break
 
         # The third pass adds back special dependencies like `ruby*-dev`.
         # It isn't apparent from the rules above that a manager like RubyGems
