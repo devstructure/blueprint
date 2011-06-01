@@ -3,19 +3,21 @@ blueprint-create(1) -- create a blueprint
 
 ## SYNOPSIS
 
-`blueprint create` [`-P`|`-C`|`-S`] [`-m` _message_] [`-q`] _name_  
+`blueprint create` [`-P`|`-C`|`-S`|`-I`] [`-m` _message_] [`-q`] _name_  
 
 ## DESCRIPTION
 
 `blueprint-create` creates a list of all installed packages and modified configuration files and stores it in the branch _name_ in the local blueprint repository with the commit _message_ (if given).
 
-If one of `--puppet`, `--chef`, or `--sh` is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated and its filename will be printed to `stdout`.
+If one of `--puppet`, `--chef`, or `--sh` is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to `stdout`.  If `--ignore` is given, the `blueprintignore`(5) rules used to create the blueprint will be printed to `stdout`.
 
 Debian packages, Ruby gems, Python packages, and PHP PEAR/PECL packages are enumerated in the blueprint.  Debian packages that are listed as `essential`, `important`, `required`, or `standard` and those that are depended upon by `ubuntu-minimal`, `ubuntu-standard`, or `ubuntu-desktop` are ignored.
 
-The contents of system configuration files in `/etc` that have been created or modified from their packaged versions will be included in the blueprint.  `blueprintignore`(5) provides means for ignoring specific files.
+The contents of system configuration files in `/etc` that have been created or modified from their packaged versions will be included in the blueprint.
 
 Anything installed in `/usr/local` will be archived and included in the blueprint, tagged with the architecture (_amd64_ or _i386_) of the server.
+
+`blueprintignore`(5) provides means for ignoring specific files and packages plus treating arbitrary directories as `/usr/local` is treated.
 
 ## OPTIONS
 
@@ -25,6 +27,8 @@ Anything installed in `/usr/local` will be archived and included in the blueprin
   Generate a Chef cookbook.
 * `-S`, `--sh`:
   Generate POSIX shell code.
+* `-I`, `--ignore`:
+  Show the blueprint's ~/.blueprintignore.
 * `-m` _message_, `--message=`_message_:
   Commit message.
 * `-q`, `--quiet`:
