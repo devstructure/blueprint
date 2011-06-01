@@ -158,7 +158,8 @@ class Blueprint(dict):
                 for package in packages:
                     package = package.format(match.group(1))
                     for managername in ('apt', 'yum'):
-                        mine = self.packages[managername].get(package, None)
+                        mine = self.packages.get(managername, {}).get(package,
+                                                                      None)
                         if mine is not None:
                             b.packages[managername][package] = mine
         other.walk(after=after)
