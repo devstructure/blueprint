@@ -91,6 +91,11 @@ class Blueprint(dict):
         """
         b = copy.deepcopy(self)
 
+        # Compare file contents and metadata.  Keep files that differ.
+        for pathname, file in self.files.iteritems():
+            if other.files.get(pathname, {}) == file:
+                del b.files[pathname]
+
         # The first pass removes all duplicate packages that are not
         # themselves managers.  Allowing multiple versions of the same
         # packages complicates things slightly.  For each package, each
@@ -163,6 +168,12 @@ class Blueprint(dict):
                         if mine is not None:
                             b.packages[managername][package] = mine
         other.walk(after=after)
+
+        # Compare source tarball filenames, which indicate their content.
+        # Keep source tarballs that differ.
+        for dirname, filename in self.sources.iteritems():
+            if other.sources.get(dirname, '') == filename:
+                del b.sources[dirname]
 
         return b
 
