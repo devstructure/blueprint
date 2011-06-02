@@ -1,4 +1,6 @@
-# `blueprint` reverse engineers servers for you:
+# Blueprint
+
+## Blueprint reverse engineers servers for you
 
 * See what's been installed.
 * Standardize development environments.
@@ -6,21 +8,73 @@
 * Generate configurations for Puppet or Chef.
 * Audit your infrastructure.
 
-`blueprint` is DevStructure's workhorse tool that looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source to generate Puppet, Chef, or shell code.  Everything blueprint sees is stored in Git to be diffed and pushed.  It runs on Debian and RPM based distros with Python >= 2.6.
+Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source to generate Puppet, Chef, or shell code.  Everything Blueprint sees is stored in Git to be diffed and pushed.
 
-## Try it now!
+## Usage
+
+### Create your first blueprint
+
+	blueprint create my-first-blueprint
+
+Blueprint inspects your server and stores the results in its local repository.  `blueprint list` shows all the blueprints you've created on this server.
+
+### Generate POSIX shell code to recreate this environment elsewhere.
+
+	blueprint show -S my-first-blueprint
+
+`my-first-blueprint.sh` is written to your working directory.  Try out `-P` or `-C` to generate a Puppet module or a Chef cookbook.
+
+## Installation
+
+Prerequisites:
+
+* A Debian- or RPM-based Linux distribution
+* Python >= 2.6
+* Git >= 1.7
+
+### From source on Debian, Ubuntu, and Fedora
 
 	git clone git://github.com/devstructure/blueprint.git
 	cd blueprint
 	make && sudo make install
 
-Not sure what to do next?  Take a peek at our [install documentation](http://devstructure.github.com/blueprint/) or try this [tutorial](http://devstructure.github.com/blueprint/tutorial.html) that takes you from setup to production with a simple web application.
+### From source on CentOS and RHEL
+
+	rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+	yum install python26
+	git clone git://github.com/devstructure/blueprint.git
+	cd blueprint
+	make && sudo make install PYTHON=/usr/bin/python26
+
+This installs Python 2.6 from EPEL side-by-side with Python 2.4 and so won't break yum.
+
+### With a package manager
+
+DevStructure maintains Debian packages and Python eggs for Blueprint.  See [Installing with a package manager](https://github.com/devstructure/blueprint/wiki/Installing-with-a-package-manager) on the wiki.
+
+## Documentation
+
+The [Blueprint tutorial](https://devstructure.com/docs/tutorial.html) works through creating and deploying a simple web application via Blueprint.
+
+## Manuals
+
+* [blueprint(1)](http://devstructure.github.com/blueprint/blueprint.1.html)
+* [blueprint-list(1)](http://devstructure.github.com/blueprint/blueprint-list.1.html)
+* [blueprint-create(1)](http://devstructure.github.com/blueprint/blueprint-create.1.html)
+* [blueprint-show(1)](http://devstructure.github.com/blueprint/blueprint-show.1.html)
+* [blueprint-apply(1)](http://devstructure.github.com/blueprint/blueprint-apply.1.html)
+* [blueprint-destroy(1)](http://devstructure.github.com/blueprint/blueprint-destroy.1.html)
+* [blueprint(5)](http://devstructure.github.com/blueprint/blueprint.5.html)
+* [blueprintignore(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html)
+* [blueprint(7)](http://devstructure.github.com/blueprint/blueprint.7.html)
 
 ## Contribute
 
-`blueprint` is BSD-licensed.  We love bug reports and pull requests!
+Blueprint is [BSD-licensed](https://github.com/devstructure/blueprint/blob/master/LICENSE).
 
-* [Source code](https://github.com/devstructure/blueprint)
-* [Issue tracker](https://github.com/devstructure/blueprint/issues)
-* [Documentation](http://devstructure.github.com/blueprint/)
-* [Discuss](https://groups.google.com/forum/#!forum/blueprint-users) or `#devstructure` on Freenode
+* Source code: <https://github.com/devstructure/blueprint>
+* Issue tracker: <https://github.com/devstructure/blueprint/issues>
+* Documentation: <https://devstructure.com/docs/>
+* Wiki: <https://github.com/devstructure/blueprint/wiki>
+* Mailing list: <https://groups.google.com/forum/#!forum/blueprint-users>
+* IRC: `#devstructure` on Freenode

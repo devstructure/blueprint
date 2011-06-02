@@ -516,7 +516,7 @@ class Blueprint(dict):
 
         return c
 
-    def sh(self, secret=None):
+    def sh(self, server='https://devstructure.com', secret=None):
         """
         Generate shell code.
         """
@@ -526,7 +526,8 @@ class Blueprint(dict):
         # Extract source tarballs.
         if secret is not None:
             for dirname, filename in sorted(self.sources.iteritems()):
-                s.add('wget https://devstructure.com/{0}/{1}/{2}',
+                s.add('wget "{0}/{1}/{2}/{3}"',
+                      server,
                       secret,
                       self.name,
                       filename)
