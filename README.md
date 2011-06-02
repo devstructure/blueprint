@@ -58,15 +58,15 @@ The [Blueprint tutorial](https://devstructure.com/docs/tutorial.html) works thro
 
 ## Manuals
 
-* [blueprint(1)](http://devstructure.github.com/blueprint/blueprint.1.html)
-* [blueprint-list(1)](http://devstructure.github.com/blueprint/blueprint-list.1.html)
-* [blueprint-create(1)](http://devstructure.github.com/blueprint/blueprint-create.1.html)
-* [blueprint-show(1)](http://devstructure.github.com/blueprint/blueprint-show.1.html)
-* [blueprint-apply(1)](http://devstructure.github.com/blueprint/blueprint-apply.1.html)
-* [blueprint-destroy(1)](http://devstructure.github.com/blueprint/blueprint-destroy.1.html)
-* [blueprint(5)](http://devstructure.github.com/blueprint/blueprint.5.html)
-* [blueprintignore(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html)
-* [blueprint(7)](http://devstructure.github.com/blueprint/blueprint.7.html)
+* [`blueprint`(1)](http://devstructure.github.com/blueprint/blueprint.1.html)
+* [`blueprint-list`(1)](http://devstructure.github.com/blueprint/blueprint-list.1.html)
+* [`blueprint-create`(1)](http://devstructure.github.com/blueprint/blueprint-create.1.html)
+* [`blueprint-show`(1)](http://devstructure.github.com/blueprint/blueprint-show.1.html)
+* [`blueprint-apply`(1)](http://devstructure.github.com/blueprint/blueprint-apply.1.html)
+* [`blueprint-destroy`(1)](http://devstructure.github.com/blueprint/blueprint-destroy.1.html)
+* [`blueprint`(5)](http://devstructure.github.com/blueprint/blueprint.5.html)
+* [`blueprintignore`(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html)
+* [`blueprint`(7)](http://devstructure.github.com/blueprint/blueprint.7.html)
 
 ## Contribute
 
