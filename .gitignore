@@ -12,7 +12,3 @@ build
 control
 dist
 setup.py
-=======
-*
-!*.html
-!.gitignore
