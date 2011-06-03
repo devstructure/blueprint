@@ -1,6 +1,6 @@
 # Blueprint
 
-## Blueprint reverse engineers servers
+## `blueprint` reverse engineers servers:
 
 * Easy configuration management.
 * Detect relevant packages, files, and source installs.
@@ -8,21 +8,33 @@
 * Convert blueprints to Puppet or Chef.
 * No DSLs, no extra servers, no workflow changes.
 
-Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  Everything Blueprint sees is stored in Git.
+`blueprint` looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian and RPM based distros with Python >= 2.6.
 
 ## Usage
 
-### Create your first blueprint
+### Create a blueprint
 
-	blueprint create my-first-blueprint
-
+    blueprint create my-first-blueprint
+    
 Blueprint inspects your server and stores the results in its local repository.  `blueprint list` shows all the blueprints you've created on this server.
+	
+### Apply a blueprint
 
-### Generate POSIX shell code to recreate this environment elsewhere.
+    blueprint apply my-first-blueprint
+    
+Blueprint generates shell code from my-first-blueprint and executes it on the server. 
+
+### Generate POSIX shell code from a blueprint
 
 	blueprint show -S my-first-blueprint
 
 `my-first-blueprint.sh` is written to your working directory.  Try out `-P` or `-C` to generate a Puppet module or a Chef cookbook.
+
+### Diff a blueprint
+	
+	blueprint diff foo bar baz
+
+Blueprint subtracts bar from foo. Files, packages and source that appears in foo but not bar will be carried over to baz and everything else will be dropped.
 
 ## Installation
 
@@ -35,16 +47,23 @@ Prerequisites:
 ### From source on Debian, Ubuntu, and Fedora
 
 	git clone git://github.com/devstructure/blueprint.git
-	cd blueprint
-	make && sudo make install
+	(cd blueprint && make && sudo make install)
 
 ### From source on CentOS and RHEL
 
 	rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
 	yum install python26
 	git clone git://github.com/devstructure/blueprint.git
-	cd blueprint
-	make && sudo make install PYTHON=/usr/bin/python26
+	cd blueprint && make && sudo make install PYTHON=/usr/bin/python26
+
+This installs Python 2.6 from EPEL side-by-side with Python 2.4 and so won't break yum.
+
+### From source on CentOS and RHEL
+
+	rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+	yum install python26
+	git clone git://github.com/devstructure/blueprint.git
+	cd blueprint && make && sudo make install PYTHON=/usr/bin/python26
 
 This installs Python 2.6 from EPEL side-by-side with Python 2.4 and so won't break yum.
 
