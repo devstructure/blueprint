@@ -1,6 +1,6 @@
 # Blueprint
 
-## `blueprint` reverse engineers servers:
+## Blueprint reverse engineers servers:
 
 * Easy configuration management.
 * Detect relevant packages, files, and source installs.
@@ -8,7 +8,7 @@
 * Convert blueprints to Puppet or Chef.
 * No DSLs, no extra servers, no workflow changes.
 
-`blueprint` looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian and RPM based distros with Python >= 2.6.
+Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian and RPM based distros with Python >= 2.6.
 
 ## Usage
 
