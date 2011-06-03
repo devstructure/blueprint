@@ -1,6 +1,6 @@
 # Blueprint
 
-## Blueprint reverse engineers servers:
+## Blueprint reverse engineers servers
 
 * Easy configuration management.
 * Detect relevant packages, files, and source installs.
