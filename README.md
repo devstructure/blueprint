@@ -1,14 +1,14 @@
 # Blueprint
 
-## Blueprint reverse engineers servers for you
+## Blueprint reverse engineers servers
 
-* See what's been installed.
-* Standardize development environments.
-* Share stacks with your team.
-* Generate configurations for Puppet or Chef.
-* Audit your infrastructure.
+* Easy configuration management.
+* Detect relevant packages, files, and source installs.
+* Generate reusable server configs.
+* Convert blueprints to Puppet or Chef.
+* No DSLs, no extra servers, no workflow changes.
 
-Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source to generate Puppet, Chef, or shell code.  Everything Blueprint sees is stored in Git to be diffed and pushed.
+Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  Everything Blueprint sees is stored in Git.
 
 ## Usage
 
