@@ -82,19 +82,21 @@
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>blueprint create</code> [<code>-P</code>|<code>-C</code>|<code>-S</code>] [<code>-m</code> <em>message</em>] [<code>-q</code>] <em>name</em></p>
+<p><code>blueprint create</code> [<code>-P</code>|<code>-C</code>|<code>-S</code>|<code>-I</code>] [<code>-m</code> <em>message</em>] [<code>-q</code>] <em>name</em></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
 <p><code>blueprint-create</code> creates a list of all installed packages and modified configuration files and stores it in the branch <em>name</em> in the local blueprint repository with the commit <em>message</em> (if given).</p>
 
-<p>If one of <code>--puppet</code>, <code>--chef</code>, or <code>--sh</code> is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated and its filename will be printed to <code>stdout</code>.</p>
+<p>If one of <code>--puppet</code>, <code>--chef</code>, or <code>--sh</code> is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to <code>stdout</code>.  If <code>--ignore</code> is given, the <code>blueprintignore</code>(5) rules used to create the blueprint will be printed to <code>stdout</code>.</p>
 
 <p>Debian packages, Ruby gems, Python packages, and PHP PEAR/PECL packages are enumerated in the blueprint.  Debian packages that are listed as <code>essential</code>, <code>important</code>, <code>required</code>, or <code>standard</code> and those that are depended upon by <code>ubuntu-minimal</code>, <code>ubuntu-standard</code>, or <code>ubuntu-desktop</code> are ignored.</p>
 
-<p>The contents of system configuration files in <code>/etc</code> that have been created or modified from their packaged versions will be included in the blueprint.  <code>blueprintignore</code>(5) provides means for ignoring specific files.</p>
+<p>The contents of system configuration files in <code>/etc</code> that have been created or modified from their packaged versions will be included in the blueprint.</p>
 
 <p>Anything installed in <code>/usr/local</code> will be archived and included in the blueprint, tagged with the architecture (<em>amd64</em> or <em>i386</em>) of the server.</p>
+
+<p><code>blueprintignore</code>(5) provides means for ignoring specific files and packages plus treating arbitrary directories as <code>/usr/local</code> is treated.</p>
 
 <h2 id="OPTIONS">OPTIONS</h2>
 
@@ -102,6 +104,7 @@
 <dt><code>-P</code>, <code>--puppet</code></dt><dd>Generate a Puppet module.</dd>
 <dt><code>-C</code>, <code>--chef</code></dt><dd>Generate a Chef cookbook.</dd>
 <dt><code>-S</code>, <code>--sh</code></dt><dd>Generate POSIX shell code.</dd>
+<dt><code>-I</code>, <code>--ignore</code></dt><dd>Show the blueprint's ~/.blueprintignore.</dd>
 <dt><code>-m</code> <em>message</em>, <code>--message=</code><em>message</em></dt><dd>Commit message.</dd>
 <dt><code>-q</code>, <code>--quiet</code></dt><dd>Operate quietly.</dd>
 <dt><code>-h</code>, <code>--help</code></dt><dd>Show a help message.</dd>
@@ -122,7 +125,7 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#114;&#105;&#x63;&#104;&#x61;&#x72;&#100;&#64;&#100;&#101;&#118;&#x73;&#x74;&#114;&#117;&#x63;&#116;&#x75;&#114;&#101;&#x2e;&#x63;&#111;&#109;" data-bare-link="true">&#x72;&#x69;&#x63;&#x68;&#97;&#x72;&#100;&#64;&#x64;&#101;&#118;&#x73;&#x74;&#x72;&#x75;&#x63;&#x74;&#x75;&#114;&#101;&#x2e;&#99;&#111;&#109;</a></p>
+<p>Richard Crowley <a href="&#109;&#97;&#105;&#x6c;&#116;&#111;&#58;&#114;&#105;&#x63;&#104;&#x61;&#x72;&#x64;&#64;&#x64;&#101;&#x76;&#x73;&#x74;&#x72;&#x75;&#99;&#116;&#x75;&#114;&#x65;&#46;&#99;&#111;&#109;" data-bare-link="true">&#114;&#105;&#99;&#x68;&#97;&#114;&#x64;&#64;&#x64;&#101;&#118;&#115;&#x74;&#114;&#x75;&#99;&#116;&#117;&#114;&#101;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -131,7 +134,7 @@
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>May 2011</li>
+    <li class='tc'>June 2011</li>
     <li class='tr'>blueprint-create(1)</li>
   </ol>
 
