@@ -58,15 +58,6 @@ Prerequisites:
 
 This installs Python 2.6 from EPEL side-by-side with Python 2.4 and so won't break yum.
 
-### From source on CentOS and RHEL
-
-	rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
-	yum install python26
-	git clone git://github.com/devstructure/blueprint.git
-	cd blueprint && make && sudo make install PYTHON=/usr/bin/python26
-
-This installs Python 2.6 from EPEL side-by-side with Python 2.4 and so won't break yum.
-
 ### With a package manager
 
 DevStructure maintains Debian packages and Python eggs for Blueprint.  See [Installing with a package manager](https://github.com/devstructure/blueprint/wiki/Installing-with-a-package-manager) on the wiki.
