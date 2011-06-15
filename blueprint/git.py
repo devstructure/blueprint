@@ -67,7 +67,11 @@ def repo():
     """
     Return the full path to the Git repository.
     """
-    return os.path.expanduser('~/.blueprints.git')
+    if 'SUDO_USER' in os.environ:
+        return os.path.expanduser('~{0}/.blueprints.git'.
+            format(os.environ['SUDO_USER']))
+    else:
+        return os.path.expanduser('~/.blueprints.git')
 
 
 def rev_parse(refname):
