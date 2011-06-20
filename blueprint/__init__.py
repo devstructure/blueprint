@@ -188,11 +188,13 @@ class Blueprint(dict):
         self._name = name
     name = property(get_name, set_name)
 
-    @property
-    def arch(self):
+    def get_arch(self):
         if 'arch' not in self:
             self['arch'] = None
         return self['arch']
+    def set_arch(self, arch):
+        self['arch'] = arch
+    arch = property(get_arch, set_arch)
 
     @property
     def files(self):

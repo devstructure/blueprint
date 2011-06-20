@@ -6,6 +6,22 @@ import re
 import subprocess
 
 
+def arch():
+    """
+    Return the system's architecture according to dpkg or rpm.
+    """
+    try:
+        p = subprocess.Popen(['dpkg', '--print-architecture'],
+                             close_fds=True, stdout=subprocess.PIPE)
+    except OSError as e:
+        p = subprocess.Popen(['rpm', '--eval', '%_arch'],
+                             close_fds=True, stdout=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    if 0 != p.returncode:
+        return None
+    return stdout.rstrip()
+
+
 def lsb_release_codename():
     """
     Return the OS release's codename.

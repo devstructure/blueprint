@@ -14,6 +14,7 @@ import subprocess
 import tarfile
 
 from blueprint import ignore
+from blueprint import util
 
 
 def _source(b, dirname):
@@ -161,3 +162,5 @@ def sources(b):
     for pathname, negate in ignore.cache['source']:
         if negate and os.path.isdir(pathname) and not ignore.source(pathname):
             _source(b, pathname)
+    if 0 < len(b.sources):
+        b.arch = util.arch()
