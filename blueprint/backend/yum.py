@@ -27,8 +27,15 @@ def yum(b):
         package, group, epoch, version, arch = line.strip().split('\x1E')
         if ignore.package('yum', package):
             continue
+
         if '(none)' != epoch:
             version = '{0}:{1}'.format(epoch, version)
         if '(none)' != arch:
             version = '{0}.{1}'.format(version, arch)
         b.packages['yum'][package].append(version)
+
+        # Create service resources for each service in this package.
+        p = subprocess.Popen(['rpm', '-ql', package],
+                             close_fds=True, stdout=subprocess.PIPE)
+        for line in p.stdout:
+            b.add_service(line.rstrip(), packages=[package])

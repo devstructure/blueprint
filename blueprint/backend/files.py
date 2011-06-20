@@ -134,7 +134,6 @@ def files(b):
             if 0 < len(packages):
                 md5sums = [_dpkg_md5sum(package, pathname)
                            for package in packages]
-                # TODO Equivalent checksumming for RPMs.
             elif pathname in MD5SUMS:
                 md5sums = MD5SUMS[pathname]
                 for i in range(len(md5sums)):
@@ -204,6 +203,9 @@ def files(b):
                                      group=group,
                                      mode='{0:o}'.format(s.st_mode),
                                      owner=owner)
+
+            # If this file is a service, create a service resource.
+            b.add_service(pathname, files=[pathname])
 
 
 def _dpkg_query_S(pathname):

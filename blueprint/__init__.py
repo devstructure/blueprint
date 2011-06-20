@@ -226,10 +226,40 @@ class Blueprint(dict):
         return self['packages']
 
     @property
+    def services(self):
+        if 'services' not in self:
+            self['services'] = defaultdict(lambda: defaultdict(
+                lambda: defaultdict(list)))
+        return self['services']
+
+    @property
     def sources(self):
         if 'sources' not in self:
             self['sources'] = defaultdict(dict)
         return self['sources']
+
+    def add_service(self, pathname, files=[], packages=[]):
+        """
+        Parse the given pathname to create a service resource.  Associate
+        it with the given files and packages.
+        """
+        dirname, basename = os.path.split(pathname)
+        if '/etc/init' == dirname:
+            service, ext = os.path.splitext(basename)
+            if '.conf' != ext:
+                return
+            manager = 'upstart'
+        elif '/etc/init.d' == dirname \
+            and (not os.path.islink(pathname) \
+            or '/lib/init/upstart-job' != os.readlink(pathname)):
+            service= basename
+            manager = 'sysvinit'
+        else:
+            return
+        for file in files:
+            self.services[manager][service]['files'].append(file)
+        for package in packages:
+            self.services[manager][service]['packages'].append(package)
 
     def commit(self, message=''):
         """
