@@ -573,6 +573,9 @@ class Blueprint(dict):
             if 0 == len(manager):
                 return
             if 'apt' == manager.name:
+                s.add('export APT_LISTBUGS_FRONTEND="none"')
+                s.add('export APT_LISTCHANGES_FRONTEND="none"')
+                s.add('export DEBIAN_FRONTEND="noninteractive"')
                 s.add('apt-get -q update')
             elif 'yum' == manager.name:
                 s.add('yum makecache')
