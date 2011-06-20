@@ -150,9 +150,8 @@ def files(b):
                 and hashlib.md5(content).hexdigest() in md5sums \
                 and ignore.file(pathname, True):
                 continue
-            if True in [_rpm_V(package, pathname) and ignore.file(pathname,
-                                                                  True)
-                        for package in packages]:
+            if any([not _rpm_V(package, pathname) for package in packages]) \
+                and ignore.file(pathname, True):
                 continue
 
             # A symbolic link's content is the link target.
