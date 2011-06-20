@@ -205,7 +205,7 @@ def files(b):
                        owner=owner)
 
             # If this file is a service, create a service resource.
-            b.add_service(pathname, files=[pathname])
+            b.add_service(pathname, packages=packages)
 
 
 def _dpkg_query_S(pathname):
