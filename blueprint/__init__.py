@@ -238,6 +238,18 @@ class Blueprint(dict):
             self['sources'] = defaultdict(dict)
         return self['sources']
 
+    def add_file(self, pathname, **kwargs):
+        """
+        Create a file resource.
+        """
+        self.files[pathname] = kwargs
+
+    def add_package(self, manager, package, version):
+        """
+        Create a package resource.
+        """
+        self.packages[manager][package].append(version)
+
     def add_service(self, pathname, files=[], packages=[]):
         """
         Parse the given pathname to create a service resource.  Associate
@@ -247,7 +259,7 @@ class Blueprint(dict):
         if '/etc/init' == dirname:
             service, ext = os.path.splitext(basename)
             if '.conf' != ext:
-                return
+                return None
             manager = 'upstart'
         elif '/etc/init.d' == dirname \
             and (not os.path.islink(pathname) \
@@ -255,11 +267,18 @@ class Blueprint(dict):
             service= basename
             manager = 'sysvinit'
         else:
-            return
+            return None
         for file in files:
             self.services[manager][service]['files'].append(file)
         for package in packages:
             self.services[manager][service]['packages'].append(package)
+        return self.services[manager][service]
+
+    def add_source(self, dirname, filename):
+        """
+        Create a source tarball resource.
+        """
+        self.sources[dirname] = filename
 
     def commit(self, message=''):
         """

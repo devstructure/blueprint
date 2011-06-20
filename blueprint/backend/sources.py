@@ -154,7 +154,7 @@ def _source(b, dirname):
     f.close()
     tarname = '{0}.tar'.format(sha1.hexdigest())
     os.rename('tmp.tar', tarname)
-    b.sources[dirname] = tarname
+    b.add_source(dirname, tarname)
 
 
 def sources(b):

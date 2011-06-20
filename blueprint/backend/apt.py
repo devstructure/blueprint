@@ -27,7 +27,7 @@ def apt(b):
         if ignore.package('apt', package):
             continue
 
-        b.packages['apt'][package].append(version)
+        b.add_package('apt', package, version)
 
         # Create service resources for each service in this package.
         p = subprocess.Popen(['dpkg-query', '-L', package],

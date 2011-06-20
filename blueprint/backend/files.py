@@ -198,11 +198,12 @@ def files(b):
                 group = gr.gr_name
             except KeyError:
                 group = s.st_gid
-            b.files[pathname] = dict(content=content,
-                                     encoding=encoding,
-                                     group=group,
-                                     mode='{0:o}'.format(s.st_mode),
-                                     owner=owner)
+            b.add_file(pathname,
+                       content=content,
+                       encoding=encoding,
+                       group=group,
+                       mode='{0:o}'.format(s.st_mode),
+                       owner=owner)
 
             # If this file is a service, create a service resource.
             b.add_service(pathname, files=[pathname])

@@ -32,7 +32,7 @@ def yum(b):
             version = '{0}:{1}'.format(epoch, version)
         if '(none)' != arch:
             version = '{0}.{1}'.format(version, arch)
-        b.packages['yum'][package].append(version)
+        b.add_package('yum', package, version)
 
         # Create service resources for each service in this package.
         p = subprocess.Popen(['rpm', '-ql', package],
