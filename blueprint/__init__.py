@@ -222,14 +222,14 @@ class Blueprint(dict):
     @property
     def packages(self):
         if 'packages' not in self:
-            self['packages'] = defaultdict(lambda: defaultdict(list))
+            self['packages'] = defaultdict(lambda: defaultdict(set))
         return self['packages']
 
     @property
     def services(self):
         if 'services' not in self:
             self['services'] = defaultdict(lambda: defaultdict(
-                lambda: defaultdict(list)))
+                lambda: defaultdict(set)))
         return self['services']
 
     @property
@@ -248,7 +248,7 @@ class Blueprint(dict):
         """
         Create a package resource.
         """
-        self.packages[manager][package].append(version)
+        self.packages[manager][package].add(version)
 
     def add_service(self, pathname, files=[], packages=[]):
         """
@@ -269,9 +269,9 @@ class Blueprint(dict):
         else:
             return None
         for file in files:
-            self.services[manager][service]['files'].append(file)
+            self.services[manager][service]['files'].add(file)
         for package in packages:
-            self.services[manager][service]['packages'].append(package)
+            self.services[manager][service]['packages'].add(package)
         return self.services[manager][service]
 
     def add_source(self, dirname, filename):
@@ -335,7 +335,7 @@ class Blueprint(dict):
         for key in ['files', 'packages', 'sources']:
             if key in self and 0 == len(self[key]):
                 del self[key]
-        return json.dumps(self, indent=2, sort_keys=True)
+        return util.JSONEncoder(indent=2, sort_keys=True).encode(self)
 
     def puppet(self):
         """

@@ -2,6 +2,7 @@
 Utility functions.
 """
 
+import json
 import os
 import re
 import subprocess
@@ -81,3 +82,11 @@ def via_sudo():
     return 'SUDO_UID' in os.environ \
         and 'SUDO_GID' in os.environ \
         and -1 != os.environ.get('SUDO_COMMAND', '').find('blueprint')
+
+
+class JSONEncoder(json.JSONEncoder):
+
+    def default(self, o):
+        if isinstance(o, set):
+            return list(o)
+        return super(JSONEncoder, self).default(o)

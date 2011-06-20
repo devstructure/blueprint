@@ -83,7 +83,7 @@ def pypi(b):
                             continue
                         versions = b.packages['apt'][manager]
                         if stdout not in versions:
-                            versions.append(stdout)
+                            versions.add(stdout)
                         b.add_package(manager, package, version)
 
                     # This package was installed via `pip`.  Figure out how
@@ -130,7 +130,7 @@ def pypi(b):
                             continue
                         versions = b.packages['yum']['python']
                         if stdout not in versions:
-                            versions.append(stdout)
+                            versions.add(stdout)
                         b.add_package('python', package, version)
 
                     # This package was installed via `pip`.  Figure out how
