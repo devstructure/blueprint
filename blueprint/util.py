@@ -35,7 +35,7 @@ def rubygems_update():
     on Lucid and older systems.
     """
     codename = lsb_release_codename()
-    return codename is not None and codename[0] >= 'm'
+    return codename is not None and codename[0] < 'm'
 
 
 def rubygems_virtual():
