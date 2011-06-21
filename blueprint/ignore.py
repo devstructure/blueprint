@@ -204,7 +204,8 @@ def _mtime(pathname):
 
 # Check for a fresh cache of the complete blueprintignore(5) rules.
 cache = None
-if _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE):
+if _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE) \
+    and _mtime(__file__) < _mtime(CACHE):
     try:
         cache = defaultdict(list, json.load(open(CACHE)))
         logging.info('using cached blueprintignore rules')
