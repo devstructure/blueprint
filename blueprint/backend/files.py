@@ -16,6 +16,7 @@ import stat
 import subprocess
 
 from blueprint import ignore
+from blueprint import util
 
 
 # An extra list of pathnames and MD5 sums that will be checked after no
@@ -205,7 +206,12 @@ def files(b):
                        owner=owner)
 
             # If this file is a service, create a service resource.
-            b.add_service(pathname, packages=packages)
+            try:
+                manager, service = util.parse_service(pathname)
+                if not ignore.service(manager, service):
+                    b.add_service(manager, service, packages=packages)
+            except ValueError:
+                pass
 
 
 def _dpkg_query_S(pathname):

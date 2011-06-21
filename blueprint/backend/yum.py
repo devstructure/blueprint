@@ -6,6 +6,7 @@ import logging
 import subprocess
 
 from blueprint import ignore
+from blueprint import util
 
 
 def yum(b):
@@ -38,4 +39,9 @@ def yum(b):
         p = subprocess.Popen(['rpm', '-ql', package],
                              close_fds=True, stdout=subprocess.PIPE)
         for line in p.stdout:
-            b.add_service(line.rstrip(), packages=[package])
+            try:
+                manager, service = util.parse_service(line.rstrip())
+                if not ignore.service(manager, service):
+                    b.add_service(manager, service, packages=[package])
+            except ValueError:
+                pass

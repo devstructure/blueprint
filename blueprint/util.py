@@ -4,6 +4,7 @@ Utility functions.
 
 import json
 import os
+import os.path
 import re
 import subprocess
 
@@ -45,6 +46,25 @@ def lsb_release_codename():
         return lsb_release_codename._cache
     lsb_release_codename._cache = match.group(1)
     return lsb_release_codename._cache
+
+
+def parse_service(pathname):
+    """
+    Parse a potential service init script or config file into the
+    manager and service name or raise `ValueError`.
+    """
+    dirname, basename = os.path.split(pathname)
+    if '/etc/init' == dirname:
+        service, ext = os.path.splitext(basename)
+        if '.conf' != ext:
+            raise ValueError("not an Upstart config")
+        return ('upstart', service)
+    elif '/etc/init.d' == dirname \
+        and (not os.path.islink(pathname) \
+        or '/lib/init/upstart-job' != os.readlink(pathname)):
+        return ('sysvinit', basename)
+    else:
+        raise ValueError("not a service")
 
 
 def rubygems_update():

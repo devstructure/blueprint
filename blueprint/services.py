@@ -4,6 +4,7 @@ have already found the services of note but the file and package resources
 which need to trigger restarts have not been fully enumerated.
 """
 
+import logging
 import os.path
 import subprocess
 
@@ -36,6 +37,7 @@ def _service(b, manager, service, deps):
 
 
 def services(b):
+    logging.info('searching for service dependencies')
     for manager, services in b.services.iteritems():
         for service, deps in services.iteritems():
             _service(b, manager, service, deps)

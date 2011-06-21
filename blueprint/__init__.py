@@ -252,24 +252,10 @@ class Blueprint(dict):
         """
         self.packages[manager][package].add(version)
 
-    def add_service(self, pathname, files=[], packages=[]):
+    def add_service(self, manager, service, files=[], packages=[]):
         """
-        Parse the given pathname to create a service resource.  Associate
-        it with the given files and packages.
+        Create a service resource which depends on given files and packages.
         """
-        dirname, basename = os.path.split(pathname)
-        if '/etc/init' == dirname:
-            service, ext = os.path.splitext(basename)
-            if '.conf' != ext:
-                return None
-            manager = 'upstart'
-        elif '/etc/init.d' == dirname \
-            and (not os.path.islink(pathname) \
-            or '/lib/init/upstart-job' != os.readlink(pathname)):
-            service= basename
-            manager = 'sysvinit'
-        else:
-            return None
         for file in files:
             self.services[manager][service]['files'].add(file)
         for package in packages:
