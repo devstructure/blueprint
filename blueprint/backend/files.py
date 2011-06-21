@@ -82,37 +82,39 @@ def files(b):
         # Determine if this entire directory should be ignored by default.
         ignored = ignore.file(dirpath)
 
-        # Track the ctime of each file in this directory.  Weed out false
-        # positives by ignoring files with common ctimes.
-        ctimes = defaultdict(lambda: 0)
-
-        # Collect up the full pathname to each file and `lstat` them all.
+        # Collect up the full pathname to each file, `lstat` them all, and
+        # note which ones will probably be ignored.
         files = []
         for filename in filenames:
             pathname = os.path.join(dirpath, filename)
             try:
-                files.append((pathname, os.lstat(pathname)))
+                files.append((pathname,
+                              os.lstat(pathname),
+                              ignore.file(pathname, ignored)))
             except OSError as e:
-                logging.warning('{0} caused {1} - try running as root'
-                                ''.format(pathname, errno.errorcode[e.errno]))
+                logging.warning('{0} caused {1} - try running as root'.
+                                format(pathname, errno.errorcode[e.errno]))
 
-        # Map the ctimes of each directory entry.
-        for pathname, s in files:
-            ctimes[s.st_ctime] += 1
+        # Track the ctime of each file in this directory.  Weed out false
+        # positives by ignoring files with common ctimes.
+        ctimes = defaultdict(lambda: 0)
+
+        # Map the ctimes of each directory entry that isn't being ignored.
+        for pathname, s, ignored in files:
+            if not ignored:
+                ctimes[s.st_ctime] += 1
         for dirname in dirnames:
             try:
                 ctimes[os.lstat(os.path.join(dirpath, dirname)).st_ctime] += 1
             except OSError:
                 pass
 
-        for pathname, s in files:
+        for pathname, s, ignored in files:
 
-            # Ignore files that match in the `gitignore`(5)-style
-            # `~/.blueprintignore` file.  Default to ignoring files that
-            # share their ctime with other files in the directory.  This
-            # is a very strong indication that the file is original to
-            # the system and should be ignored.
-            if ignore.file(pathname, ignored or 1 < ctimes[s.st_ctime]):
+            # Ignore ignored files and files that share their ctime with other
+            # files in the directory.  This is a very strong indication that
+            # the file is original to the system and should be ignored.
+            if ignored or 1 < ctimes[s.st_ctime]:
                 continue
 
             # The content is used even for symbolic links to determine whether
@@ -183,8 +185,8 @@ def files(b):
             # Other types, like FIFOs and sockets are not supported within
             # a blueprint and really shouldn't appear in `/etc` at all.
             else:
-                logging.warning('{0} is not a regular file or symbolic link'
-                                ''.format(pathname))
+                logging.warning('{0} is not a regular file or symbolic link'.
+                                format(pathname))
                 continue
 
             try:
