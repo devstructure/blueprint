@@ -64,6 +64,8 @@ class Blueprint(dict):
             import backend
             for funcname in backend.__all__:
                 getattr(backend, funcname)(self)
+            import services
+            services.services(self)
 
         # Create a blueprint from a Git repository.
         elif name is not None:
