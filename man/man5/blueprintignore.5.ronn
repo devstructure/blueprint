@@ -28,6 +28,7 @@ All APT- or Yum-managed packages considered essential to the system are part of 
 
 The following files and directories are part of the default ignore list.  They can be negated using `!` just like any other pattern.
 
+* `*~`
 * `*.dpkg-*`
 * `/etc/.git`
 * `/etc/.pwd.lock`

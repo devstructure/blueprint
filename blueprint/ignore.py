@@ -16,7 +16,8 @@ from blueprint import deps
 # and cause matching files to be included in blueprints.
 #
 # XXX Update `blueprintignore`(5) if you make changes here.
-IGNORE = {'*.dpkg-*': False,
+IGNORE = {'*~': False,
+          '*.dpkg-*': False,
           '/etc/.git': False,
           '/etc/.pwd.lock': False,
           '/etc/X11/default-display-manager': False,
