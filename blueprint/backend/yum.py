@@ -35,7 +35,8 @@ def yum(b):
             version = '{0}.{1}'.format(version, arch)
         b.add_package('yum', package, version)
 
-        # Create service resources for each service in this package.
+        # Create service resources for each service init script or config
+        # in this package.
         p = subprocess.Popen(['rpm', '-ql', package],
                              close_fds=True, stdout=subprocess.PIPE)
         for line in p.stdout:

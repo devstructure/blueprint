@@ -15,6 +15,10 @@ pattern = re.compile(r'(/[/0-9A-Za-z_.-]+)')
 
 
 def _service_files(b, manager, service, deps):
+    """
+    Extract fully-qualified pathnames from files on which this service
+    depends as further dependencies.
+    """
     if 'files' not in deps:
         return
 
@@ -38,6 +42,10 @@ def _service_files(b, manager, service, deps):
 
 
 def _service_packages(b, manager, service, deps):
+    """
+    Extract files from packages on which this service depends as further
+    dependencies.
+    """
     if 'packages' not in deps:
         return
 
@@ -70,7 +78,7 @@ def services(b):
     for manager, services in b.services.iteritems():
         for service, deps in services.iteritems():
 
-            # Order is important here because many files of note are
-            # only discovered by the _service_packages step.
+            # Order is important here because many files of note
+            # are only discovered by the _service_packages step.
             _service_packages(b, manager, service, deps)
             _service_files(b, manager, service, deps)

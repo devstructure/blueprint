@@ -205,7 +205,8 @@ def files(b):
                        mode='{0:o}'.format(s.st_mode),
                        owner=owner)
 
-            # If this file is a service, create a service resource.
+            # If this file is a service init script or config , create a
+            # service resource.
             try:
                 manager, service = util.parse_service(pathname)
                 if not ignore.service(manager, service):

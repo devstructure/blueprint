@@ -30,7 +30,8 @@ def apt(b):
 
         b.add_package('apt', package, version)
 
-        # Create service resources for each service in this package.
+        # Create service resources for each service init script or config
+        # found in this package.
         p = subprocess.Popen(['dpkg-query', '-L', package],
                              close_fds=True, stdout=subprocess.PIPE)
         for line in p.stdout:
