@@ -8,7 +8,7 @@
 * Convert blueprints to Puppet or Chef.
 * No DSLs, no extra servers, no workflow changes.
 
-Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian and RPM based distros with Python >= 2.6. Move blueprints around with [Blueprint I/O](https://github.com/devstructure/blueprint-io).
+Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7.  Move blueprints around with [Blueprint I/O](https://github.com/devstructure/blueprint-io).
 
 ## Usage
 
