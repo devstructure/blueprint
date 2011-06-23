@@ -363,25 +363,84 @@ class Blueprint(dict):
             return ignore.Rules('')
         return ignore.Rules(content)
 
-    def walk(self, managername=None, **kwargs):
+    def walk(self, **kwargs):
         """
-        Walk a blueprint tree and execute callbacks along the way.  This is
+        Walk an entire blueprint in the appropriate order, executing
+        callbacks along the way.  See blueprint(5) for details on the
+        algorithm.  The callbacks are passed directly from this method
+        to the resource type-specific methods and are documented there.
+        """
+        self.walk_sources(**kwargs)
+        self.walk_files(**kwargs)
+        self.walk_packages(**kwargs)
+        self.walk_services(**kwargs)
+
+    def walk_sources(self, **kwargs):
+        """
+        Walk a blueprint's source tarballs and execute callbacks.
+
+        * `before_sources():`
+          Executed before source tarballs are enumerated.
+        * `source(dirname, filename, gen_content):`
+          Executed when a source tarball is enumerated.  `gen_content`
+          is a callable that will return the file's contents.
+        * `after_sources():`
+          Executed after source tarballs are enumerated.
+        """
+
+        getattr(kwargs.get('before_sources'), '__call__', lambda: None)()
+
+        callable = getattr(kwargs.get('source', None),
+                           '__call__',
+                           lambda dirname, filename, gen_content: None)
+        tree = git.tree(self._commit)
+        for dirname, filename in sorted(self.sources.iteritems()):
+            blob = git.blob(tree, filename)
+            callable(dirname, filename, lambda: git.content(blob))
+
+        getattr(kwargs.get('after_sources'), '__call__', lambda: None)()
+
+    def walk_files(self, **kwargs):
+        """
+        Walk a blueprint's files and execute callbacks.
+
+        * `before_files():`
+          Executed before files are enumerated.
+        * `file(pathname, meta):`
+          Executed when a file is enumerated.
+        * `after_files():`
+          Executed after files are enumerated.
+        """
+
+        getattr(kwargs.get('before_files'), '__call__', lambda: None)()
+
+        callable = getattr(kwargs.get('file', None),
+                           '__call__',
+                           lambda pathname, meta: None)
+        for pathname, meta in sorted(self.files.iteritems()):
+            callable(pathname, meta)
+
+        getattr(kwargs.get('after_files'), '__call__', lambda: None)()
+
+    def walk_packages(self, managername=None, **kwargs):
+        """
+        Walk a package tree and execute callbacks along the way.  This is
         a bit like iteration but can't match the iterator protocol due to
         the varying argument lists given to each type of callback.  The
         available callbacks are:
 
         * `before_packages(manager):`
           Executed before a package manager's dependencies are enumerated.
-        * `package(manager, package, versions):`
-          Executed when a package is enumerated.
+        * `package(manager, package, version):`
+          Executed when a package version is enumerated.
         * `after_packages(manager):`
           Executed after a package manager's dependencies are enumerated.
         """
 
         # Walking begins with the system package managers, `apt` and `yum`.
         if managername is None:
-            self.walk('apt', **kwargs)
-            self.walk('yum', **kwargs)
+            self.walk_packages('apt', **kwargs)
+            self.walk_packages('yum', **kwargs)
             return
 
         # Get the full manager from its name.  Watch out for KeyError (by
@@ -390,29 +449,62 @@ class Blueprint(dict):
         manager = Manager(managername, self.packages.get(managername, {}))
 
         # Give the manager a chance to setup for its dependencies.
-        callable = getattr(kwargs.get('before_packages'), '__call__', None)
-        if callable:
-            callable(manager)
+        getattr(kwargs.get('before_packages'),
+                '__call__',
+                lambda manager: None)(manager)
 
         # Each package gets its chance to take action.  Note which packages
         # are themselves managers so they may be visited recursively later.
         managers = []
-        callable = getattr(kwargs.get('package', None), '__call__', None)
+        callable = getattr(kwargs.get('package', None),
+                           '__call__',
+                           lambda manager, package, version: None)
         for package, versions in sorted(manager.iteritems()):
-            if callable:
-                for version in versions:
-                    callable(manager, package, version)
+            for version in versions:
+                callable(manager, package, version)
             if managername != package and package in self.packages:
                 managers.append(package)
 
         # Give the manager a change to cleanup after itself.
-        callable = getattr(kwargs.get('after_packages'), '__call__', None)
-        if callable:
-            callable(manager)
+        getattr(kwargs.get('after_packages'),
+                '__call__',
+                lambda manager: None)(manager)
 
         # Now recurse into each manager that was just installed.  Recursing
         # here is safer because there may be secondary dependencies that are
         # not expressed in the hierarchy (for example the `mysql2` gem
         # depends on `libmysqlclient-dev` in addition to its manager).
         for managername in managers:
-            self.walk(managername, **kwargs)
+            self.walk_packages(managername, **kwargs)
+
+    def walk_services(self, managername=None, **kwargs):
+        """
+        Walk a blueprint's services and execute callbacks.
+
+        * `before_services(managername):`
+          Executed before a service manager's dependencies are enumerated.
+        * `service(managername, service, deps):`
+          Executed when a service is enumerated.
+        * `after_services(managername):`
+          Executed after a service manager's dependencies are enumerated.
+        """
+
+        # Unless otherwise specified, walk all service managers.
+        if managername is None:
+            for managername in sorted(self.services.iterkeys()):
+                self.walk_services(managername, **kwargs)
+            return
+
+        getattr(kwargs.get('before_services'),
+                '__call__',
+                lambda managername: None)(managername)
+
+        callable = getattr(kwargs.get('service', None),
+                           '__call__',
+                           lambda managername, service, deps: None)
+        for service, deps in sorted(self.services[managername].iteritems()):
+            callable(managername, service, deps)
+
+        getattr(kwargs.get('after_services'),
+                '__call__',
+                lambda managername: None)(managername)
