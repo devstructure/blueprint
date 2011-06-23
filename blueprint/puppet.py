@@ -238,7 +238,7 @@ class Resource(dict):
         The string representation of a resource is the Puppet syntax for a
         reference as used when declaring dependencies.
         """
-        return u'{0}["{1}"]'.format(self.type.capitalize(), self.name)
+        return u'{0}[\'{1}\']'.format(self.type.capitalize(), self.name)
 
     @property
     def type(self):
@@ -338,7 +338,7 @@ class Class(Resource):
         in the grammar.
         """
         name, count = re.subn(r'\.', '--', unicode(self.name))
-        return u'{0}["{1}"]'.format(self.type.capitalize(), name)
+        return u'{0}[\'{1}\']'.format(self.type.capitalize(), name)
 
 
 class File(Resource):
@@ -373,7 +373,7 @@ class File(Resource):
                 del self.content
         else:
             if self.content is not None and 'source' not in self:
-                self['content'] = BareString(u'template("{0}/{1}")'.format(
+                self['content'] = BareString(u'template(\'{0}/{1}\')'.format(
                     self.modulename,
                     self.name[1:]))
         return super(File, self).dumps(inline, tab)
