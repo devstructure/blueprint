@@ -51,17 +51,35 @@ def lsb_release_codename():
 def parse_service(pathname):
     """
     Parse a potential service init script or config file into the
-    manager and service name or raise `ValueError`.
+    manager and service name or raise `ValueError`.  Use the Upstart
+    "start on" stanzas and SysV init's LSB headers to restrict services to
+    only those that start at boot and run all the time.
     """
     dirname, basename = os.path.split(pathname)
     if '/etc/init' == dirname:
         service, ext = os.path.splitext(basename)
+
+        # Ignore extraneous files in /etc/init.
         if '.conf' != ext:
             raise ValueError("not an Upstart config")
+
+        # Ignore services that don't operate on the (faked) main runlevels.
+        if not re.search(r'start on .*runlevel \[[2345]',
+                         open(pathname).read()):
+            raise ValueError("not a running service")
+
         return ('upstart', service)
-    elif '/etc/init.d' == dirname \
-        and (not os.path.islink(pathname) \
-        or '/lib/init/upstart-job' != os.readlink(pathname)):
+    elif '/etc/init.d' == dirname:
+
+        # Let Upstart handle its services.
+        if os.path.islink(pathname) \
+            and '/lib/init/upstart-job' == os.readlink(pathname):
+            raise ValueError("proxy for an Upstart config")
+
+        # Ignore services that don't operate on the main runlevels.
+        if not re.search(r'Default-Start:\s*[2345]', open(pathname).read()):
+            raise ValueError("not a running service")
+
         return ('sysvinit', basename)
     else:
         raise ValueError("not a service")
