@@ -122,6 +122,14 @@ def via_sudo():
         and -1 != os.environ.get('SUDO_COMMAND', '').find('blueprint')
 
 
+class BareString(unicode):
+    """
+    Strings of this type will not be quoted when written into a Puppet
+    manifest or Chef cookbook.
+    """
+    pass
+
+
 class JSONEncoder(json.JSONEncoder):
 
     def default(self, o):

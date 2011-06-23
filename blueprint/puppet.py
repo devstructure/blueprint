@@ -10,6 +10,8 @@ import os.path
 import re
 import tarfile
 
+from blueprint.util import BareString
+
 
 class Manifest(object):
     """
@@ -174,14 +176,6 @@ class Manifest(object):
             tarball.close()
             return filename
         return filename
-
-
-class BareString(unicode):
-    """
-    Strings of this type will not be quoted when written into a Puppet
-    manifest.
-    """
-    pass
 
 
 class Resource(dict):
