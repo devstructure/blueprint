@@ -10,7 +10,167 @@ import os.path
 import re
 import tarfile
 
-from blueprint.util import BareString
+from blueprint import git
+from blueprint import util
+
+
+def puppet(b):
+    """
+    Generate Puppet code.
+    """
+    m = Manifest(b.name, comment=b.DISCLAIMER)
+
+    # Set the default `PATH` for exec resources.
+    m.add(Exec.defaults(path=os.environ['PATH']))
+
+    # Extract source tarballs.
+    tree = git.tree(b._commit)
+    for dirname, filename in sorted(b.sources.iteritems()):
+        blob = git.blob(tree, filename)
+        content = git.content(blob)
+        pathname = os.path.join('/tmp', filename)
+        m['sources'].add(File(
+            pathname,
+            b.name,
+            content,
+            owner='root',
+            group='root',
+            mode='0644',
+            source='puppet:///modules/{0}/{1}'.format(b.name, pathname[1:])))
+        m['sources'].add(Exec('tar xf {0}'.format(pathname),
+                              alias=filename,
+                              cwd=dirname,
+                              require=File.ref(pathname)))
+
+    # Place files.
+    if 0 < len(b.files):
+        for pathname, f in sorted(b.files.iteritems()):
+
+            # Create resources for parent directories and let the
+            # autorequire mechanism work out dependencies.
+            dirnames = os.path.dirname(pathname).split('/')[1:]
+            for i in xrange(len(dirnames)):
+                m['files'].add(File(os.path.join('/', *dirnames[0:i + 1]),
+                                    ensure='directory'))
+
+            # Create the actual file resource.
+            if '120000' == f['mode'] or '120777' == f['mode']:
+                m['files'].add(File(pathname,
+                                    None,
+                                    None,
+                                    owner=f['owner'],
+                                    group=f['group'],
+                                    ensure=f['content']))
+                continue
+            content = f['content']
+            if 'base64' == f['encoding']:
+                content = base64.b64decode(content)
+            m['files'].add(File(pathname,
+                                b.name,
+                                content,
+                                owner=f['owner'],
+                                group=f['group'],
+                                mode=f['mode'][-4:],
+                                ensure='file'))
+
+    # Install packages.
+    deps = []
+
+    def before(manager):
+        if 0 == len(manager):
+            return
+        if 1 == len(manager) and manager.name in manager:
+            return
+        if 'apt' == manager.name:
+            m['packages'].add(Exec('apt-get -q update',
+                                   before=Class.ref('apt')))
+        elif 'yum' == manager.name:
+            m['packages'].add(Exec('yum makecache', before=Class.ref('yum')))
+        deps.append(manager)
+
+    def package(manager, package, version):
+
+        # `apt` and `yum` are easy since they're the default for their
+        # respective platforms.
+        if manager.name in ('apt', 'yum'):
+            m['packages'][manager].add(Package(package, ensure=version))
+
+            # If APT is installing RubyGems, get complicated.  This would
+            # make sense to do with Yum, too, but there's no consensus on
+            # where, exactly, you might find RubyGems from Yum.  Going
+            # the other way, it's entirely likely that doing this sort of
+            # forced upgrade goes against the spirit of Blueprint itself.
+            match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
+            if match is not None and util.rubygems_update():
+                m['packages'][manager].add(Exec('/bin/sh -c "' # No ,
+                    '/usr/bin/gem{0} install --no-rdoc --no-ri ' # No ,
+                    'rubygems-update; /usr/bin/ruby{0} ' # No ,
+                    '$(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
+                    'which update_rubygems)"'.format(match.group(1)),
+                    require=Package.ref(package)))
+
+        # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
+        # built in provider.  This is called simply "rubygems" on
+        # RPM-based distros.
+        elif manager.name in ('rubygems', 'rubygems1.8'):
+            m['packages'][manager].add(Package(package,
+                                               ensure=version,
+                                               provider='gem'))
+
+        # Other versions of RubyGems are slightly more complicated.
+        elif re.search(r'ruby', manager.name) is not None:
+            match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
+                             manager.name)
+            m['packages'][manager].add(Exec(
+                manager(package, version),
+                creates='{0}/{1}/gems/{2}-{3}'.format(util.rubygems_path(),
+                                                      match.group(1),
+                                                      package,
+                                                      version)))
+
+        # Python works basically like alternative versions of Ruby
+        # but follows a less predictable directory structure so the
+        # directory is not known ahead of time.  This just so happens
+        # to be the way everything else works, too.
+        else:
+            m['packages'][manager].add(Exec(manager(package, version)))
+
+    b.walk(before=before, package=package)
+    m['packages'].dep(*[Class.ref(dep) for dep in deps])
+
+    # Manage services and all their dependencies.
+    restypes = {'files': File,
+                'packages': Package,
+                'sources': Exec}
+    for manager, services in sorted(b.services.iteritems()):
+        for service, service_deps in sorted(services.iteritems()):
+
+            # Transform dependency list into a subscribe parameter.
+            subscribe = []
+            for restype, names in sorted(service_deps.iteritems()):
+                if 'sources' == restype:
+                    names = [b.sources[name] for name in names]
+                subscribe.append(restypes[restype].ref(*sorted(names)))
+
+            kwargs = {'enable': True,
+                      'ensure': 'running',
+                      'subscribe': subscribe}
+            if 'upstart' == manager:
+                kwargs['provider'] = 'upstart'
+            m['services'][manager].add(Service(service, **kwargs))
+
+    # Strict ordering of classes.  Don't bother with services since
+    # they manage their own dependencies.
+    deps = []
+    if 0 < len(b.sources):
+        deps.append('sources')
+    if 0 < len(b.files):
+        deps.append('files')
+    if 0 < len(b.packages):
+        deps.append('packages')
+    m.dep(*[Class.ref(dep) for dep in deps])
+
+    return m
 
 
 class Manifest(object):
@@ -255,7 +415,7 @@ class Resource(dict):
         elif bare and re.match(r'^[0-9a-zA-Z]+$', u'{0}'.format(
             value)) is not None:
             return value
-        elif hasattr(value, 'bare') or isinstance(value, BareString):
+        elif hasattr(value, 'bare') or isinstance(value, util.BareString):
             return value.replace(u'$', u'\\$')
         elif isinstance(value, Resource):
             return repr(value)
@@ -367,22 +527,22 @@ class File(Resource):
                 del self.content
         else:
             if self.content is not None and 'source' not in self:
-                self['content'] = BareString(u'template(\'{0}/{1}\')'.format(
-                    self.modulename,
-                    self.name[1:]))
+                self['content'] = util.BareString(u'template(\'{0}/{1}\')'.
+                                                  format(self.modulename,
+                                                         self.name[1:]))
         return super(File, self).dumps(inline, tab)
-
-
-class Package(Resource):
-    """
-    Puppet package resource.
-    """
-    pass
 
 
 class Exec(Resource):
     """
     Puppet exec resource.
+    """
+    pass
+
+
+class Package(Resource):
+    """
+    Puppet package resource.
     """
     pass
 

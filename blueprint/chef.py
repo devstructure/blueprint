@@ -10,7 +10,122 @@ import os.path
 import re
 import tarfile
 
-from blueprint.util import BareString
+from blueprint import git
+from blueprint import util
+
+
+def chef(b):
+    """
+    Generate Chef code.
+    """
+    c = Cookbook(b.name, comment=b.DISCLAIMER)
+
+    # Extract source tarballs.
+    tree = git.tree(b._commit)
+    for dirname, filename in sorted(b.sources.iteritems()):
+        blob = git.blob(tree, filename)
+        content = git.content(blob)
+        pathname = os.path.join('/tmp', filename)
+        c.file(pathname,
+               content,
+               owner='root',
+               group='root',
+               mode='0644',
+               backup=False,
+               source=pathname[1:])
+        c.execute(filename,
+                  command='tar xf {0}'.format(pathname),
+                  cwd=dirname)
+
+    # Place files.
+    for pathname, f in sorted(b.files.iteritems()):
+        c.directory(os.path.dirname(pathname),
+                    group='root',
+                    mode='0755',
+                    owner='root',
+                    recursive=True)
+        if '120000' == f['mode'] or '120777' == f['mode']:
+            c.link(pathname,
+                   owner=f['owner'],
+                   group=f['group'],
+                   to=f['content'])
+            continue
+        content = f['content']
+        if 'base64' == f['encoding']:
+            content = base64.b64decode(content)
+        c.file(pathname, content,
+               owner=f['owner'],
+               group=f['group'],
+               mode=f['mode'][-4:],
+               backup=False,
+               source=pathname[1:])
+
+    # Install packages.
+    def before(manager):
+        if 0 == len(manager):
+            return
+        if 'apt' == manager.name:
+            c.execute('apt-get -q update')
+        elif 'yum' == manager.name:
+            c.execute('yum makecache')
+
+    def package(manager, package, version):
+        if manager.name == package:
+            return
+
+        if manager.name in ('apt', 'yum'):
+            c.package(package, version=version)
+
+            # See comments on this section in `puppet` above.
+            match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
+            if match is not None and util.rubygems_update():
+                c.execute('/usr/bin/gem{0} install --no-rdoc --no-ri ' # No ,
+                          'rubygems-update'.format(match.group(1)))
+                c.execute('/usr/bin/ruby{0} ' # No ,
+                          '$(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
+                          'which update_rubygems)"'.format(match.group(1)))
+
+        # All types of gems get to have package resources.
+        elif 'rubygems' == manager.name:
+            c.gem_package(package, version=version)
+        elif re.search(r'ruby', manager.name) is not None:
+            match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
+                             manager.name)
+            c.gem_package(package,
+                gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
+                version=version)
+
+        # Everything else is an execute resource.
+        else:
+            c.execute(manager(package, version))
+
+    b.walk(before=before, package=package)
+
+    # Manage services and all their dependencies.
+    restypes = {'files': 'cookbook_file[{0}]', # FIXME Broken for inlining.
+                'packages': 'package[{0}]',
+                'sources': 'execute[{0}]'}
+    for manager, services in sorted(b.services.iteritems()):
+        for service, service_deps in sorted(services.iteritems()):
+
+            # Transform dependency list into a subscribes attribute.
+            subscribe = []
+            for restype, names in sorted(service_deps.iteritems()):
+                if 'sources' == restype:
+                    names = [b.sources[name] for name in names]
+                subscribe.extend([restypes[restype].format(name)
+                                  for name in names])
+            subscribe = util.BareString('resources(' \
+                + ', '.join([repr(s) for s in subscribe]) + ')')
+
+            kwargs = {'action': [[':enable', ':start']],
+                      'subscribes': [':restart', subscribe]}
+            if 'upstart' == manager:
+                kwargs['provider'] = util.BareString(
+                    'Chef::Provider::Service::Upstart')
+            c.service(service, **kwargs)
+
+    return c
 
 
 class Cookbook(object):
@@ -169,7 +284,7 @@ class Resource(dict):
             return 'false'
         elif 1 < len(value) and ':' == value[0]:
             return value
-        elif hasattr(value, 'bare') or isinstance(value, BareString):
+        elif hasattr(value, 'bare') or isinstance(value, util.BareString):
             return value
         elif isinstance(value, cls):
             return repr(value)
