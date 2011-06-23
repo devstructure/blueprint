@@ -2,6 +2,7 @@
 Puppet code generator.
 """
 
+import base64
 import codecs
 import errno
 from collections import defaultdict
@@ -23,16 +24,15 @@ def puppet(b):
     # Set the default `PATH` for exec resources.
     m.add(Exec.defaults(path=os.environ['PATH']))
 
-    # Extract source tarballs.
-    tree = git.tree(b._commit)
-    for dirname, filename in sorted(b.sources.iteritems()):
-        blob = git.blob(tree, filename)
-        content = git.content(blob)
+    def source(dirname, filename, gen_content):
+        """
+        Create file and exec resources to fetch and extract a source tarball.
+        """
         pathname = os.path.join('/tmp', filename)
         m['sources'].add(File(
             pathname,
             b.name,
-            content,
+            gen_content(),
             owner='root',
             group='root',
             mode='0644',
@@ -42,41 +42,43 @@ def puppet(b):
                               cwd=dirname,
                               require=File.ref(pathname)))
 
-    # Place files.
-    if 0 < len(b.files):
-        for pathname, f in sorted(b.files.iteritems()):
+    def file(pathname, meta):
+        """
+        Create a file resource.
+        """
 
-            # Create resources for parent directories and let the
-            # autorequire mechanism work out dependencies.
-            dirnames = os.path.dirname(pathname).split('/')[1:]
-            for i in xrange(len(dirnames)):
-                m['files'].add(File(os.path.join('/', *dirnames[0:i + 1]),
-                                    ensure='directory'))
+        # Create resources for parent directories and let the
+        # autorequire mechanism work out dependencies.
+        dirnames = os.path.dirname(pathname).split('/')[1:]
+        for i in xrange(len(dirnames)):
+            m['files'].add(File(os.path.join('/', *dirnames[0:i + 1]),
+                                ensure='directory'))
 
-            # Create the actual file resource.
-            if '120000' == f['mode'] or '120777' == f['mode']:
-                m['files'].add(File(pathname,
-                                    None,
-                                    None,
-                                    owner=f['owner'],
-                                    group=f['group'],
-                                    ensure=f['content']))
-                continue
-            content = f['content']
-            if 'base64' == f['encoding']:
-                content = base64.b64decode(content)
+        # Create the actual file resource.
+        if '120000' == meta['mode'] or '120777' == meta['mode']:
             m['files'].add(File(pathname,
-                                b.name,
-                                content,
-                                owner=f['owner'],
-                                group=f['group'],
-                                mode=f['mode'][-4:],
-                                ensure='file'))
+                                None,
+                                None,
+                                owner=meta['owner'],
+                                group=meta['group'],
+                                ensure=meta['content']))
+            return
+        content = meta['content']
+        if 'base64' == meta['encoding']:
+            content = base64.b64decode(content)
+        m['files'].add(File(pathname,
+                            b.name,
+                            content,
+                            owner=meta['owner'],
+                            group=meta['group'],
+                            mode=meta['mode'][-4:],
+                            ensure='file'))
 
-    # Install packages.
     deps = []
-
     def before_packages(manager):
+        """
+        Create exec resources to configure the package managers.
+        """
         if 0 == len(manager):
             return
         if 1 == len(manager) and manager.name in manager:
@@ -89,6 +91,9 @@ def puppet(b):
         deps.append(manager)
 
     def package(manager, package, version):
+        """
+        Create a package resource.
+        """
 
         # `apt` and `yum` are easy since they're the default for their
         # respective platforms.
@@ -135,29 +140,34 @@ def puppet(b):
         else:
             m['packages'][manager].add(Exec(manager(package, version)))
 
-    b.walk(before_packages=before_packages, package=package)
-    m['packages'].dep(*[Class.ref(dep) for dep in deps])
-
-    # Manage services and all their dependencies.
     restypes = {'files': File,
                 'packages': Package,
                 'sources': Exec}
-    for manager, services in sorted(b.services.iteritems()):
-        for service, service_deps in sorted(services.iteritems()):
+    def service(manager, service, deps):
+        """
+        Create a service resource and subscribe to its dependencies.
+        """
 
-            # Transform dependency list into a subscribe parameter.
-            subscribe = []
-            for restype, names in sorted(service_deps.iteritems()):
-                if 'sources' == restype:
-                    names = [b.sources[name] for name in names]
-                subscribe.append(restypes[restype].ref(*sorted(names)))
+        # Transform dependency list into a subscribe parameter.
+        subscribe = []
+        for restype, names in sorted(deps.iteritems()):
+            if 'sources' == restype:
+                names = [b.sources[name] for name in names]
+            subscribe.append(restypes[restype].ref(*sorted(names)))
 
-            kwargs = {'enable': True,
-                      'ensure': 'running',
-                      'subscribe': subscribe}
-            if 'upstart' == manager:
-                kwargs['provider'] = 'upstart'
-            m['services'][manager].add(Service(service, **kwargs))
+        kwargs = {'enable': True,
+                  'ensure': 'running',
+                  'subscribe': subscribe}
+        if 'upstart' == manager:
+            kwargs['provider'] = 'upstart'
+        m['services'][manager].add(Service(service, **kwargs))
+
+    b.walk(source=source,
+           file=file,
+           before_packages=before_packages,
+           package=package,
+           service=service)
+    m['packages'].dep(*[Class.ref(dep) for dep in deps])
 
     # Strict ordering of classes.  Don't bother with services since
     # they manage their own dependencies.
