@@ -61,7 +61,7 @@ def chef(b):
                source=pathname[1:])
 
     # Install packages.
-    def before(manager):
+    def before_packages(manager):
         if 0 == len(manager):
             return
         if 'apt' == manager.name:
@@ -99,7 +99,7 @@ def chef(b):
         else:
             c.execute(manager(package, version))
 
-    b.walk(before=before, package=package)
+    b.walk(before_packages=before_packages, package=package)
 
     # Manage services and all their dependencies.
     restypes = {'files': 'cookbook_file[{0}]', # FIXME Broken for inlining.

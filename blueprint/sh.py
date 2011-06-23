@@ -58,7 +58,7 @@ def sh(b, server='https://devstructure.com', secret=None):
             s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
 
     # Install packages.
-    def before(manager):
+    def before_packages(manager):
         if 0 == len(manager):
             return
         if 'apt' == manager.name:
@@ -84,7 +84,7 @@ def sh(b, server='https://devstructure.com', secret=None):
             s.add('/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
                   'which update_rubygems)', match.group(1))
 
-    b.walk(before=before, package=package)
+    b.walk(before_packages=before_packages, package=package)
 
     return s
 

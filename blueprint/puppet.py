@@ -76,7 +76,7 @@ def puppet(b):
     # Install packages.
     deps = []
 
-    def before(manager):
+    def before_packages(manager):
         if 0 == len(manager):
             return
         if 1 == len(manager) and manager.name in manager:
@@ -135,7 +135,7 @@ def puppet(b):
         else:
             m['packages'][manager].add(Exec(manager(package, version)))
 
-    b.walk(before=before, package=package)
+    b.walk(before_packages=before_packages, package=package)
     m['packages'].dep(*[Class.ref(dep) for dep in deps])
 
     # Manage services and all their dependencies.

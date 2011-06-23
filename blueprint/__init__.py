@@ -144,7 +144,7 @@ class Blueprint(dict):
         # be considered a missing dependency in the Debian archive but in
         # reality it's only _likely_ that you need `ruby*-dev` to use
         # `rubygems*`.
-        def after(manager):
+        def after_packages(manager):
             if manager.name not in b.packages:
                 return
 
@@ -169,7 +169,7 @@ class Blueprint(dict):
                                                                       None)
                         if mine is not None:
                             b.packages[managername][package] = mine
-        other.walk(after=after)
+        other.walk(after_packages=after_packages)
 
         # Compare source tarball filenames, which indicate their content.
         # Keep source tarballs that differ.
@@ -365,17 +365,17 @@ class Blueprint(dict):
 
     def walk(self, managername=None, **kwargs):
         """
-        Walk a package tree and execute callbacks along the way.  This is
+        Walk a blueprint tree and execute callbacks along the way.  This is
         a bit like iteration but can't match the iterator protocol due to
         the varying argument lists given to each type of callback.  The
         available callbacks are:
 
-        * `before(manager):`
-          Executed before a manager's dependencies are enumerated.
+        * `before_packages(manager):`
+          Executed before a package manager's dependencies are enumerated.
         * `package(manager, package, versions):`
           Executed when a package is enumerated.
-        * `after(manager):`
-          Executed after a manager's dependencies are enumerated.
+        * `after_packages(manager):`
+          Executed after a package manager's dependencies are enumerated.
         """
 
         # Walking begins with the system package managers, `apt` and `yum`.
@@ -390,7 +390,7 @@ class Blueprint(dict):
         manager = Manager(managername, self.packages.get(managername, {}))
 
         # Give the manager a chance to setup for its dependencies.
-        callable = getattr(kwargs.get('before', None), '__call__', None)
+        callable = getattr(kwargs.get('before_packages'), '__call__', None)
         if callable:
             callable(manager)
 
@@ -406,7 +406,7 @@ class Blueprint(dict):
                 managers.append(package)
 
         # Give the manager a change to cleanup after itself.
-        callable = getattr(kwargs.get('after', None), '__call__', None)
+        callable = getattr(kwargs.get('after_packages'), '__call__', None)
         if callable:
             callable(manager)
 
