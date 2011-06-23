@@ -229,8 +229,7 @@ class Blueprint(dict):
     @property
     def services(self):
         if 'services' not in self:
-            self['services'] = defaultdict(lambda: defaultdict(
-                lambda: defaultdict(set)))
+            self['services'] = defaultdict(lambda: defaultdict(dict))
         return self['services']
 
     @property
@@ -251,15 +250,45 @@ class Blueprint(dict):
         """
         self.packages[manager][package].add(version)
 
-    def add_service(self, manager, service, files=[], packages=[]):
+    def add_service(self, manager, service):
         """
         Create a service resource which depends on given files and packages.
         """
-        for file in files:
-            self.services[manager][service]['files'].add(file)
-        for package in packages:
-            self.services[manager][service]['packages'].add(package)
-        return self.services[manager][service]
+        self.services[manager][service]
+
+    def add_service_file(self, manager, service, *args):
+        """
+        Add file dependencies to a service resource.
+        """
+        print('add_service_file', manager, service, args)
+        if 0 == len(args):
+            return
+        s = self.services[manager][service].setdefault('files', set())
+        for dirname in args:
+            s.add(dirname)
+
+    def add_service_package(self, manager, service, package_manager, *args):
+        """
+        Add package dependencies to a service resource.
+        """
+        print('add_service_package', manager, service, package_manager, args)
+        if 0 == len(args):
+            return
+        d = self.services[manager][service].setdefault('packages',
+                                                       defaultdict(set))
+        for package in args:
+            d[package_manager].add(package)
+
+    def add_service_source(self, manager, service, *args):
+        """
+        Add source tarball dependencies to a service resource.
+        """
+        print('add_service_source', manager, service, args)
+        if 0 == len(args):
+            return
+        s = self.services[manager][service].setdefault('sources', set())
+        for dirname in args:
+            s.add(dirname)
 
     def add_source(self, dirname, filename):
         """

@@ -38,6 +38,7 @@ def apt(b):
             try:
                 manager, service = util.parse_service(line.rstrip())
                 if not ignore.service(manager, service):
-                    b.add_service(manager, service, packages=[package])
+                    b.add_service(manager, service)
+                    b.add_service_package(manager, service, 'apt', package)
             except ValueError:
                 pass

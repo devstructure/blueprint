@@ -129,7 +129,9 @@ def files(b):
             # Ignore files that are from the `base-files` package (which
             # doesn't include MD5 sums for every file for some reason),
             # are unchanged from their packaged version, or match in `MD5SUMS`.
-            packages = _dpkg_query_S(pathname) + _rpm_qf(pathname)
+            apt_packages = _dpkg_query_S(pathname)
+            yum_packages = _rpm_qf(pathname)
+            packages = apt_packages + yum_packages
             if 'base-files' in packages:
                 continue
             if 0 < len(packages):
@@ -210,7 +212,15 @@ def files(b):
             try:
                 manager, service = util.parse_service(pathname)
                 if not ignore.service(manager, service):
-                    b.add_service(manager, service, packages=packages)
+                    b.add_service(manager, service)
+                    b.add_service_package(manager,
+                                          service,
+                                          'apt',
+                                          *apt_packages)
+                    b.add_service_package(manager,
+                                          service,
+                                          'yum',
+                                          *yum_packages)
             except ValueError:
                 pass
 

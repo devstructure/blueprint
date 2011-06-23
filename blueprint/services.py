@@ -4,6 +4,7 @@ have already found the services of note but the file and package resources
 which need to trigger restarts have not been fully enumerated.
 """
 
+from collections import defaultdict
 import logging
 import os.path
 import re
@@ -35,10 +36,10 @@ def _service_files(b, manager, service, deps):
         content = open(pathname).read()
         for match in pattern.finditer(content):
             if match.group(1) in b.files:
-                b.services[manager][service]['files'].add(match.group(1))
+                b.add_service_file(manager, service, match.group(1))
         for dirname in b.sources.iterkeys():
             if -1 != content.find(dirname):
-                b.services[manager][service]['sources'].add(dirname)
+                b.add_service_source(manager, service, dirname)
 
 
 def _service_packages(b, manager, service, deps):
@@ -51,26 +52,31 @@ def _service_packages(b, manager, service, deps):
 
     # Build a map of the directory that contains each file in the
     # blueprint to the pathname of that file.
-    dirs = dict([(os.path.dirname(pathname), pathname)
-                 for pathname in b.files])
-    for dirname in ('/etc', '/etc/init', '/etc/init.d'):
-        dirs.pop(dirname, None)
+    dirs = defaultdict(list)
+    for pathname in b.files:
+        dirname = os.path.dirname(pathname)
+        if dirname not in ('/etc', '/etc/init', '/etc/init.d'):
+            dirs[dirname].append(pathname)
 
     # Add dependencies for every file in the blueprint that's also in
     # this service's package or in a directory in this service's package.
-    for package in deps['packages']:
-        try:
-            p = subprocess.Popen(['dpkg-query', '-L', package],
-                                 close_fds=True, stdout=subprocess.PIPE)
-        except OSError as e:
-            p = subprocess.Popen(['rpm', '-ql', package],
-                                 close_fds=True, stdout=subprocess.PIPE)
-        for line in p.stdout:
-            pathname = line.rstrip()
-            if pathname in b.files:
-                b.services[manager][service]['files'].add(pathname)
-            elif pathname in dirs:
-                b.services[manager][service]['files'].add(dirs[pathname])
+    for package_manager, packages in deps['packages'].iteritems():
+        if 'apt' == package_manager:
+            argv = ['dpkg-query', '-L']
+        elif 'yum' == package_manager:
+            argv = ['rpm', '-ql']
+        else:
+            continue
+        for package in packages:
+            p = subprocess.Popen(argv + [package],
+                                 close_fds=True,
+                                 stdout=subprocess.PIPE)
+            for line in p.stdout:
+                pathname = line.rstrip()
+                if pathname in b.files:
+                    b.add_service_file(manager, service, pathname)
+                elif pathname in dirs:
+                    b.add_service_file(manager, service, *dirs[pathname])
 
 
 def services(b):
