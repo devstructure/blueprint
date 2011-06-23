@@ -247,8 +247,8 @@ class Resource(dict):
         """
         return self._type
 
-    @staticmethod
-    def _dumps(value, bare=True):
+    @classmethod
+    def _dumps(cls, value, bare=True):
         """
         Return a value as it should be written.
         """
@@ -265,6 +265,11 @@ class Resource(dict):
             return value.replace(u'$', u'\\$')
         elif isinstance(value, Resource):
             return repr(value)
+        elif isinstance(value, list):
+            if 1 == len(value):
+                return cls._dumps(value[0])
+            else:
+                return '[' + ', '.join([cls._dumps(v) for v in value]) + ']'
         return repr(unicode(value).replace(u'$', u'\\$'))[1:]
 
     def dumps(self, inline=False, tab=''):
@@ -322,18 +327,18 @@ class Resource(dict):
         return '\n'.join(out)
 
 
-class Package(Resource):
+class Class(Resource):
     """
-    Puppet package resource.
+    Puppet class resource.
     """
-    pass
 
-
-class Exec(Resource):
-    """
-    Puppet exec resource.
-    """
-    pass
+    def __repr__(self):
+        """
+        Puppet class resource names cannot contain dots due to limitations
+        in the grammar.
+        """
+        name, count = re.subn(r'\.', '--', unicode(self.name))
+        return u'{0}["{1}"]'.format(self.type.capitalize(), name)
 
 
 class File(Resource):
@@ -374,15 +379,22 @@ class File(Resource):
         return super(File, self).dumps(inline, tab)
 
 
-class Class(Resource):
+class Package(Resource):
     """
-    Puppet class resource.
+    Puppet package resource.
     """
+    pass
 
-    def __repr__(self):
-        """
-        Puppet class resource names cannot contain dots due to limitations
-        in the grammar.
-        """
-        name, count = re.subn(r'\.', '--', unicode(self.name))
-        return u'{0}["{1}"]'.format(self.type.capitalize(), name)
+
+class Exec(Resource):
+    """
+    Puppet exec resource.
+    """
+    pass
+
+
+class Service(Resource):
+    """
+    Puppet service resource.
+    """
+    pass
