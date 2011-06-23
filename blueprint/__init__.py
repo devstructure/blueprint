@@ -510,7 +510,9 @@ class Blueprint(dict):
                    mode='0644',
                    backup=False,
                    source=pathname[1:])
-            c.execute('tar xf {0}'.format(pathname), cwd=dirname)
+            c.execute(filename,
+                      command='tar xf {0}'.format(pathname),
+                      cwd=dirname)
 
         # Place files.
         for pathname, f in sorted(self.files.iteritems()):
@@ -575,6 +577,30 @@ class Blueprint(dict):
                 c.execute(manager(package, version))
 
         self.walk(before=before, package=package)
+
+        # Manage services and all their dependencies.
+        restypes = {'files': 'cookbook_file[{0}]', # FIXME Broken for inlining.
+                    'packages': 'package[{0}]',
+                    'sources': 'execute[{0}]'}
+        for manager, services in sorted(self.services.iteritems()):
+            for service, service_deps in sorted(services.iteritems()):
+
+                # Transform dependency list into a subscribes attribute.
+                subscribe = []
+                for restype, names in sorted(service_deps.iteritems()):
+                    if 'sources' == restype:
+                        names = [self.sources[name] for name in names]
+                    subscribe.extend([restypes[restype].format(name)
+                                      for name in names])
+                subscribe = util.BareString('resources(' \
+                    + ', '.join([repr(s) for s in subscribe]) + ')')
+
+                kwargs = {'action': [[':enable', ':start']],
+                          'subscribes': [':restart', subscribe]}
+                if 'upstart' == manager:
+                    kwargs['provider'] = util.BareString(
+                        'Chef::Provider::Service::Upstart')
+                c.service(service, **kwargs)
 
         return c
 

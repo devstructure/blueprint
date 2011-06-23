@@ -10,6 +10,8 @@ import os.path
 import re
 import tarfile
 
+from blueprint.util import BareString
+
 
 class Cookbook(object):
     """
@@ -32,24 +34,6 @@ class Cookbook(object):
         """
         self.resources.append(resource)
 
-    def package(self, name, **kwargs):
-        """
-        Create a package resource provided by the default provider.
-        """
-        self.add(Resource('package', name, **kwargs))
-
-    def gem_package(self, name, **kwargs):
-        """
-        Create a package resource provided by RubyGems.
-        """
-        self.add(Resource('gem_package', name, **kwargs))
-
-    def execute(self, name, **kwargs):
-        """
-        Create an execute resource.
-        """
-        self.add(Resource('execute', name, **kwargs))
-
     def directory(self, name, **kwargs):
         """
         Create a directory resource.
@@ -68,6 +52,30 @@ class Cookbook(object):
         cookbook is dumped to a string or to files.
         """
         self.add(File(name, content, **kwargs))
+
+    def package(self, name, **kwargs):
+        """
+        Create a package resource provided by the default provider.
+        """
+        self.add(Resource('package', name, **kwargs))
+
+    def gem_package(self, name, **kwargs):
+        """
+        Create a package resource provided by RubyGems.
+        """
+        self.add(Resource('gem_package', name, **kwargs))
+
+    def execute(self, name, **kwargs):
+        """
+        Create an execute resource.
+        """
+        self.add(Resource('execute', name, **kwargs))
+
+    def service(self, name, **kwargs):
+        """
+        Create a service resource.
+        """
+        self.add(Resource('service', name, **kwargs))
 
     def _dump(self, w, inline=False):
         """
@@ -147,7 +155,7 @@ class Resource(dict):
         self.name = name
 
     @classmethod
-    def _dumps(cls, value):
+    def _dumps(cls, value, recursive=False):
         """
         Return a value as it should be written.  If the value starts with
         a ':', it will be written as-is.  Otherwise, it will be written as
@@ -159,10 +167,18 @@ class Resource(dict):
             return 'true'
         elif False == value:
             return 'false'
-        elif 0 < len(value) and ':' == value[0]:
+        elif 1 < len(value) and ':' == value[0]:
+            return value
+        elif hasattr(value, 'bare') or isinstance(value, BareString):
             return value
         elif isinstance(value, cls):
             return repr(value)
+        elif isinstance(value, list) or isinstance(value, tuple):
+            s = ', '.join([cls._dumps(v, True) for v in value])
+            if recursive:
+                return '[' + s + ']'
+            else:
+                return s
         return repr(unicode(value).replace(u'#{', u'\\#{'))[1:]
 
     def dumps(self, inline=False):
