@@ -413,17 +413,15 @@ class Blueprint(dict):
           Executed after source tarballs are enumerated.
         """
 
-        getattr(kwargs.get('before_sources'), '__call__', lambda: None)()
+        kwargs.get('before_sources', lambda *args: None)()
 
-        callable = getattr(kwargs.get('source', None),
-                           '__call__',
-                           lambda dirname, filename, gen_content: None)
+        callable = kwargs.get('source', lambda *args: None)
         tree = git.tree(self._commit)
         for dirname, filename in sorted(self.sources.iteritems()):
             blob = git.blob(tree, filename)
             callable(dirname, filename, lambda: git.content(blob))
 
-        getattr(kwargs.get('after_sources'), '__call__', lambda: None)()
+        kwargs.get('before_sources', lambda *args: None)()
 
     def walk_files(self, **kwargs):
         """
@@ -437,15 +435,13 @@ class Blueprint(dict):
           Executed after files are enumerated.
         """
 
-        getattr(kwargs.get('before_files'), '__call__', lambda: None)()
+        kwargs.get('before_files', lambda *args: None)()
 
-        callable = getattr(kwargs.get('file', None),
-                           '__call__',
-                           lambda pathname, f: None)
+        callable = kwargs.get('file', lambda *args: None)
         for pathname, f in sorted(self.files.iteritems()):
             callable(pathname, f)
 
-        getattr(kwargs.get('after_files'), '__call__', lambda: None)()
+        kwargs.get('after_files', lambda *args: None)()
 
     def walk_packages(self, managername=None, **kwargs):
         """
@@ -474,16 +470,12 @@ class Blueprint(dict):
         manager = Manager(managername, self.packages.get(managername, {}))
 
         # Give the manager a chance to setup for its dependencies.
-        getattr(kwargs.get('before_packages'),
-                '__call__',
-                lambda manager: None)(manager)
+        kwargs.get('before_packages', lambda *args: None)(manager)
 
         # Each package gets its chance to take action.  Note which packages
         # are themselves managers so they may be visited recursively later.
         managers = []
-        callable = getattr(kwargs.get('package', None),
-                           '__call__',
-                           lambda manager, package, version: None)
+        callable = kwargs.get('package', lambda *args: None)
         for package, versions in sorted(manager.iteritems()):
             for version in versions:
                 callable(manager, package, version)
@@ -491,9 +483,7 @@ class Blueprint(dict):
                 managers.append(package)
 
         # Give the manager a change to cleanup after itself.
-        getattr(kwargs.get('after_packages'),
-                '__call__',
-                lambda manager: None)(manager)
+        kwargs.get('after_packages', lambda *args: None)(manager)
 
         # Now recurse into each manager that was just installed.  Recursing
         # here is safer because there may be secondary dependencies that are
@@ -520,22 +510,16 @@ class Blueprint(dict):
                 self.walk_services(managername, **kwargs)
             return
 
-        getattr(kwargs.get('before_services'),
-                '__call__',
-                lambda managername: None)(managername)
+        kwargs.get('before_services', lambda *args: None)(managername)
 
-        callable = getattr(kwargs.get('service', None),
-                           '__call__',
-                           lambda managername, service: None)
+        callable = kwargs.get('service', lambda *args: None)
         for service, deps in sorted(self.services[managername].iteritems()):
             callable(managername, service)
             self.walk_service_files(managername, service, **kwargs)
             self.walk_service_packages(managername, service, **kwargs)
             self.walk_service_sources(managername, service, **kwargs)
 
-        getattr(kwargs.get('after_services'),
-                '__call__',
-                lambda managername: None)(managername)
+        kwargs.get('after_services', lambda *args: None)(managername)
 
     def walk_service_files(self, managername, servicename, **kwargs):
         """
@@ -547,9 +531,7 @@ class Blueprint(dict):
         deps = self.services[managername][servicename]
         if 'files' not in deps:
             return
-        callable = getattr(kwargs.get('service_file', None),
-                           '__call__',
-                           lambda managername, servicename, pathname: None)
+        callable = kwargs.get('service_file', lambda *args: None)
         for pathname in deps['files']:
             callable(managername, servicename, pathname)
 
@@ -566,12 +548,7 @@ class Blueprint(dict):
         deps = self.services[managername][servicename]
         if 'packages' not in deps:
             return
-        callable = getattr(kwargs.get('service_package', None),
-                           '__call__',
-                           lambda managername,
-                                  servicename,
-                                  package_managername,
-                                  package: None)
+        callable = kwargs.get('service_package', lambda *args: None)
         for package_managername, packages in deps['packages'].iteritems():
             for package in packages:
                 callable(managername,
@@ -589,8 +566,6 @@ class Blueprint(dict):
         deps = self.services[managername][servicename]
         if 'sources' not in deps:
             return
-        callable = getattr(kwargs.get('service_source', None),
-                           '__call__',
-                           lambda managername, servicename, dirname: None)
+        callable = kwargs.get('service_source', lambda *args: None)
         for dirname in deps['sources']:
             callable(managername, servicename, dirname)
