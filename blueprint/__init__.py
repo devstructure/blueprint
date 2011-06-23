@@ -328,22 +328,22 @@ class Blueprint(dict):
         """
         Generate Puppet code.
         """
-        import puppet
-        return puppet.puppet(self)
+        import frontend.puppet
+        return frontend.puppet.puppet(self)
 
     def chef(self):
         """
         Generate Chef code.
         """
-        import chef
-        return chef.chef(self)
+        import frontend.chef
+        return frontend.chef.chef(self)
 
     def sh(self, server='https://devstructure.com', secret=None):
         """
         Generate shell code.
         """
-        import sh
-        return sh.sh(self, server, secret)
+        import frontend.sh
+        return frontend.sh.sh(self, server, secret)
 
     def blueprintignore(self):
         """
