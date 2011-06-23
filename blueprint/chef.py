@@ -2,6 +2,7 @@
 Chef code generator.
 """
 
+import base64
 import codecs
 import errno
 from collections import defaultdict
@@ -20,14 +21,14 @@ def chef(b):
     """
     c = Cookbook(b.name, comment=b.DISCLAIMER)
 
-    # Extract source tarballs.
-    tree = git.tree(b._commit)
-    for dirname, filename in sorted(b.sources.iteritems()):
-        blob = git.blob(tree, filename)
-        content = git.content(blob)
+    def source(dirname, filename, gen_content):
+        """
+        Create a cookbook_file and execute resource to fetch and extract
+        a source tarball.
+        """
         pathname = os.path.join('/tmp', filename)
         c.file(pathname,
-               content,
+               gen_content(),
                owner='root',
                group='root',
                mode='0644',
@@ -37,31 +38,36 @@ def chef(b):
                   command='tar xf {0}'.format(pathname),
                   cwd=dirname)
 
-    # Place files.
-    for pathname, f in sorted(b.files.iteritems()):
+    def file(pathname, meta):
+        """
+        Create a cookbook_file resource.
+        """
         c.directory(os.path.dirname(pathname),
                     group='root',
                     mode='0755',
                     owner='root',
                     recursive=True)
-        if '120000' == f['mode'] or '120777' == f['mode']:
+        if '120000' == meta['mode'] or '120777' == meta['mode']:
             c.link(pathname,
-                   owner=f['owner'],
-                   group=f['group'],
-                   to=f['content'])
-            continue
-        content = f['content']
-        if 'base64' == f['encoding']:
+                   owner=meta['owner'],
+                   group=meta['group'],
+                   to=meta['content'])
+            return
+        content = meta['content']
+        if 'base64' == meta['encoding']:
             content = base64.b64decode(content)
-        c.file(pathname, content,
-               owner=f['owner'],
-               group=f['group'],
-               mode=f['mode'][-4:],
+        c.file(pathname,
+               content,
+               owner=meta['owner'],
+               group=meta['group'],
+               mode=meta['mode'][-4:],
                backup=False,
                source=pathname[1:])
 
-    # Install packages.
     def before_packages(manager):
+        """
+        Create execute resources to configure the package managers.
+        """
         if 0 == len(manager):
             return
         if 'apt' == manager.name:
@@ -70,6 +76,9 @@ def chef(b):
             c.execute('yum makecache')
 
     def package(manager, package, version):
+        """
+        Create a package resource.
+        """
         if manager.name == package:
             return
 
@@ -99,31 +108,36 @@ def chef(b):
         else:
             c.execute(manager(package, version))
 
-    b.walk(before_packages=before_packages, package=package)
-
-    # Manage services and all their dependencies.
-    restypes = {'files': 'cookbook_file[{0}]', # FIXME Broken for inlining.
+    restypes = {'files': 'cookbook_file[{0}]', # FIXME Breaks inlining.
                 'packages': 'package[{0}]',
                 'sources': 'execute[{0}]'}
-    for manager, services in sorted(b.services.iteritems()):
-        for service, service_deps in sorted(services.iteritems()):
+    def service(manager, service, deps):
+        """
+        Create a service resource and subscribe to its dependencies.
+        """
 
-            # Transform dependency list into a subscribes attribute.
-            subscribe = []
-            for restype, names in sorted(service_deps.iteritems()):
-                if 'sources' == restype:
-                    names = [b.sources[name] for name in names]
-                subscribe.extend([restypes[restype].format(name)
-                                  for name in names])
-            subscribe = util.BareString('resources(' \
-                + ', '.join([repr(s) for s in subscribe]) + ')')
+        # Transform dependency list into a subscribes attribute.
+        subscribe = []
+        for restype, names in sorted(deps.iteritems()):
+            if 'sources' == restype:
+                names = [b.sources[name] for name in names]
+            subscribe.extend([restypes[restype].format(name)
+                              for name in names])
+        subscribe = util.BareString('resources(' \
+            + ', '.join([repr(s) for s in subscribe]) + ')')
 
-            kwargs = {'action': [[':enable', ':start']],
-                      'subscribes': [':restart', subscribe]}
-            if 'upstart' == manager:
-                kwargs['provider'] = util.BareString(
-                    'Chef::Provider::Service::Upstart')
-            c.service(service, **kwargs)
+        kwargs = {'action': [[':enable', ':start']],
+                  'subscribes': [':restart', subscribe]}
+        if 'upstart' == manager:
+            kwargs['provider'] = util.BareString(
+                'Chef::Provider::Service::Upstart')
+        c.service(service, **kwargs)
+
+    b.walk(source=source,
+           file=file,
+           before_packages=before_packages,
+           package=package,
+           service=service)
 
     return c
 
