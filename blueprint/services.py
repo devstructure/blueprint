@@ -81,10 +81,64 @@ def _service_packages(b, manager, service, deps):
 
 def services(b):
     logging.info('searching for service dependencies')
-    for manager, services in b.services.iteritems():
-        for service, deps in services.iteritems():
 
-            # Order is important here because many files of note
-            # are only discovered by the _service_packages step.
-            _service_packages(b, manager, service, deps)
-            _service_files(b, manager, service, deps)
+    # Command fragments for listing the files in a package.
+    commands = {'apt': ['dpkg-query', '-L'],
+                'yum': ['rpm', '-ql']}
+
+    # Build a map of the directory that contains each file in the
+    # blueprint to the pathname of that file.
+    dirs = defaultdict(list)
+    for pathname in b.files:
+        dirname = os.path.dirname(pathname)
+        if dirname not in ('/etc', '/etc/init', '/etc/init.d'):
+            dirs[dirname].append(pathname)
+
+    def service_file(manager, service, pathname):
+        """
+        Add dependencies for every pathname extracted from init scripts and
+        other dependent files.
+        """
+        content = open(pathname).read()
+        for match in pattern.finditer(content):
+            if match.group(1) in b.files:
+                b.add_service_file(manager, service, match.group(1))
+        for dirname in b.sources.iterkeys():
+            if -1 != content.find(dirname):
+                b.add_service_source(manager, service, dirname)
+
+    def service_package(manager, service, package_manager, package):
+        """
+        Add dependencies for every file in the blueprint that's also in
+        this service's package or in a directory in this service's package.
+        """
+        try:
+            p = subprocess.Popen(commands[package_manager] + [package],
+                                 close_fds=True,
+                                 stdout=subprocess.PIPE)
+        except KeyError:
+            return
+        for line in p.stdout:
+            pathname = line.rstrip()
+            if pathname in b.files:
+                b.add_service_file(manager, service, pathname)
+            elif pathname in dirs:
+                b.add_service_file(manager, service, *dirs[pathname])
+
+    def service(manager, service):
+        """
+        Add extra file dependencies found in packages.  Then add extra file
+        dependencies found by searching file content for pathnames.
+        """
+        b.walk_service_packages(manager,
+                                service,
+                                service_package=service_package)
+        if 'sysvinit' == manager:
+            service_file(manager, service, '/etc/init.d/{0}'.format(service))
+        elif 'upstart' == manager:
+            service_file(manager,
+                         service,
+                         '/etc/init/{0}.conf'.format(service))
+        b.walk_service_files(manager, service, service_file=service_file)
+
+    b.walk_services(service=service)

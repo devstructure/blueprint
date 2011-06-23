@@ -150,6 +150,7 @@ def puppet(b):
 
         # Transform dependency list into a subscribe parameter.
         subscribe = []
+        # TODO Call walk_service_* methods with a closure over subscribe.
         for restype, names in sorted(deps.iteritems()):
             if 'sources' == restype:
                 names = [b.sources[name] for name in names]

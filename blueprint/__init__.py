@@ -260,7 +260,6 @@ class Blueprint(dict):
         """
         Add file dependencies to a service resource.
         """
-        print('add_service_file', manager, service, args)
         if 0 == len(args):
             return
         s = self.services[manager][service].setdefault('files', set())
@@ -271,7 +270,6 @@ class Blueprint(dict):
         """
         Add package dependencies to a service resource.
         """
-        print('add_service_package', manager, service, package_manager, args)
         if 0 == len(args):
             return
         d = self.services[manager][service].setdefault('packages',
@@ -283,7 +281,6 @@ class Blueprint(dict):
         """
         Add source tarball dependencies to a service resource.
         """
-        print('add_service_source', manager, service, args)
         if 0 == len(args):
             return
         s = self.services[manager][service].setdefault('sources', set())
@@ -511,7 +508,7 @@ class Blueprint(dict):
 
         * `before_services(managername):`
           Executed before a service manager's dependencies are enumerated.
-        * `service(managername, service, deps):`
+        * `service(managername, service):`
           Executed when a service is enumerated.
         * `after_services(managername):`
           Executed after a service manager's dependencies are enumerated.
@@ -529,10 +526,71 @@ class Blueprint(dict):
 
         callable = getattr(kwargs.get('service', None),
                            '__call__',
-                           lambda managername, service, deps: None)
+                           lambda managername, service: None)
         for service, deps in sorted(self.services[managername].iteritems()):
-            callable(managername, service, deps)
+            callable(managername, service)
+            self.walk_service_files(managername, service, **kwargs)
+            self.walk_service_packages(managername, service, **kwargs)
+            self.walk_service_sources(managername, service, **kwargs)
 
         getattr(kwargs.get('after_services'),
                 '__call__',
                 lambda managername: None)(managername)
+
+    def walk_service_files(self, managername, servicename, **kwargs):
+        """
+        Walk a service's file dependencies and execute callbacks.
+
+        * `service_file(managername, servicename, pathname):`
+          Executed when a file service dependency is enumerated.
+        """
+        deps = self.services[managername][servicename]
+        if 'files' not in deps:
+            return
+        callable = getattr(kwargs.get('service_file', None),
+                           '__call__',
+                           lambda managername, servicename, pathname: None)
+        for pathname in deps['files']:
+            callable(managername, servicename, pathname)
+
+    def walk_service_packages(self, managername, servicename, **kwargs):
+        """
+        Walk a service's package dependencies and execute callbacks.
+
+        * `service_package(managername,
+                           servicename,
+                           package_managername,
+                           package):`
+          Executed when a file service dependency is enumerated.
+        """
+        deps = self.services[managername][servicename]
+        if 'packages' not in deps:
+            return
+        callable = getattr(kwargs.get('service_package', None),
+                           '__call__',
+                           lambda managername,
+                                  servicename,
+                                  package_managername,
+                                  package: None)
+        for package_managername, packages in deps['packages'].iteritems():
+            for package in packages:
+                callable(managername,
+                         servicename,
+                         package_managername,
+                         package)
+
+    def walk_service_sources(self, managername, servicename, **kwargs):
+        """
+        Walk a service's source tarball dependencies and execute callbacks.
+
+        * `service_source(managername, servicename, dirname):`
+          Executed when a source tarball service dependency is enumerated.
+        """
+        deps = self.services[managername][servicename]
+        if 'sources' not in deps:
+            return
+        callable = getattr(kwargs.get('service_source', None),
+                           '__call__',
+                           lambda managername, servicename, dirname: None)
+        for dirname in deps['sources']:
+            callable(managername, servicename, dirname)
