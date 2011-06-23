@@ -108,21 +108,24 @@ def chef(b):
         else:
             c.execute(manager(package, version))
 
-    restypes = {'files': 'cookbook_file[{0}]', # FIXME Breaks inlining.
-                'packages': 'package[{0}]',
-                'sources': 'execute[{0}]'}
-    def service(manager, service, deps):
+    def service(manager, service):
         """
         Create a service resource and subscribe to its dependencies.
         """
 
         # Transform dependency list into a subscribes attribute.
         subscribe = []
-        for restype, names in sorted(deps.iteritems()):
-            if 'sources' == restype:
-                names = [b.sources[name] for name in names]
-            subscribe.extend([restypes[restype].format(name)
-                              for name in names])
+        def service_file(m, s, pathname):
+            subscribe.append('cookbook_file[{0}]'.format(pathname)) # FIXME Breaks inlining
+        b.walk_service_files(manager, service, service_file=service_file)
+        def service_package(m, s, pm, package):
+            subscribe.append('package[{0}]'.format(package))
+        b.walk_service_packages(manager,
+                                service,
+                                service_package=service_package)
+        def service_source(m, s, dirname):
+            subscribe.append('execute[{0}]'.format(b.sources[dirname]))
+        b.walk_service_sources(manager, service, service_source=service_source)
         subscribe = util.BareString('resources(' \
             + ', '.join([repr(s) for s in subscribe]) + ')')
 

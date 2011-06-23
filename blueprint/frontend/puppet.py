@@ -143,18 +143,24 @@ def puppet(b):
     restypes = {'files': File,
                 'packages': Package,
                 'sources': Exec}
-    def service(manager, service, deps):
+    def service(manager, service):
         """
         Create a service resource and subscribe to its dependencies.
         """
 
         # Transform dependency list into a subscribe parameter.
         subscribe = []
-        # TODO Call walk_service_* methods with a closure over subscribe.
-        for restype, names in sorted(deps.iteritems()):
-            if 'sources' == restype:
-                names = [b.sources[name] for name in names]
-            subscribe.append(restypes[restype].ref(*sorted(names)))
+        def service_file(m, s, pathname):
+            subscribe.append(File.ref(pathname))
+        b.walk_service_files(manager, service, service_file=service_file)
+        def service_package(m, s, pm, package):
+            subscribe.append(Package.ref(package))
+        b.walk_service_packages(manager,
+                                service,
+                                service_package=service_package)
+        def service_source(m, s, dirname):
+            subscribe.append(Exec.ref(b.sources[dirname]))
+        b.walk_service_sources(manager, service, service_source=service_source)
 
         kwargs = {'enable': True,
                   'ensure': 'running',
