@@ -405,7 +405,7 @@ class Blueprint(dict):
 
         * `before_files():`
           Executed before files are enumerated.
-        * `file(pathname, meta):`
+        * `file(pathname, f):`
           Executed when a file is enumerated.
         * `after_files():`
           Executed after files are enumerated.
@@ -415,9 +415,9 @@ class Blueprint(dict):
 
         callable = getattr(kwargs.get('file', None),
                            '__call__',
-                           lambda pathname, meta: None)
-        for pathname, meta in sorted(self.files.iteritems()):
-            callable(pathname, meta)
+                           lambda pathname, f: None)
+        for pathname, f in sorted(self.files.iteritems()):
+            callable(pathname, f)
 
         getattr(kwargs.get('after_files'), '__call__', lambda: None)()
 

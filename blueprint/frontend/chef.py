@@ -38,7 +38,7 @@ def chef(b):
                   command='tar xf {0}'.format(pathname),
                   cwd=dirname)
 
-    def file(pathname, meta):
+    def file(pathname, f):
         """
         Create a cookbook_file resource.
         """
@@ -47,20 +47,20 @@ def chef(b):
                     mode='0755',
                     owner='root',
                     recursive=True)
-        if '120000' == meta['mode'] or '120777' == meta['mode']:
+        if '120000' == f['mode'] or '120777' == f['mode']:
             c.link(pathname,
-                   owner=meta['owner'],
-                   group=meta['group'],
-                   to=meta['content'])
+                   owner=f['owner'],
+                   group=f['group'],
+                   to=f['content'])
             return
-        content = meta['content']
-        if 'base64' == meta['encoding']:
+        content = f['content']
+        if 'base64' == f['encoding']:
             content = base64.b64decode(content)
         c.file(pathname,
                content,
-               owner=meta['owner'],
-               group=meta['group'],
-               mode=meta['mode'][-4:],
+               owner=f['owner'],
+               group=f['group'],
+               mode=f['mode'][-4:],
                backup=False,
                source=pathname[1:])
 

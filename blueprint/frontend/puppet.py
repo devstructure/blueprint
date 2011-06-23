@@ -42,7 +42,7 @@ def puppet(b):
                               cwd=dirname,
                               require=File.ref(pathname)))
 
-    def file(pathname, meta):
+    def file(pathname, f):
         """
         Create a file resource.
         """
@@ -55,23 +55,23 @@ def puppet(b):
                                 ensure='directory'))
 
         # Create the actual file resource.
-        if '120000' == meta['mode'] or '120777' == meta['mode']:
+        if '120000' == f['mode'] or '120777' == f['mode']:
             m['files'].add(File(pathname,
                                 None,
                                 None,
-                                owner=meta['owner'],
-                                group=meta['group'],
-                                ensure=meta['content']))
+                                owner=f['owner'],
+                                group=f['group'],
+                                ensure=f['content']))
             return
-        content = meta['content']
-        if 'base64' == meta['encoding']:
+        content = f['content']
+        if 'base64' == f['encoding']:
             content = base64.b64decode(content)
         m['files'].add(File(pathname,
                             b.name,
                             content,
-                            owner=meta['owner'],
-                            group=meta['group'],
-                            mode=meta['mode'][-4:],
+                            owner=f['owner'],
+                            group=f['group'],
+                            mode=f['mode'][-4:],
                             ensure='file'))
 
     deps = []

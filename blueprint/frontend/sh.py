@@ -37,29 +37,29 @@ def sh(b, server='https://devstructure.com', secret=None):
                   dirname,
                   sources={filename: gen_content()})
 
-    def file(pathname, meta):
+    def file(pathname, f):
         """
         Place a file.
         """
         s.add('mkdir -p "{0}"', os.path.dirname(pathname))
-        if '120000' == meta['mode'] or '120777' == meta['mode']:
-            s.add('ln -s "{0}" "{1}"', meta['content'], pathname)
+        if '120000' == f['mode'] or '120777' == f['mode']:
+            s.add('ln -s "{0}" "{1}"', f['content'], pathname)
             return
-        command = 'base64 --decode' if 'base64' == meta['encoding'] else 'cat'
+        command = 'base64 --decode' if 'base64' == f['encoding'] else 'cat'
         eof = 'EOF'
-        while re.search(r'{0}'.format(eof), meta['content']):
+        while re.search(r'{0}'.format(eof), f['content']):
             eof += 'EOF'
         s.add('{0} >"{1}" <<{2}', command, pathname, eof)
-        s.add(raw=meta['content'])
-        if 0 < len(meta['content']) and '\n' != meta['content'][-1]:
+        s.add(raw=f['content'])
+        if 0 < len(f['content']) and '\n' != f['content'][-1]:
             eof = '\n{0}'.format(eof)
         s.add(eof)
-        if 'root' != meta['owner']:
-            s.add('chown {0} "{1}"', meta['owner'], pathname)
-        if 'root' != meta['group']:
-            s.add('chgrp {0} "{1}"', meta['group'], pathname)
-        if '000644' != meta['mode']:
-            s.add('chmod {0} "{1}"', meta['mode'][-4:], pathname)
+        if 'root' != f['owner']:
+            s.add('chown {0} "{1}"', f['owner'], pathname)
+        if 'root' != f['group']:
+            s.add('chgrp {0} "{1}"', f['group'], pathname)
+        if '000644' != f['mode']:
+            s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
 
     def before_packages(manager):
         """
