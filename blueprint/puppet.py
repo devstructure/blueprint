@@ -265,7 +265,7 @@ class Resource(dict):
             return value.replace(u'$', u'\\$')
         elif isinstance(value, Resource):
             return repr(value)
-        elif isinstance(value, list):
+        elif isinstance(value, list) or isinstance(value, tuple):
             if 1 == len(value):
                 return cls._dumps(value[0])
             else:

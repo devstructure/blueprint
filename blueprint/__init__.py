@@ -458,20 +458,24 @@ class Blueprint(dict):
 
         # Manage services and all their dependencies.
         restypes = {'files': puppet.File,
-                    'packages': puppet.Package}
+                    'packages': puppet.Package,
+                    'sources': puppet.Exec}
         for manager, services in sorted(self.services.iteritems()):
             for service, service_deps in sorted(services.iteritems()):
+
+                # Transform dependency list into a subscribe parameter.
                 subscribe = []
                 for restype, names in sorted(service_deps.iteritems()):
                     if 'sources' == restype:
-                        subscribe.extend([puppet.Exec.ref(self.sources[name])
-                                          for name in names])
-                    else:
-                        subscribe.append(restypes[restype].ref(*sorted(names)))
-                m['services'][manager].add(puppet.Service(service,
-                                                          enable=True,
-                                                          ensure='running',
-                                                          subscribe=subscribe))
+                        names = [self.sources[name] for name in names]
+                    subscribe.append(restypes[restype].ref(*sorted(names)))
+
+                kwargs = {'enable': True,
+                          'ensure': 'running',
+                          'subscribe': subscribe}
+                if 'upstart' == manager:
+                    kwargs['provider'] = 'upstart'
+                m['services'][manager].add(puppet.Service(service, **kwargs))
 
         # Strict ordering of classes.  Don't bother with services since
         # they manage their own dependencies.
