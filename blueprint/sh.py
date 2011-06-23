@@ -20,45 +20,51 @@ def sh(b, server='https://devstructure.com', secret=None):
     """
     s = Script(b.name, comment=b.DISCLAIMER)
 
-    # Extract source tarballs.
     if secret is not None:
-        for dirname, filename in sorted(b.sources.iteritems()):
+        def source(dirname, filename, gen_content):
+            """
+            Extract a source tarball.
+            """
             s.add('wget "{0}/{1}/{2}/{3}"', server, secret, b.name, filename)
             s.add('tar xf "{0}" -C "{1}"', filename, dirname)
     else:
-        tree = git.tree(b._commit)
-        for dirname, filename in sorted(b.sources.iteritems()):
-            blob = git.blob(tree, filename)
-            content = git.content(blob)
+        def source(dirname, filename, gen_content):
+            """
+            Extract a source tarball.
+            """
             s.add('tar xf "{0}" -C "{1}"',
                   filename,
                   dirname,
-                  sources={filename: content})
+                  sources={filename: gen_content()})
 
-    # Place files.
-    for pathname, f in sorted(b.files.iteritems()):
+    def file(pathname, meta):
+        """
+        Place a file.
+        """
         s.add('mkdir -p "{0}"', os.path.dirname(pathname))
-        if '120000' == f['mode'] or '120777' == f['mode']:
-            s.add('ln -s "{0}" "{1}"', f['content'], pathname)
-            continue
-        command = 'base64 --decode' if 'base64' == f['encoding'] else 'cat'
+        if '120000' == meta['mode'] or '120777' == meta['mode']:
+            s.add('ln -s "{0}" "{1}"', meta['content'], pathname)
+            return
+        command = 'base64 --decode' if 'base64' == meta['encoding'] else 'cat'
         eof = 'EOF'
-        while re.search(r'{0}'.format(eof), f['content']):
+        while re.search(r'{0}'.format(eof), meta['content']):
             eof += 'EOF'
         s.add('{0} >"{1}" <<{2}', command, pathname, eof)
-        s.add(raw=f['content'])
-        if 0 < len(f['content']) and '\n' != f['content'][-1]:
+        s.add(raw=meta['content'])
+        if 0 < len(meta['content']) and '\n' != meta['content'][-1]:
             eof = '\n{0}'.format(eof)
         s.add(eof)
-        if 'root' != f['owner']:
-            s.add('chown {0} "{1}"', f['owner'], pathname)
-        if 'root' != f['group']:
-            s.add('chgrp {0} "{1}"', f['group'], pathname)
-        if '000644' != f['mode']:
-            s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
+        if 'root' != meta['owner']:
+            s.add('chown {0} "{1}"', meta['owner'], pathname)
+        if 'root' != meta['group']:
+            s.add('chgrp {0} "{1}"', meta['group'], pathname)
+        if '000644' != meta['mode']:
+            s.add('chmod {0} "{1}"', meta['mode'][-4:], pathname)
 
-    # Install packages.
     def before_packages(manager):
+        """
+        Configure the package managers.
+        """
         if 0 == len(manager):
             return
         if 'apt' == manager.name:
@@ -70,6 +76,9 @@ def sh(b, server='https://devstructure.com', secret=None):
             s.add('yum makecache')
 
     def package(manager, package, version):
+        """
+        Install a package.
+        """
         if manager.name == package:
             return
         s.add(manager(package, version))
@@ -84,7 +93,14 @@ def sh(b, server='https://devstructure.com', secret=None):
             s.add('/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
                   'which update_rubygems)', match.group(1))
 
-    b.walk(before_packages=before_packages, package=package)
+    def service(manager, service, deps):
+        pass
+
+    b.walk(source=source,
+           file=file,
+           before_packages=before_packages,
+           package=package,
+           service=service)
 
     return s
 
