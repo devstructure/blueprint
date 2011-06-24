@@ -14,6 +14,16 @@ from blueprint import git
 from blueprint import util
 
 
+_service_env_pattern = re.compile(r'[^0-9A-Za-z]')
+def _service_env(manager, service):
+    """
+    Return the name of the environment variable being used to track the
+    state of the given service.
+    """
+    return 'SERVICE_{0}_{1}'.format(_service_env_pattern.sub('', manager),
+                                    _service_env_pattern.sub('', service))
+
+
 def sh(b, server='https://devstructure.com', secret=None):
     """
     Generate shell code.
@@ -93,8 +103,12 @@ def sh(b, server='https://devstructure.com', secret=None):
             s.add('/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
                   'which update_rubygems)', match.group(1))
 
-    def service(manager, service, deps):
-        pass
+    def service(manager, service):
+        if 'upstart' == manager:
+            command = '[ -n "${0}" ] && restart {1}'
+        else:
+            command = '[ -n "${0}" ] && /etc/init.d/{1} restart'
+        s.add(command, _service_env(manager, service), service)
 
     b.walk(source=source,
            file=file,
