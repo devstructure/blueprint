@@ -3,6 +3,7 @@ Shell code generator.
 """
 
 import codecs
+from collections import defaultdict
 import gzip as gziplib
 import os
 import os.path
@@ -29,6 +30,21 @@ def sh(b, server='https://devstructure.com', secret=None):
     Generate shell code.
     """
     s = Script(b.name, comment=b.DISCLAIMER)
+
+    # Build an inverted index (lookup table, like in hardware, hence the name)
+    # of service dependencies to services.
+    lut = {'files': defaultdict(set),
+           'packages': defaultdict(lambda: defaultdict(set)),
+           'sources': defaultdict(set)}
+    def service_file(manager, service, pathname):
+        lut['files'][pathname].add((manager, service))
+    def service_package(manager, service, package_manager, package):
+        lut['packages'][package_manager][package].add((manager, service))
+    def service_source(manager, service, dirname):
+        lut['sources'][dirname].add((manager, service))
+    b.walk_services(service_file=service_file,
+                    service_package=service_package,
+                    service_source=service_source)
 
     if secret is not None:
         def source(dirname, filename, gen_content):
