@@ -9,6 +9,7 @@ import re
 import subprocess
 
 from blueprint import deps
+from blueprint import util
 
 
 # The default list of ignore patterns.  Typically, the value of each key
@@ -73,7 +74,7 @@ CACHE = '/tmp/blueprintignore'
 
 def _cache_open(pathname, mode):
     f = open(pathname, mode)
-    if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
+    if util.via_sudo():
         uid = int(os.environ['SUDO_UID'])
         gid = int(os.environ['SUDO_GID'])
         os.fchown(f.fileno(), uid, gid)

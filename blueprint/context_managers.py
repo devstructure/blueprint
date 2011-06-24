@@ -4,6 +4,8 @@ import os.path
 import shutil
 import tempfile
 
+from blueprint import util
+
 
 class cd(object):
     """
@@ -33,7 +35,7 @@ class mkdtemp(object):
         if dir is None:
             dir = tempfile.gettempdir()
         self.tempdir = tempfile.mkdtemp(dir=dir)
-        if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
+        if util.via_sudo():
             uid = int(os.environ['SUDO_UID'])
             gid = int(os.environ['SUDO_GID'])
             os.chown(self.tempdir, uid, gid)

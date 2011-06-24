@@ -2,6 +2,7 @@
 Utility functions.
 """
 
+import os
 import re
 import subprocess
 
@@ -70,3 +71,13 @@ def rubygems_path():
     if lsb_release_codename() is None or rubygems_update():
         return '/usr/lib/ruby/gems'
     return '/var/lib/gems'
+
+
+def via_sudo():
+    """
+    Return `True` if Blueprint was invoked via `sudo`(8), which indicates
+    that privileges must be dropped when writing to the filesystem.
+    """
+    return 'SUDO_UID' in os.environ \
+        and 'SUDO_GID' in os.environ \
+        and -1 != os.environ.get('SUDO_COMMAND', '').find('blueprint')

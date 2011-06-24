@@ -3,6 +3,8 @@ import os.path
 import subprocess
 import sys
 
+from blueprint import util
+
 
 class GitError(EnvironmentError):
     pass
@@ -12,7 +14,7 @@ def unroot():
     """
     Drop privileges gained through sudo(1).
     """
-    if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
+    if util.via_sudo():
         uid = int(os.environ['SUDO_UID'])
         gid = int(os.environ['SUDO_GID'])
         os.setgid(gid)
@@ -28,7 +30,7 @@ def init():
     dirname = repo()
     try:
         os.makedirs(dirname)
-        if 'SUDO_UID' in os.environ and 'SUDO_GID' in os.environ:
+        if util.via_sudo():
             uid = int(os.environ['SUDO_UID'])
             gid = int(os.environ['SUDO_GID'])
             os.chown(dirname, uid, gid)
@@ -67,11 +69,7 @@ def repo():
     """
     Return the full path to the Git repository.
     """
-    if 'SUDO_USER' in os.environ:
-        return os.path.expanduser('~{0}/.blueprints.git'.
-            format(os.environ['SUDO_USER']))
-    else:
-        return os.path.expanduser('~/.blueprints.git')
+    return os.path.expandvars('$HOME/.blueprints.git')
 
 
 def rev_parse(refname):
