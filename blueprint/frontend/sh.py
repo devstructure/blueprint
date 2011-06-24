@@ -67,25 +67,31 @@ def sh(b, server='https://devstructure.com', secret=None):
         """
         Place a file.
         """
+        if pathname in lut['files']:
+            s.add('MD5SUM="$(md5sum "{0}" 2>/dev/null)"', pathname)
         s.add('mkdir -p "{0}"', os.path.dirname(pathname))
         if '120000' == f['mode'] or '120777' == f['mode']:
             s.add('ln -s "{0}" "{1}"', f['content'], pathname)
-            return
-        command = 'base64 --decode' if 'base64' == f['encoding'] else 'cat'
-        eof = 'EOF'
-        while re.search(r'{0}'.format(eof), f['content']):
-            eof += 'EOF'
-        s.add('{0} >"{1}" <<{2}', command, pathname, eof)
-        s.add(raw=f['content'])
-        if 0 < len(f['content']) and '\n' != f['content'][-1]:
-            eof = '\n{0}'.format(eof)
-        s.add(eof)
-        if 'root' != f['owner']:
-            s.add('chown {0} "{1}"', f['owner'], pathname)
-        if 'root' != f['group']:
-            s.add('chgrp {0} "{1}"', f['group'], pathname)
-        if '000644' != f['mode']:
-            s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
+        else:
+            command = 'base64 --decode' if 'base64' == f['encoding'] else 'cat'
+            eof = 'EOF'
+            while re.search(r'{0}'.format(eof), f['content']):
+                eof += 'EOF'
+            s.add('{0} >"{1}" <<{2}', command, pathname, eof)
+            s.add(raw=f['content'])
+            if 0 < len(f['content']) and '\n' != f['content'][-1]:
+                eof = '\n{0}'.format(eof)
+            s.add(eof)
+            if 'root' != f['owner']:
+                s.add('chown {0} "{1}"', f['owner'], pathname)
+            if 'root' != f['group']:
+                s.add('chgrp {0} "{1}"', f['group'], pathname)
+            if '000644' != f['mode']:
+                s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
+        for manager, service in lut['files'][pathname]:
+            s.add('[ "$MD5SUM" != "$(md5sum "{0}")" ] && {1}=1',
+                  pathname,
+                  _service_env(manager, service))
 
     def before_packages(manager):
         """
