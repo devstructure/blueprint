@@ -106,7 +106,14 @@ def sh(b, server='https://devstructure.com', secret=None):
         """
         if manager == package:
             return
-        s.add(manager(package, version))
+
+        if manager in lut['packages'] and package in lut['packages'][manager]:
+            s.add(manager(package, version) + ' && ' + ' && '.join(
+                ['{0}=1'.format(m.env_var(service))
+                 for m, service in lut['packages'][manager][package]]))
+        else:
+            s.add(manager(package, version))
+
         if manager not in ('apt', 'yum'):
             return
 
