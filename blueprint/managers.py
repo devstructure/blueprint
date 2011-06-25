@@ -25,15 +25,14 @@ class PackageManager(unicode):
                    ).format(package, version)
 
         if 'yum' == self:
-            match = re.match(r'^(\d+):(.+)$', version)
+            match = re.match(r'^\d+:(.+)$', version)
             if match is None:
                 return ('rpm -q {0}-{1} >/dev/null '
                         '|| yum -y install {0}-{1}').format(package, version)
             else:
-                return ('rpm -q {0}:{1}-{2} >/dev/null '
-                        '|| yum -y install {1}-{3}').format(match.group(1),
-                                                            package,
-                                                            match.group(2),
+                return ('rpm -q {0}-{1} >/dev/null '
+                        '|| yum -y install {0}-{2}').format(package,
+                                                            match.group(1),
                                                             version)
 
         if 'rubygems' == self:
