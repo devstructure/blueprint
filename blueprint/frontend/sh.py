@@ -100,7 +100,7 @@ def sh(b, server='https://devstructure.com', secret=None):
         """
         Configure the package managers.
         """
-        if 0 == len(manager):
+        if manager not in b.packages:
             return
         if 'apt' == manager:
             s.add('export APT_LISTBUGS_FRONTEND="none"')
