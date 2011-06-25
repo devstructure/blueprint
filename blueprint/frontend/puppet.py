@@ -81,12 +81,12 @@ def puppet(b):
         """
         if 0 == len(manager):
             return
-        if 1 == len(manager) and manager.name in manager:
+        if 1 == len(manager) and manager in manager:
             return
-        if 'apt' == manager.name:
+        if 'apt' == manager:
             m['packages'].add(Exec('apt-get -q update',
                                    before=Class.ref('apt')))
-        elif 'yum' == manager.name:
+        elif 'yum' == manager:
             m['packages'].add(Exec('yum makecache', before=Class.ref('yum')))
         deps.append(manager)
 
@@ -97,7 +97,7 @@ def puppet(b):
 
         # `apt` and `yum` are easy since they're the default for their
         # respective platforms.
-        if manager.name in ('apt', 'yum'):
+        if manager in ('apt', 'yum'):
             m['packages'][manager].add(Package(package, ensure=version))
 
             # If APT is installing RubyGems, get complicated.  This would
@@ -117,15 +117,15 @@ def puppet(b):
         # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
         # built in provider.  This is called simply "rubygems" on
         # RPM-based distros.
-        elif manager.name in ('rubygems', 'rubygems1.8'):
+        elif manager in ('rubygems', 'rubygems1.8'):
             m['packages'][manager].add(Package(package,
                                                ensure=version,
                                                provider='gem'))
 
         # Other versions of RubyGems are slightly more complicated.
-        elif re.search(r'ruby', manager.name) is not None:
+        elif re.search(r'ruby', manager) is not None:
             match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
-                             manager.name)
+                             manager)
             m['packages'][manager].add(Exec(
                 manager(package, version),
                 creates='{0}/{1}/gems/{2}-{3}'.format(util.rubygems_path(),

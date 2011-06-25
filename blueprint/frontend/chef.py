@@ -70,19 +70,19 @@ def chef(b):
         """
         if 0 == len(manager):
             return
-        if 'apt' == manager.name:
+        if 'apt' == manager:
             c.execute('apt-get -q update')
-        elif 'yum' == manager.name:
+        elif 'yum' == manager:
             c.execute('yum makecache')
 
     def package(manager, package, version):
         """
         Create a package resource.
         """
-        if manager.name == package:
+        if manager == package:
             return
 
-        if manager.name in ('apt', 'yum'):
+        if manager in ('apt', 'yum'):
             c.package(package, version=version)
 
             # See comments on this section in `puppet` above.
@@ -95,11 +95,11 @@ def chef(b):
                           'which update_rubygems)"'.format(match.group(1)))
 
         # All types of gems get to have package resources.
-        elif 'rubygems' == manager.name:
+        elif 'rubygems' == manager:
             c.gem_package(package, version=version)
-        elif re.search(r'ruby', manager.name) is not None:
+        elif re.search(r'ruby', manager) is not None:
             match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
-                             manager.name)
+                             manager)
             c.gem_package(package,
                 gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
                 version=version)

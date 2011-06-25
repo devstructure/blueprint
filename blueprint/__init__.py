@@ -106,9 +106,9 @@ class Blueprint(dict):
         def package(manager, package, version):
             if package in b.packages:
                 return
-            if manager.name in b.packages.get(manager.name, {}):
+            if manager in b.packages.get(manager, {}):
                 return
-            b_packages = b.packages[manager.name]
+            b_packages = b.packages[manager]
             if package not in b_packages:
                 return
             b_versions = b_packages[package]
@@ -144,7 +144,7 @@ class Blueprint(dict):
         # reality it's only _likely_ that you need `ruby*-dev` to use
         # `rubygems*`.
         def after_packages(manager):
-            if manager.name not in b.packages:
+            if manager not in b.packages:
                 return
 
             deps = {r'^python(\d+(?:\.\d+)?)$': ['python{0}',
@@ -158,7 +158,7 @@ class Blueprint(dict):
                                                         'ruby-devel']}
 
             for pattern, packages in deps.iteritems():
-                match = re.search(pattern, manager.name)
+                match = re.search(pattern, manager)
                 if match is None:
                     continue
                 for package in packages:
@@ -464,10 +464,8 @@ class Blueprint(dict):
             self.walk_packages('yum', **kwargs)
             return
 
-        # Get the full manager from its name.  Watch out for KeyError (by
-        # using dict.get instead of dict.__get__), which means the manager
-        # isn't part of this blueprint.
-        manager = Manager(managername, self.packages.get(managername, {}))
+        # Get the full manager from its name.
+        manager = Manager(managername)
 
         # Give the manager a chance to setup for its dependencies.
         kwargs.get('before_packages', lambda *args: None)(manager)
@@ -476,7 +474,8 @@ class Blueprint(dict):
         # are themselves managers so they may be visited recursively later.
         managers = []
         callable = kwargs.get('package', lambda *args: None)
-        for package, versions in sorted(manager.iteritems()):
+        for package, versions in sorted(self.packages.get(managername,
+                                                          {}).iteritems()):
             for version in versions:
                 callable(manager, package, version)
             if managername != package and package in self.packages:

@@ -102,22 +102,22 @@ def sh(b, server='https://devstructure.com', secret=None):
         """
         if 0 == len(manager):
             return
-        if 'apt' == manager.name:
+        if 'apt' == manager:
             s.add('export APT_LISTBUGS_FRONTEND="none"')
             s.add('export APT_LISTCHANGES_FRONTEND="none"')
             s.add('export DEBIAN_FRONTEND="noninteractive"')
             s.add('apt-get -q update')
-        elif 'yum' == manager.name:
+        elif 'yum' == manager:
             s.add('yum makecache')
 
     def package(manager, package, version):
         """
         Install a package.
         """
-        if manager.name == package:
+        if manager == package:
             return
         s.add(manager(package, version))
-        if manager.name not in ('apt', 'yum'):
+        if manager not in ('apt', 'yum'):
             return
 
         # See comments on this section in `blueprint.frontend.puppet`.
