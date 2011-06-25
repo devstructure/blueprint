@@ -19,9 +19,22 @@ class PackageManager(unicode):
         """
 
         if 'apt' == self:
-            return '[ "$(dpkg-query -f\'${{{{Version}}}}\\n\' -W {0})" != "{1}" ] && apt-get -y -q -o DPkg::Options::=--force-confold install {0}={1}'.format(package, version)
+            return ('[ "$(dpkg-query -f\'${{{{Version}}}}\\n\' -W {0})" '
+                    '!= "{1}" ] && apt-get -y -q '
+                    '-o DPkg::Options::=--force-confold install {0}={1}'
+                   ).format(package, version)
+
         if 'yum' == self:
-            return ('rpm -q {0}-{1} >/dev/null || yum -y install {0}-{1}').format(package, version)
+            match = re.match(r'^(\d+):(.+)$', version)
+            if match is None:
+                return ('rpm -q {0}-{1} >/dev/null '
+                        '|| yum -y install {0}-{1}').format(package, version)
+            else:
+                return ('rpm -q {0}:{1}-{2} >/dev/null '
+                        '|| yum -y install {1}-{3}').format(match.group(1),
+                                                            package,
+                                                            match.group(2),
+                                                            version)
 
         if 'rubygems' == self:
             return 'gem install {0} -v{1}'.format(package, version)
