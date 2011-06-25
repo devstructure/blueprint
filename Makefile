@@ -17,8 +17,8 @@ clean:
 	rm -rf \
 		control *.deb \
 		setup.py build dist *.egg *.egg-info \
-		blueprint/**.pyc \
 		man/man*/*.htm
+	find . -name \*.pyc -delete
 
 install: install-bin install-lib install-man install-sysconf
 
