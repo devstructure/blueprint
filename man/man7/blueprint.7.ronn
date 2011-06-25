@@ -67,11 +67,11 @@ The `blueprint.Blueprint` class manages blueprints stored in the local blueprint
   Executed before a service manager's dependencies are enumerated.
 * `service(manager, service, deps):`
   Executed when a service is enumerated.
-* `service_file(managername, service, pathname):`
+* `service_file(manager, service, pathname):`
   Executed when a file dependency is enumerated.
-* `service_package(managername, service, package_managername, package):`
+* `service_package(manager, service, package_managername, package):`
   Executed when a package dependency is enumerated.
-* `service_source(managername, service, dirname):`
+* `service_source(manager, service, dirname):`
   Executed when a source tarball dependency is enumerated.
 * `after_services(manager):`
   Executed after a service manager's dependencies are enumerated.

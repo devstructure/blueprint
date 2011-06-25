@@ -15,16 +15,6 @@ from blueprint import git
 from blueprint import util
 
 
-_service_env_pattern = re.compile(r'[^0-9A-Za-z]')
-def _service_env(manager, service):
-    """
-    Return the name of the environment variable being used to track the
-    state of the given service.
-    """
-    return 'SERVICE_{0}_{1}'.format(_service_env_pattern.sub('', manager),
-                                    _service_env_pattern.sub('', service))
-
-
 def sh(b, server='https://devstructure.com', secret=None):
     """
     Generate shell code.
@@ -64,7 +54,7 @@ def sh(b, server='https://devstructure.com', secret=None):
             s.add('[ "$MD5SUM" != "$(find "{0}" -printf %T@\\\\n ' # No ,
                   '| md5sum)" ] && {1}=1',
                   dirname,
-                  _service_env(manager, service))
+                  manager.env_var(service))
 
     def file(pathname, f):
         """
@@ -94,7 +84,7 @@ def sh(b, server='https://devstructure.com', secret=None):
         for manager, service in lut['files'][pathname]:
             s.add('[ "$MD5SUM" != "$(md5sum "{0}")" ] && {1}=1',
                   pathname,
-                  _service_env(manager, service))
+                  manager.env_var(service))
 
     def before_packages(manager):
         """
@@ -129,11 +119,7 @@ def sh(b, server='https://devstructure.com', secret=None):
                   'which update_rubygems)', match.group(1))
 
     def service(manager, service):
-        if 'upstart' == manager:
-            command = '[ -n "${0}" ] && restart {1}'
-        else:
-            command = '[ -n "${0}" ] && /etc/init.d/{1} restart'
-        s.add(command, _service_env(manager, service), service)
+        s.add(manager(service))
 
     b.walk(source=source,
            file=file,

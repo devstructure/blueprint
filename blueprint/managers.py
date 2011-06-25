@@ -49,3 +49,33 @@ class PackageManager(unicode):
         return ': unknown manager {0} for {1} {2}'.format(self,
                                                           package,
                                                           version)
+
+
+class ServiceManager(unicode):
+    """
+    Service managers each have their own syntax.  All supported service
+    managers are encapsulated in this manager class.
+    """
+
+    _env_pattern = re.compile(r'[^0-9A-Za-z]')
+
+    def env_var(self, service):
+        """
+        Return the name of the environment variable being used to track the
+        state of the given service.
+        """
+        return 'SERVICE_{0}_{1}'.format(self._env_pattern.sub('', self),
+                                        self._env_pattern.sub('', service))
+
+    def __call__(self, service):
+        """
+        Return a shell command that restarts the given service via this
+        service manager.
+        """
+
+        if 'upstart' == self:
+            return '[ -n "${0}" ] && restart {1}'.format(self.env_var(service),
+                                                         service)
+
+        return '[ -n "${0}" ] && /etc/init.d/{1} restart'.format(
+            self.env_var(service), service)

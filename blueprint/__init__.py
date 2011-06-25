@@ -474,7 +474,7 @@ class Blueprint(dict):
         # are themselves managers so they may be visited recursively later.
         next_managers = []
         callable = kwargs.get('package', lambda *args: None)
-        for package, versions in sorted(self.packages.get(managername,
+        for package, versions in sorted(self.packages.get(manager,
                                                           {}).iteritems()):
             for version in versions:
                 callable(manager, package, version)
@@ -495,11 +495,11 @@ class Blueprint(dict):
         """
         Walk a blueprint's services and execute callbacks.
 
-        * `before_services(managername):`
+        * `before_services(manager):`
           Executed before a service manager's dependencies are enumerated.
-        * `service(managername, service):`
+        * `service(manager, service):`
           Executed when a service is enumerated.
-        * `after_services(managername):`
+        * `after_services(manager):`
           Executed after a service manager's dependencies are enumerated.
         """
 
@@ -509,62 +509,65 @@ class Blueprint(dict):
                 self.walk_services(managername, **kwargs)
             return
 
-        kwargs.get('before_services', lambda *args: None)(managername)
+        manager = managers.ServiceManager(managername)
+
+        kwargs.get('before_services', lambda *args: None)(manager)
 
         callable = kwargs.get('service', lambda *args: None)
-        for service, deps in sorted(self.services[managername].iteritems()):
-            callable(managername, service)
-            self.walk_service_files(managername, service, **kwargs)
-            self.walk_service_packages(managername, service, **kwargs)
-            self.walk_service_sources(managername, service, **kwargs)
+        for service, deps in sorted(self.services.get(manager,
+                                                      {}).iteritems()):
+            callable(manager, service)
+            self.walk_service_files(manager, service, **kwargs)
+            self.walk_service_packages(manager, service, **kwargs)
+            self.walk_service_sources(manager, service, **kwargs)
 
-        kwargs.get('after_services', lambda *args: None)(managername)
+        kwargs.get('after_services', lambda *args: None)(manager)
 
-    def walk_service_files(self, managername, servicename, **kwargs):
+    def walk_service_files(self, manager, servicename, **kwargs):
         """
         Walk a service's file dependencies and execute callbacks.
 
-        * `service_file(managername, servicename, pathname):`
+        * `service_file(manager, servicename, pathname):`
           Executed when a file service dependency is enumerated.
         """
-        deps = self.services[managername][servicename]
+        deps = self.services[manager][servicename]
         if 'files' not in deps:
             return
         callable = kwargs.get('service_file', lambda *args: None)
         for pathname in deps['files']:
-            callable(managername, servicename, pathname)
+            callable(manager, servicename, pathname)
 
-    def walk_service_packages(self, managername, servicename, **kwargs):
+    def walk_service_packages(self, manager, servicename, **kwargs):
         """
         Walk a service's package dependencies and execute callbacks.
 
-        * `service_package(managername,
+        * `service_package(manager,
                            servicename,
                            package_managername,
                            package):`
           Executed when a file service dependency is enumerated.
         """
-        deps = self.services[managername][servicename]
+        deps = self.services[manager][servicename]
         if 'packages' not in deps:
             return
         callable = kwargs.get('service_package', lambda *args: None)
         for package_managername, packages in deps['packages'].iteritems():
             for package in packages:
-                callable(managername,
+                callable(manager,
                          servicename,
                          package_managername,
                          package)
 
-    def walk_service_sources(self, managername, servicename, **kwargs):
+    def walk_service_sources(self, manager, servicename, **kwargs):
         """
         Walk a service's source tarball dependencies and execute callbacks.
 
-        * `service_source(managername, servicename, dirname):`
+        * `service_source(manager, servicename, dirname):`
           Executed when a source tarball service dependency is enumerated.
         """
-        deps = self.services[managername][servicename]
+        deps = self.services[manager][servicename]
         if 'sources' not in deps:
             return
         callable = kwargs.get('service_source', lambda *args: None)
         for dirname in deps['sources']:
-            callable(managername, servicename, dirname)
+            callable(manager, servicename, dirname)
