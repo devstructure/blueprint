@@ -17,8 +17,8 @@ clean:
 	rm -rf \
 		control *.deb \
 		setup.py build dist *.egg *.egg-info \
-		blueprint/**.pyc \
 		man/man*/*.htm
+	find . -name \*.pyc -delete
 
 install: install-bin install-lib install-man install-sysconf
 
@@ -50,6 +50,7 @@ install-lib:
 		blueprint/__init__.py \
 		blueprint/manager.py \
 		blueprint/puppet.py \
+		blueprint/services.py \
 		blueprint/sh.py \
 		blueprint/util.py \
 		$(DESTDIR)$(pydir)/blueprint/
@@ -120,6 +121,8 @@ uninstall-lib:
 		$(DESTDIR)$(pydir)/blueprint/manager.pyc \
 		$(DESTDIR)$(pydir)/blueprint/puppet.py \
 		$(DESTDIR)$(pydir)/blueprint/puppet.pyc \
+		$(DESTDIR)$(pydir)/blueprint/services.py \
+		$(DESTDIR)$(pydir)/blueprint/services.pyc \
 		$(DESTDIR)$(pydir)/blueprint/sh.py \
 		$(DESTDIR)$(pydir)/blueprint/sh.pyc \
 		$(DESTDIR)$(pydir)/blueprint/util.py \

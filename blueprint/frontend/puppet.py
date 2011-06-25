@@ -2,6 +2,7 @@
 Puppet code generator.
 """
 
+import base64
 import codecs
 import errno
 from collections import defaultdict
@@ -9,6 +10,184 @@ import os
 import os.path
 import re
 import tarfile
+
+from blueprint import git
+from blueprint import util
+
+
+def puppet(b):
+    """
+    Generate Puppet code.
+    """
+    m = Manifest(b.name, comment=b.DISCLAIMER)
+
+    # Set the default `PATH` for exec resources.
+    m.add(Exec.defaults(path=os.environ['PATH']))
+
+    def source(dirname, filename, gen_content):
+        """
+        Create file and exec resources to fetch and extract a source tarball.
+        """
+        pathname = os.path.join('/tmp', filename)
+        m['sources'].add(File(
+            pathname,
+            b.name,
+            gen_content(),
+            owner='root',
+            group='root',
+            mode='0644',
+            source='puppet:///modules/{0}/{1}'.format(b.name, pathname[1:])))
+        m['sources'].add(Exec('tar xf {0}'.format(pathname),
+                              alias=filename,
+                              cwd=dirname,
+                              require=File.ref(pathname)))
+
+    def file(pathname, f):
+        """
+        Create a file resource.
+        """
+
+        # Create resources for parent directories and let the
+        # autorequire mechanism work out dependencies.
+        dirnames = os.path.dirname(pathname).split('/')[1:]
+        for i in xrange(len(dirnames)):
+            m['files'].add(File(os.path.join('/', *dirnames[0:i + 1]),
+                                ensure='directory'))
+
+        # Create the actual file resource.
+        if '120000' == f['mode'] or '120777' == f['mode']:
+            m['files'].add(File(pathname,
+                                None,
+                                None,
+                                owner=f['owner'],
+                                group=f['group'],
+                                ensure=f['content']))
+            return
+        content = f['content']
+        if 'base64' == f['encoding']:
+            content = base64.b64decode(content)
+        m['files'].add(File(pathname,
+                            b.name,
+                            content,
+                            owner=f['owner'],
+                            group=f['group'],
+                            mode=f['mode'][-4:],
+                            ensure='file'))
+
+    deps = []
+    def before_packages(manager):
+        """
+        Create exec resources to configure the package managers.
+        """
+        if 0 == len(manager):
+            return
+        if 1 == len(manager) and manager in manager:
+            return
+        if 'apt' == manager:
+            m['packages'].add(Exec('apt-get -q update',
+                                   before=Class.ref('apt')))
+        elif 'yum' == manager:
+            m['packages'].add(Exec('yum makecache', before=Class.ref('yum')))
+        deps.append(manager)
+
+    def package(manager, package, version):
+        """
+        Create a package resource.
+        """
+
+        # `apt` and `yum` are easy since they're the default for their
+        # respective platforms.
+        if manager in ('apt', 'yum'):
+            m['packages'][manager].add(Package(package, ensure=version))
+
+            # If APT is installing RubyGems, get complicated.  This would
+            # make sense to do with Yum, too, but there's no consensus on
+            # where, exactly, you might find RubyGems from Yum.  Going
+            # the other way, it's entirely likely that doing this sort of
+            # forced upgrade goes against the spirit of Blueprint itself.
+            match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
+            if match is not None and util.rubygems_update():
+                m['packages'][manager].add(Exec('/bin/sh -c "' # No ,
+                    '/usr/bin/gem{0} install --no-rdoc --no-ri ' # No ,
+                    'rubygems-update; /usr/bin/ruby{0} ' # No ,
+                    '$(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
+                    'which update_rubygems)"'.format(match.group(1)),
+                    require=Package.ref(package)))
+
+        # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
+        # built in provider.  This is called simply "rubygems" on
+        # RPM-based distros.
+        elif manager in ('rubygems', 'rubygems1.8'):
+            m['packages'][manager].add(Package(package,
+                                               ensure=version,
+                                               provider='gem'))
+
+        # Other versions of RubyGems are slightly more complicated.
+        elif re.search(r'ruby', manager) is not None:
+            match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
+                             manager)
+            m['packages'][manager].add(Exec(
+                manager(package, version),
+                creates='{0}/{1}/gems/{2}-{3}'.format(util.rubygems_path(),
+                                                      match.group(1),
+                                                      package,
+                                                      version)))
+
+        # Python works basically like alternative versions of Ruby
+        # but follows a less predictable directory structure so the
+        # directory is not known ahead of time.  This just so happens
+        # to be the way everything else works, too.
+        else:
+            m['packages'][manager].add(Exec(manager(package, version)))
+
+    restypes = {'files': File,
+                'packages': Package,
+                'sources': Exec}
+    def service(manager, service):
+        """
+        Create a service resource and subscribe to its dependencies.
+        """
+
+        # Transform dependency list into a subscribe parameter.
+        subscribe = []
+        def service_file(m, s, pathname):
+            subscribe.append(File.ref(pathname))
+        b.walk_service_files(manager, service, service_file=service_file)
+        def service_package(m, s, pm, package):
+            subscribe.append(Package.ref(package))
+        b.walk_service_packages(manager,
+                                service,
+                                service_package=service_package)
+        def service_source(m, s, dirname):
+            subscribe.append(Exec.ref(b.sources[dirname]))
+        b.walk_service_sources(manager, service, service_source=service_source)
+
+        kwargs = {'enable': True,
+                  'ensure': 'running',
+                  'subscribe': subscribe}
+        if 'upstart' == manager:
+            kwargs['provider'] = 'upstart'
+        m['services'][manager].add(Service(service, **kwargs))
+
+    b.walk(source=source,
+           file=file,
+           before_packages=before_packages,
+           package=package,
+           service=service)
+    m['packages'].dep(*[Class.ref(dep) for dep in deps])
+
+    # Strict ordering of classes.  Don't bother with services since
+    # they manage their own dependencies.
+    deps = []
+    if 0 < len(b.sources):
+        deps.append('sources')
+    if 0 < len(b.files):
+        deps.append('files')
+    if 0 < len(b.packages):
+        deps.append('packages')
+    m.dep(*[Class.ref(dep) for dep in deps])
+
+    return m
 
 
 class Manifest(object):
@@ -176,14 +355,6 @@ class Manifest(object):
         return filename
 
 
-class BareString(unicode):
-    """
-    Strings of this type will not be quoted when written into a Puppet
-    manifest.
-    """
-    pass
-
-
 class Resource(dict):
     """
     A Puppet resource is basically a named hash.  The name is unique to
@@ -238,7 +409,7 @@ class Resource(dict):
         The string representation of a resource is the Puppet syntax for a
         reference as used when declaring dependencies.
         """
-        return u'{0}["{1}"]'.format(self.type.capitalize(), self.name)
+        return u'{0}[\'{1}\']'.format(self.type.capitalize(), self.name)
 
     @property
     def type(self):
@@ -247,8 +418,8 @@ class Resource(dict):
         """
         return self._type
 
-    @staticmethod
-    def _dumps(value, bare=True):
+    @classmethod
+    def _dumps(cls, value, bare=True):
         """
         Return a value as it should be written.
         """
@@ -261,10 +432,15 @@ class Resource(dict):
         elif bare and re.match(r'^[0-9a-zA-Z]+$', u'{0}'.format(
             value)) is not None:
             return value
-        elif hasattr(value, 'bare') or isinstance(value, BareString):
+        elif hasattr(value, 'bare') or isinstance(value, util.BareString):
             return value.replace(u'$', u'\\$')
         elif isinstance(value, Resource):
             return repr(value)
+        elif isinstance(value, list) or isinstance(value, tuple):
+            if 1 == len(value):
+                return cls._dumps(value[0])
+            else:
+                return '[' + ', '.join([cls._dumps(v) for v in value]) + ']'
         return repr(unicode(value).replace(u'$', u'\\$'))[1:]
 
     def dumps(self, inline=False, tab=''):
@@ -322,18 +498,18 @@ class Resource(dict):
         return '\n'.join(out)
 
 
-class Package(Resource):
+class Class(Resource):
     """
-    Puppet package resource.
+    Puppet class resource.
     """
-    pass
 
-
-class Exec(Resource):
-    """
-    Puppet exec resource.
-    """
-    pass
+    def __repr__(self):
+        """
+        Puppet class resource names cannot contain dots due to limitations
+        in the grammar.
+        """
+        name, count = re.subn(r'\.', '--', unicode(self.name))
+        return u'{0}[\'{1}\']'.format(self.type.capitalize(), name)
 
 
 class File(Resource):
@@ -368,21 +544,28 @@ class File(Resource):
                 del self.content
         else:
             if self.content is not None and 'source' not in self:
-                self['content'] = BareString(u'template("{0}/{1}")'.format(
-                    self.modulename,
-                    self.name[1:]))
+                self['content'] = util.BareString(u'template(\'{0}/{1}\')'.
+                                                  format(self.modulename,
+                                                         self.name[1:]))
         return super(File, self).dumps(inline, tab)
 
 
-class Class(Resource):
+class Exec(Resource):
     """
-    Puppet class resource.
+    Puppet exec resource.
     """
+    pass
 
-    def __repr__(self):
-        """
-        Puppet class resource names cannot contain dots due to limitations
-        in the grammar.
-        """
-        name, count = re.subn(r'\.', '--', unicode(self.name))
-        return u'{0}["{1}"]'.format(self.type.capitalize(), name)
+
+class Package(Resource):
+    """
+    Puppet package resource.
+    """
+    pass
+
+
+class Service(Resource):
+    """
+    Puppet service resource.
+    """
+    pass

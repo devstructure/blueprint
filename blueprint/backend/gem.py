@@ -45,4 +45,4 @@ def gem(b):
 
             for entry in os.listdir(dirname):
                 package, version = entry.rsplit('-', 1)
-                b.packages[manager][package].append(version)
+                b.add_package(manager, package, version)

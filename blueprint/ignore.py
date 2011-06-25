@@ -204,7 +204,8 @@ def _mtime(pathname):
 
 # Check for a fresh cache of the complete blueprintignore(5) rules.
 cache = None
-if _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE):
+if _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE) \
+    and _mtime(__file__) < _mtime(CACHE):
     try:
         cache = defaultdict(list, json.load(open(CACHE)))
         logging.info('using cached blueprintignore rules')
@@ -219,6 +220,7 @@ if cache is None:
         'file': IGNORE.items(),
         'package': [('apt', package, False) for package in apt_exclusions()] +
                    [('yum', package, False) for package in yum_exclusions()],
+        'service': [('sysvinit', 'skeleton', False)],
         'source': [('/', False),
                    ('/usr/local', True)],
     })
@@ -259,13 +261,22 @@ if cache is None:
                 try:
                     manager, package = pattern.split('/')
                 except ValueError:
-                    logging.warning('invalid package ignore "{0}"'
-                                    ''.format(pattern))
+                    logging.warning('invalid package ignore "{0}"'.
+                                    format(pattern))
                     continue
                 cache['package'].append((manager, package, negate))
                 if not negate:
                     for dep in getattr(deps, manager, lambda(s): [])(package):
                         cache['package'].append((manager, dep, negate))
+
+            elif 'service' == restype:
+                try:
+                    manager, service = pattern.split('/')
+                except ValueError:
+                    logging.warning('invalid service ignore "{0}"'.
+                                    format(pattern))
+                    continue
+                cache['service'].append((manager, service, negate))
 
             # Ignore or unignore a file, glob, or directory tree.
             else:
@@ -329,6 +340,17 @@ def package(manager, package, ignored=False):
     """
     for m, p, negate in cache['package']:
         if ignored != negate or manager != m or package != p and '*' != p:
+            continue
+        ignored = not ignored
+    return ignored
+
+
+def service(manager, service, ignored=False):
+    """
+    Return `True` if a given service should be ignored.
+    """
+    for m, s, negate in cache['service']:
+        if ignored != negate or manager != m or service != s:
             continue
         ignored = not ignored
     return ignored

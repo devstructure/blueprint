@@ -6,6 +6,7 @@ import logging
 import subprocess
 
 from blueprint import ignore
+from blueprint import util
 
 
 def yum(b):
@@ -27,8 +28,22 @@ def yum(b):
         package, group, epoch, version, arch = line.strip().split('\x1E')
         if ignore.package('yum', package):
             continue
+
         if '(none)' != epoch:
             version = '{0}:{1}'.format(epoch, version)
         if '(none)' != arch:
             version = '{0}.{1}'.format(version, arch)
-        b.packages['yum'][package].append(version)
+        b.add_package('yum', package, version)
+
+        # Create service resources for each service init script or config
+        # in this package.
+        p = subprocess.Popen(['rpm', '-ql', package],
+                             close_fds=True, stdout=subprocess.PIPE)
+        for line in p.stdout:
+            try:
+                manager, service = util.parse_service(line.rstrip())
+                if not ignore.service(manager, service):
+                    b.add_service(manager, service)
+                    b.add_service_package(manager, service, 'yum', package)
+            except ValueError:
+                pass

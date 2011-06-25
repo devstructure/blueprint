@@ -1,4 +1,3 @@
-import base64
 from collections import defaultdict
 import copy
 import json
@@ -16,7 +15,7 @@ logging.basicConfig(format='# [blueprint] %(message)s',
 
 import context_managers
 import git
-from manager import Manager
+import managers
 import util
 
 
@@ -64,6 +63,8 @@ class Blueprint(dict):
             import backend
             for funcname in backend.__all__:
                 getattr(backend, funcname)(self)
+            import services
+            services.services(self)
 
         # Create a blueprint from a Git repository.
         elif name is not None:
@@ -105,9 +106,9 @@ class Blueprint(dict):
         def package(manager, package, version):
             if package in b.packages:
                 return
-            if manager.name in b.packages.get(manager.name, {}):
+            if manager in b.packages.get(manager, {}):
                 return
-            b_packages = b.packages[manager.name]
+            b_packages = b.packages[manager]
             if package not in b_packages:
                 return
             b_versions = b_packages[package]
@@ -142,8 +143,8 @@ class Blueprint(dict):
         # be considered a missing dependency in the Debian archive but in
         # reality it's only _likely_ that you need `ruby*-dev` to use
         # `rubygems*`.
-        def after(manager):
-            if manager.name not in b.packages:
+        def after_packages(manager):
+            if manager not in b.packages:
                 return
 
             deps = {r'^python(\d+(?:\.\d+)?)$': ['python{0}',
@@ -157,7 +158,7 @@ class Blueprint(dict):
                                                         'ruby-devel']}
 
             for pattern, packages in deps.iteritems():
-                match = re.search(pattern, manager.name)
+                match = re.search(pattern, manager)
                 if match is None:
                     continue
                 for package in packages:
@@ -167,7 +168,7 @@ class Blueprint(dict):
                                                                       None)
                         if mine is not None:
                             b.packages[managername][package] = mine
-        other.walk(after=after)
+        other.walk(after_packages=after_packages)
 
         # Compare source tarball filenames, which indicate their content.
         # Keep source tarballs that differ.
@@ -222,14 +223,75 @@ class Blueprint(dict):
     @property
     def packages(self):
         if 'packages' not in self:
-            self['packages'] = defaultdict(lambda: defaultdict(list))
+            self['packages'] = defaultdict(lambda: defaultdict(set))
         return self['packages']
+
+    @property
+    def services(self):
+        if 'services' not in self:
+            self['services'] = defaultdict(lambda: defaultdict(dict))
+        return self['services']
 
     @property
     def sources(self):
         if 'sources' not in self:
             self['sources'] = defaultdict(dict)
         return self['sources']
+
+    def add_file(self, pathname, **kwargs):
+        """
+        Create a file resource.
+        """
+        self.files[pathname] = kwargs
+
+    def add_package(self, manager, package, version):
+        """
+        Create a package resource.
+        """
+        self.packages[manager][package].add(version)
+
+    def add_service(self, manager, service):
+        """
+        Create a service resource which depends on given files and packages.
+        """
+        self.services[manager][service]
+
+    def add_service_file(self, manager, service, *args):
+        """
+        Add file dependencies to a service resource.
+        """
+        if 0 == len(args):
+            return
+        s = self.services[manager][service].setdefault('files', set())
+        for dirname in args:
+            s.add(dirname)
+
+    def add_service_package(self, manager, service, package_manager, *args):
+        """
+        Add package dependencies to a service resource.
+        """
+        if 0 == len(args):
+            return
+        d = self.services[manager][service].setdefault('packages',
+                                                       defaultdict(set))
+        for package in args:
+            d[package_manager].add(package)
+
+    def add_service_source(self, manager, service, *args):
+        """
+        Add source tarball dependencies to a service resource.
+        """
+        if 0 == len(args):
+            return
+        s = self.services[manager][service].setdefault('sources', set())
+        for dirname in args:
+            s.add(dirname)
+
+    def add_source(self, dirname, filename):
+        """
+        Create a source tarball resource.
+        """
+        self.sources[dirname] = filename
 
     def commit(self, message=''):
         """
@@ -286,320 +348,28 @@ class Blueprint(dict):
         for key in ['files', 'packages', 'sources']:
             if key in self and 0 == len(self[key]):
                 del self[key]
-        return json.dumps(self, indent=2, sort_keys=True)
+        return util.JSONEncoder(indent=2, sort_keys=True).encode(self)
 
     def puppet(self):
         """
         Generate Puppet code.
         """
-        import puppet
-        m = puppet.Manifest(self.name, comment=self.DISCLAIMER)
-
-        # Set the default `PATH` for exec resources.
-        m.add(puppet.Exec.defaults(path=os.environ['PATH']))
-
-        # Extract source tarballs.
-        tree = git.tree(self._commit)
-        for dirname, filename in sorted(self.sources.iteritems()):
-            blob = git.blob(tree, filename)
-            content = git.content(blob)
-            pathname = os.path.join('/tmp', filename)
-            m['sources'].add(puppet.File(
-                pathname,
-                self.name,
-                content,
-                owner='root',
-                group='root',
-                mode='0644',
-                source='puppet:///modules/{0}/{1}'.format(self.name,
-                                                          pathname[1:])))
-            m['sources'].add(puppet.Exec(
-                'tar xf {0}'.format(pathname),
-                cwd=dirname,
-                require=puppet.File.ref(pathname)))
-
-        # Place files.
-        if 0 < len(self.files):
-            for pathname, f in sorted(self.files.iteritems()):
-
-                # Create resources for parent directories and let the
-                # autorequire mechanism work out dependencies.
-                dirnames = os.path.dirname(pathname).split('/')[1:]
-                for i in xrange(len(dirnames)):
-                    m['files'].add(puppet.File(
-                        os.path.join('/', *dirnames[0:i + 1]),
-                        ensure='directory'))
-
-                # Create the actual file resource.
-                if '120000' == f['mode'] or '120777' == f['mode']:
-                    m['files'].add(puppet.File(pathname,
-                                               None,
-                                               None,
-                                               owner=f['owner'],
-                                               group=f['group'],
-                                               ensure=f['content']))
-                    continue
-                content = f['content']
-                if 'base64' == f['encoding']:
-                    content = base64.b64decode(content)
-                m['files'].add(puppet.File(pathname,
-                                           self.name,
-                                           content,
-                                           owner=f['owner'],
-                                           group=f['group'],
-                                           mode=f['mode'][-4:],
-                                           ensure='file'))
-
-        # Install packages.
-        deps = []
-
-        def before(manager):
-            if 0 == len(manager):
-                return
-            if 1 == len(manager) and manager.name in manager:
-                return
-            if 'apt' == manager.name:
-                m['packages'].add(puppet.Exec('apt-get -q update',
-                                              before=puppet.Class.ref('apt')))
-            elif 'yum' == manager.name:
-                m['packages'].add(puppet.Exec('yum makecache',
-                                              before=puppet.Class.ref('yum')))
-            deps.append(manager)
-
-        def package(manager, package, version):
-
-            # `apt` and `yum` are easy since they're the default for their
-            # respective platforms.
-            if manager.name in ('apt', 'yum'):
-                m['packages'][manager].add(puppet.Package(package,
-                                                          ensure=version))
-
-                # If APT is installing RubyGems, get complicated.  This would
-                # make sense to do with Yum, too, but there's no consensus on
-                # where, exactly, you might find RubyGems from Yum.  Going
-                # the other way, it's entirely likely that doing this sort of
-                # forced upgrade goes against the spirit of Blueprint itself.
-                match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
-                if match is not None and util.rubygems_update():
-                    m['packages'][manager].add(puppet.Exec('/bin/sh -c "'
-                        '/usr/bin/gem{0} install --no-rdoc --no-ri '
-                        'rubygems-update; '
-                        '/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin '
-                        'which update_rubygems)"'.format(match.group(1)),
-                        require=puppet.Package.ref(package)))
-
-            # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
-            # built in provider.  This is called simply "rubygems" on
-            # RPM-based distros.
-            elif manager.name in ('rubygems', 'rubygems1.8'):
-                m['packages'][manager].add(puppet.Package(package,
-                    ensure=version,
-                    provider='gem'))
-
-            # Other versions of RubyGems are slightly more complicated.
-            elif re.search(r'ruby', manager.name) is not None:
-                match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
-                                 manager.name)
-                m['packages'][manager].add(puppet.Exec(
-                    manager(package, version),
-                    creates='{0}/{1}/gems/{2}-{3}'.format(util.rubygems_path(),
-                                                          match.group(1),
-                                                          package,
-                                                          version)))
-
-            # Python works basically like alternative versions of Ruby
-            # but follows a less predictable directory structure so the
-            # directory is not known ahead of time.  This just so happens
-            # to be the way everything else works, too.
-            else:
-                m['packages'][manager].add(puppet.Exec(
-                    manager(package, version)))
-
-        self.walk(before=before, package=package)
-        m['packages'].dep(*[puppet.Class.ref(dep) for dep in deps])
-
-        # Strict ordering of classes.
-        deps = []
-        if 0 < len(self.sources):
-            deps.append('sources')
-        if 0 < len(self.files):
-            deps.append('files')
-        if 0 < len(self.packages):
-            deps.append('packages')
-        m.dep(*[puppet.Class.ref(dep) for dep in deps])
-
-        return m
+        import frontend.puppet
+        return frontend.puppet.puppet(self)
 
     def chef(self):
         """
         Generate Chef code.
         """
-        import chef
-        c = chef.Cookbook(self.name, comment=self.DISCLAIMER)
-
-        # Extract source tarballs.
-        tree = git.tree(self._commit)
-        for dirname, filename in sorted(self.sources.iteritems()):
-            blob = git.blob(tree, filename)
-            content = git.content(blob)
-            pathname = os.path.join('/tmp', filename)
-            c.file(pathname,
-                   content,
-                   owner='root',
-                   group='root',
-                   mode='0644',
-                   backup=False,
-                   source=pathname[1:])
-            c.execute('tar xf {0}'.format(pathname), cwd=dirname)
-
-        # Place files.
-        for pathname, f in sorted(self.files.iteritems()):
-            c.directory(os.path.dirname(pathname),
-                        group='root',
-                        mode='0755',
-                        owner='root',
-                        recursive=True)
-            if '120000' == f['mode'] or '120777' == f['mode']:
-                c.link(pathname,
-                       owner=f['owner'],
-                       group=f['group'],
-                       to=f['content'])
-                continue
-            content = f['content']
-            if 'base64' == f['encoding']:
-                content = base64.b64decode(content)
-            c.file(pathname, content,
-                   owner=f['owner'],
-                   group=f['group'],
-                   mode=f['mode'][-4:],
-                   backup=False,
-                   source=pathname[1:])
-
-        # Install packages.
-        def before(manager):
-            if 0 == len(manager):
-                return
-            if 'apt' == manager.name:
-                c.execute('apt-get -q update')
-            elif 'yum' == manager.name:
-                c.execute('yum makecache')
-
-        def package(manager, package, version):
-            if manager.name == package:
-                return
-
-            if manager.name in ('apt', 'yum'):
-                c.package(package, version=version)
-
-                # See comments on this section in `puppet` above.
-                match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
-                if match is not None and util.rubygems_update():
-                    c.execute('/usr/bin/gem{0} install --no-rdoc --no-ri '
-                              'rubygems-update'.format(match.group(1)))
-                    c.execute('/usr/bin/ruby{0} '
-                              '$(PATH=$PATH:/var/lib/gems/{0}/bin '
-                              'which update_rubygems)"'.format(match.group(1)))
-
-            # All types of gems get to have package resources.
-            elif 'rubygems' == manager.name:
-                c.gem_package(package, version=version)
-            elif re.search(r'ruby', manager.name) is not None:
-                match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
-                                 manager.name)
-                c.gem_package(package,
-                    gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
-                    version=version)
-
-            # Everything else is an execute resource.
-            else:
-                c.execute(manager(package, version))
-
-        self.walk(before=before, package=package)
-
-        return c
+        import frontend.chef
+        return frontend.chef.chef(self)
 
     def sh(self, server='https://devstructure.com', secret=None):
         """
         Generate shell code.
         """
-        import sh
-        s = sh.Script(self.name, comment=self.DISCLAIMER)
-
-        # Extract source tarballs.
-        if secret is not None:
-            for dirname, filename in sorted(self.sources.iteritems()):
-                s.add('wget "{0}/{1}/{2}/{3}"',
-                      server,
-                      secret,
-                      self.name,
-                      filename)
-                s.add('tar xf "{0}" -C "{1}"',
-                      filename,
-                      dirname)
-        else:
-            tree = git.tree(self._commit)
-            for dirname, filename in sorted(self.sources.iteritems()):
-                blob = git.blob(tree, filename)
-                content = git.content(blob)
-                s.add('tar xf "{0}" -C "{1}"',
-                      filename,
-                      dirname,
-                      sources={filename: content})
-
-        # Place files.
-        for pathname, f in sorted(self.files.iteritems()):
-            s.add('mkdir -p "{0}"', os.path.dirname(pathname))
-            if '120000' == f['mode'] or '120777' == f['mode']:
-                s.add('ln -s "{0}" "{1}"', f['content'], pathname)
-                continue
-            command = 'cat'
-            if 'base64' == f['encoding']:
-                command = 'base64 --decode'
-            eof = 'EOF'
-            while re.search(r'{0}'.format(eof), f['content']):
-                eof += 'EOF'
-            s.add('{0} >"{1}" <<{2}', command, pathname, eof)
-            s.add(raw=f['content'])
-            if 0 < len(f['content']) and '\n' != f['content'][-1]:
-                eof = '\n{0}'.format(eof)
-            s.add(eof)
-            if 'root' != f['owner']:
-                s.add('chown {0} "{1}"', f['owner'], pathname)
-            if 'root' != f['group']:
-                s.add('chgrp {0} "{1}"', f['group'], pathname)
-            if '000644' != f['mode']:
-                s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
-
-        # Install packages.
-        def before(manager):
-            if 0 == len(manager):
-                return
-            if 'apt' == manager.name:
-                s.add('export APT_LISTBUGS_FRONTEND="none"')
-                s.add('export APT_LISTCHANGES_FRONTEND="none"')
-                s.add('export DEBIAN_FRONTEND="noninteractive"')
-                s.add('apt-get -q update')
-            elif 'yum' == manager.name:
-                s.add('yum makecache')
-
-        def package(manager, package, version):
-            if manager.name == package:
-                return
-            s.add(manager(package, version))
-            if manager.name not in ('apt', 'yum'):
-                return
-
-            # See comments on this section in `puppet` above.
-            match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
-            if match is not None and util.rubygems_update():
-                s.add('/usr/bin/gem{0} install --no-rdoc --no-ri '
-                  'rubygems-update', match.group(1))
-                s.add('/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin '
-                  'which update_rubygems)', match.group(1))
-
-        self.walk(before=before, package=package)
-
-        return s
+        import frontend.sh
+        return frontend.sh.sh(self, server, secret)
 
     def blueprintignore(self):
         """
@@ -618,56 +388,186 @@ class Blueprint(dict):
             return ignore.Rules('')
         return ignore.Rules(content)
 
-    def walk(self, managername=None, **kwargs):
+    def walk(self, **kwargs):
+        """
+        Walk an entire blueprint in the appropriate order, executing
+        callbacks along the way.  See blueprint(5) for details on the
+        algorithm.  The callbacks are passed directly from this method
+        to the resource type-specific methods and are documented there.
+        """
+        self.walk_sources(**kwargs)
+        self.walk_files(**kwargs)
+        self.walk_packages(**kwargs)
+        self.walk_services(**kwargs)
+
+    def walk_sources(self, **kwargs):
+        """
+        Walk a blueprint's source tarballs and execute callbacks.
+
+        * `before_sources():`
+          Executed before source tarballs are enumerated.
+        * `source(dirname, filename, gen_content):`
+          Executed when a source tarball is enumerated.  `gen_content`
+          is a callable that will return the file's contents.
+        * `after_sources():`
+          Executed after source tarballs are enumerated.
+        """
+
+        kwargs.get('before_sources', lambda *args: None)()
+
+        callable = kwargs.get('source', lambda *args: None)
+        tree = git.tree(self._commit)
+        for dirname, filename in sorted(self.sources.iteritems()):
+            blob = git.blob(tree, filename)
+            callable(dirname, filename, lambda: git.content(blob))
+
+        kwargs.get('before_sources', lambda *args: None)()
+
+    def walk_files(self, **kwargs):
+        """
+        Walk a blueprint's files and execute callbacks.
+
+        * `before_files():`
+          Executed before files are enumerated.
+        * `file(pathname, f):`
+          Executed when a file is enumerated.
+        * `after_files():`
+          Executed after files are enumerated.
+        """
+
+        kwargs.get('before_files', lambda *args: None)()
+
+        callable = kwargs.get('file', lambda *args: None)
+        for pathname, f in sorted(self.files.iteritems()):
+            callable(pathname, f)
+
+        kwargs.get('after_files', lambda *args: None)()
+
+    def walk_packages(self, managername=None, **kwargs):
         """
         Walk a package tree and execute callbacks along the way.  This is
         a bit like iteration but can't match the iterator protocol due to
         the varying argument lists given to each type of callback.  The
         available callbacks are:
 
-        * `before(manager):`
-          Executed before a manager's dependencies are enumerated.
-        * `package(manager, package, versions):`
-          Executed when a package is enumerated.
-        * `after(manager):`
-          Executed after a manager's dependencies are enumerated.
+        * `before_packages(manager):`
+          Executed before a package manager's dependencies are enumerated.
+        * `package(manager, package, version):`
+          Executed when a package version is enumerated.
+        * `after_packages(manager):`
+          Executed after a package manager's dependencies are enumerated.
         """
 
         # Walking begins with the system package managers, `apt` and `yum`.
         if managername is None:
-            self.walk('apt', **kwargs)
-            self.walk('yum', **kwargs)
+            self.walk_packages('apt', **kwargs)
+            self.walk_packages('yum', **kwargs)
             return
 
-        # Get the full manager from its name.  Watch out for KeyError (by
-        # using dict.get instead of dict.__get__), which means the manager
-        # isn't part of this blueprint.
-        manager = Manager(managername, self.packages.get(managername, {}))
+        # Get the full manager from its name.
+        manager = managers.PackageManager(managername)
 
         # Give the manager a chance to setup for its dependencies.
-        callable = getattr(kwargs.get('before', None), '__call__', None)
-        if callable:
-            callable(manager)
+        kwargs.get('before_packages', lambda *args: None)(manager)
 
         # Each package gets its chance to take action.  Note which packages
         # are themselves managers so they may be visited recursively later.
-        managers = []
-        callable = getattr(kwargs.get('package', None), '__call__', None)
-        for package, versions in sorted(manager.iteritems()):
-            if callable:
-                for version in versions:
-                    callable(manager, package, version)
+        next_managers = []
+        callable = kwargs.get('package', lambda *args: None)
+        for package, versions in sorted(self.packages.get(manager,
+                                                          {}).iteritems()):
+            for version in versions:
+                callable(manager, package, version)
             if managername != package and package in self.packages:
-                managers.append(package)
+                next_managers.append(package)
 
         # Give the manager a change to cleanup after itself.
-        callable = getattr(kwargs.get('after', None), '__call__', None)
-        if callable:
-            callable(manager)
+        kwargs.get('after_packages', lambda *args: None)(manager)
 
         # Now recurse into each manager that was just installed.  Recursing
         # here is safer because there may be secondary dependencies that are
         # not expressed in the hierarchy (for example the `mysql2` gem
         # depends on `libmysqlclient-dev` in addition to its manager).
-        for managername in managers:
-            self.walk(managername, **kwargs)
+        for managername in next_managers:
+            self.walk_packages(managername, **kwargs)
+
+    def walk_services(self, managername=None, **kwargs):
+        """
+        Walk a blueprint's services and execute callbacks.
+
+        * `before_services(manager):`
+          Executed before a service manager's dependencies are enumerated.
+        * `service(manager, service):`
+          Executed when a service is enumerated.
+        * `after_services(manager):`
+          Executed after a service manager's dependencies are enumerated.
+        """
+
+        # Unless otherwise specified, walk all service managers.
+        if managername is None:
+            for managername in sorted(self.services.iterkeys()):
+                self.walk_services(managername, **kwargs)
+            return
+
+        manager = managers.ServiceManager(managername)
+
+        kwargs.get('before_services', lambda *args: None)(manager)
+
+        callable = kwargs.get('service', lambda *args: None)
+        for service, deps in sorted(self.services.get(manager,
+                                                      {}).iteritems()):
+            callable(manager, service)
+            self.walk_service_files(manager, service, **kwargs)
+            self.walk_service_packages(manager, service, **kwargs)
+            self.walk_service_sources(manager, service, **kwargs)
+
+        kwargs.get('after_services', lambda *args: None)(manager)
+
+    def walk_service_files(self, manager, servicename, **kwargs):
+        """
+        Walk a service's file dependencies and execute callbacks.
+
+        * `service_file(manager, servicename, pathname):`
+          Executed when a file service dependency is enumerated.
+        """
+        deps = self.services[manager][servicename]
+        if 'files' not in deps:
+            return
+        callable = kwargs.get('service_file', lambda *args: None)
+        for pathname in deps['files']:
+            callable(manager, servicename, pathname)
+
+    def walk_service_packages(self, manager, servicename, **kwargs):
+        """
+        Walk a service's package dependencies and execute callbacks.
+
+        * `service_package(manager,
+                           servicename,
+                           package_managername,
+                           package):`
+          Executed when a file service dependency is enumerated.
+        """
+        deps = self.services[manager][servicename]
+        if 'packages' not in deps:
+            return
+        callable = kwargs.get('service_package', lambda *args: None)
+        for package_managername, packages in deps['packages'].iteritems():
+            for package in packages:
+                callable(manager,
+                         servicename,
+                         package_managername,
+                         package)
+
+    def walk_service_sources(self, manager, servicename, **kwargs):
+        """
+        Walk a service's source tarball dependencies and execute callbacks.
+
+        * `service_source(manager, servicename, dirname):`
+          Executed when a source tarball service dependency is enumerated.
+        """
+        deps = self.services[manager][servicename]
+        if 'sources' not in deps:
+            return
+        callable = kwargs.get('service_source', lambda *args: None)
+        for dirname in deps['sources']:
+            callable(manager, servicename, dirname)

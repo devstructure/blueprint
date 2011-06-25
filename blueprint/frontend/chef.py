@@ -2,6 +2,7 @@
 Chef code generator.
 """
 
+import base64
 import codecs
 import errno
 from collections import defaultdict
@@ -9,6 +10,139 @@ import os
 import os.path
 import re
 import tarfile
+
+from blueprint import git
+from blueprint import util
+
+
+def chef(b):
+    """
+    Generate Chef code.
+    """
+    c = Cookbook(b.name, comment=b.DISCLAIMER)
+
+    def source(dirname, filename, gen_content):
+        """
+        Create a cookbook_file and execute resource to fetch and extract
+        a source tarball.
+        """
+        pathname = os.path.join('/tmp', filename)
+        c.file(pathname,
+               gen_content(),
+               owner='root',
+               group='root',
+               mode='0644',
+               backup=False,
+               source=pathname[1:])
+        c.execute(filename,
+                  command='tar xf {0}'.format(pathname),
+                  cwd=dirname)
+
+    def file(pathname, f):
+        """
+        Create a cookbook_file resource.
+        """
+        c.directory(os.path.dirname(pathname),
+                    group='root',
+                    mode='0755',
+                    owner='root',
+                    recursive=True)
+        if '120000' == f['mode'] or '120777' == f['mode']:
+            c.link(pathname,
+                   owner=f['owner'],
+                   group=f['group'],
+                   to=f['content'])
+            return
+        content = f['content']
+        if 'base64' == f['encoding']:
+            content = base64.b64decode(content)
+        c.file(pathname,
+               content,
+               owner=f['owner'],
+               group=f['group'],
+               mode=f['mode'][-4:],
+               backup=False,
+               source=pathname[1:])
+
+    def before_packages(manager):
+        """
+        Create execute resources to configure the package managers.
+        """
+        if 0 == len(manager):
+            return
+        if 'apt' == manager:
+            c.execute('apt-get -q update')
+        elif 'yum' == manager:
+            c.execute('yum makecache')
+
+    def package(manager, package, version):
+        """
+        Create a package resource.
+        """
+        if manager == package:
+            return
+
+        if manager in ('apt', 'yum'):
+            c.package(package, version=version)
+
+            # See comments on this section in `puppet` above.
+            match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
+            if match is not None and util.rubygems_update():
+                c.execute('/usr/bin/gem{0} install --no-rdoc --no-ri ' # No ,
+                          'rubygems-update'.format(match.group(1)))
+                c.execute('/usr/bin/ruby{0} ' # No ,
+                          '$(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
+                          'which update_rubygems)"'.format(match.group(1)))
+
+        # All types of gems get to have package resources.
+        elif 'rubygems' == manager:
+            c.gem_package(package, version=version)
+        elif re.search(r'ruby', manager) is not None:
+            match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
+                             manager)
+            c.gem_package(package,
+                gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
+                version=version)
+
+        # Everything else is an execute resource.
+        else:
+            c.execute(manager(package, version))
+
+    def service(manager, service):
+        """
+        Create a service resource and subscribe to its dependencies.
+        """
+
+        # Transform dependency list into a subscribes attribute.
+        subscribe = []
+        def service_file(m, s, pathname):
+            subscribe.append('cookbook_file[{0}]'.format(pathname)) # FIXME Breaks inlining
+        b.walk_service_files(manager, service, service_file=service_file)
+        def service_package(m, s, pm, package):
+            subscribe.append('package[{0}]'.format(package))
+        b.walk_service_packages(manager,
+                                service,
+                                service_package=service_package)
+        def service_source(m, s, dirname):
+            subscribe.append('execute[{0}]'.format(b.sources[dirname]))
+        b.walk_service_sources(manager, service, service_source=service_source)
+        subscribe = util.BareString('resources(' \
+            + ', '.join([repr(s) for s in subscribe]) + ')')
+
+        kwargs = {'action': [[':enable', ':start']],
+                  'subscribes': [':restart', subscribe]}
+        if 'upstart' == manager:
+            kwargs['provider'] = util.BareString(
+                'Chef::Provider::Service::Upstart')
+        c.service(service, **kwargs)
+
+    b.walk(source=source,
+           file=file,
+           before_packages=before_packages,
+           package=package,
+           service=service)
+
+    return c
 
 
 class Cookbook(object):
@@ -32,24 +166,6 @@ class Cookbook(object):
         """
         self.resources.append(resource)
 
-    def package(self, name, **kwargs):
-        """
-        Create a package resource provided by the default provider.
-        """
-        self.add(Resource('package', name, **kwargs))
-
-    def gem_package(self, name, **kwargs):
-        """
-        Create a package resource provided by RubyGems.
-        """
-        self.add(Resource('gem_package', name, **kwargs))
-
-    def execute(self, name, **kwargs):
-        """
-        Create an execute resource.
-        """
-        self.add(Resource('execute', name, **kwargs))
-
     def directory(self, name, **kwargs):
         """
         Create a directory resource.
@@ -68,6 +184,30 @@ class Cookbook(object):
         cookbook is dumped to a string or to files.
         """
         self.add(File(name, content, **kwargs))
+
+    def package(self, name, **kwargs):
+        """
+        Create a package resource provided by the default provider.
+        """
+        self.add(Resource('package', name, **kwargs))
+
+    def gem_package(self, name, **kwargs):
+        """
+        Create a package resource provided by RubyGems.
+        """
+        self.add(Resource('gem_package', name, **kwargs))
+
+    def execute(self, name, **kwargs):
+        """
+        Create an execute resource.
+        """
+        self.add(Resource('execute', name, **kwargs))
+
+    def service(self, name, **kwargs):
+        """
+        Create a service resource.
+        """
+        self.add(Resource('service', name, **kwargs))
 
     def _dump(self, w, inline=False):
         """
@@ -147,7 +287,7 @@ class Resource(dict):
         self.name = name
 
     @classmethod
-    def _dumps(cls, value):
+    def _dumps(cls, value, recursive=False):
         """
         Return a value as it should be written.  If the value starts with
         a ':', it will be written as-is.  Otherwise, it will be written as
@@ -159,10 +299,18 @@ class Resource(dict):
             return 'true'
         elif False == value:
             return 'false'
-        elif 0 < len(value) and ':' == value[0]:
+        elif 1 < len(value) and ':' == value[0]:
+            return value
+        elif hasattr(value, 'bare') or isinstance(value, util.BareString):
             return value
         elif isinstance(value, cls):
             return repr(value)
+        elif isinstance(value, list) or isinstance(value, tuple):
+            s = ', '.join([cls._dumps(v, True) for v in value])
+            if recursive:
+                return '[' + s + ']'
+            else:
+                return s
         return repr(unicode(value).replace(u'#{', u'\\#{'))[1:]
 
     def dumps(self, inline=False):

@@ -16,6 +16,7 @@ import stat
 import subprocess
 
 from blueprint import ignore
+from blueprint import util
 
 
 # An extra list of pathnames and MD5 sums that will be checked after no
@@ -128,13 +129,14 @@ def files(b):
             # Ignore files that are from the `base-files` package (which
             # doesn't include MD5 sums for every file for some reason),
             # are unchanged from their packaged version, or match in `MD5SUMS`.
-            packages = _dpkg_query_S(pathname) + _rpm_qf(pathname)
+            apt_packages = _dpkg_query_S(pathname)
+            yum_packages = _rpm_qf(pathname)
+            packages = apt_packages + yum_packages
             if 'base-files' in packages:
                 continue
             if 0 < len(packages):
                 md5sums = [_dpkg_md5sum(package, pathname)
                            for package in packages]
-                # TODO Equivalent checksumming for RPMs.
             elif pathname in MD5SUMS:
                 md5sums = MD5SUMS[pathname]
                 for i in range(len(md5sums)):
@@ -151,9 +153,8 @@ def files(b):
                 and hashlib.md5(content).hexdigest() in md5sums \
                 and ignore.file(pathname, True):
                 continue
-            if True in [_rpm_V(package, pathname) and ignore.file(pathname,
-                                                                  True)
-                        for package in packages]:
+            if any([not _rpm_V(package, pathname) for package in packages]) \
+                and ignore.file(pathname, True):
                 continue
 
             # A symbolic link's content is the link target.
@@ -199,11 +200,29 @@ def files(b):
                 group = gr.gr_name
             except KeyError:
                 group = s.st_gid
-            b.files[pathname] = dict(content=content,
-                                     encoding=encoding,
-                                     group=group,
-                                     mode='{0:o}'.format(s.st_mode),
-                                     owner=owner)
+            b.add_file(pathname,
+                       content=content,
+                       encoding=encoding,
+                       group=group,
+                       mode='{0:o}'.format(s.st_mode),
+                       owner=owner)
+
+            # If this file is a service init script or config , create a
+            # service resource.
+            try:
+                manager, service = util.parse_service(pathname)
+                if not ignore.service(manager, service):
+                    b.add_service(manager, service)
+                    b.add_service_package(manager,
+                                          service,
+                                          'apt',
+                                          *apt_packages)
+                    b.add_service_package(manager,
+                                          service,
+                                          'yum',
+                                          *yum_packages)
+            except ValueError:
+                pass
 
 
 def _dpkg_query_S(pathname):

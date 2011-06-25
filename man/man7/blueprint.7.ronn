@@ -32,6 +32,8 @@ The `blueprint.Blueprint` class manages blueprints stored in the local blueprint
   This blueprint's name.
 * `packages`:
   A dictionary of package managers that map to dictionaries of managed packages mapped to a list of version numbers to be installed.
+* `services`:
+  A dictionary of service managers that map to dictionaries of managed services mapped to resources on which the service depends.
 * `sources`:
   A dictionary that maps directory names to the name of the tarball that contains the files to be extracted there.
 
@@ -41,13 +43,46 @@ The `blueprint.Blueprint` class manages blueprints stored in the local blueprint
 
 `puppet()`, `chef()`, `sh()` return `Manifest`, `Cookbook`, and `Script` objects, respectively.  See the next section.
 
-`walk()` is a generic implementation of the package walking algorithm described in `blueprint`(5).
+`walk()` is a generic implementation of the algorithm described in `blueprint`(5) which accepts callbacks as keyword arguments:
 
-The `blueprint.Blueprint` class (not individual instances) supports `destroy(`_name_`)` to destroy blueprints and `iter()` to iterate over the names of blueprints.
+* `before_sources():`
+  Executed before source tarballs are enumerated.
+* `source(dirname, filename, gen_content):`
+  Executed when a source tarball is enumerated.  `gen_content` is a callable that will return the file's contents.
+* `after_sources():`
+  Executed after source tarballs are enumerated.
+* `before_files():`
+  Executed before files are enumerated.
+* `file(pathname, f):`
+  Executed when a file is enumerated.
+* `after_files():`
+  Executed after files are enumerated.
+* `before_packages(manager):`
+  Executed before a package manager's dependencies are enumerated.
+* `package(manager, package, version):`
+  Executed when a package version is enumerated.
+* `after_packages(manager):`
+  Executed after a package manager's dependencies are enumerated.
+* `before_services(manager):`
+  Executed before a service manager's dependencies are enumerated.
+* `service(manager, service, deps):`
+  Executed when a service is enumerated.
+* `service_file(manager, service, pathname):`
+  Executed when a file dependency is enumerated.
+* `service_package(manager, service, package_managername, package):`
+  Executed when a package dependency is enumerated.
+* `service_source(manager, service, dirname):`
+  Executed when a source tarball dependency is enumerated.
+* `after_services(manager):`
+  Executed after a service manager's dependencies are enumerated.
 
-### blueprint.puppet, blueprint.chef, and blueprint.sh
+The `blueprint.Blueprint` class (not individual instances) supports `destroy(`_name_`)` to destroy a blueprint and `iter()` to iterate over the names of blueprints.
 
-`blueprint.puppet.Manifest`, `blueprint.chef.Cookbook`, and `blueprint.sh.Script` all implement similar interfaces to code generation.
+### blueprint.frontend
+
+`blueprint.frontend.puppet.Manifest`, `blueprint.frontend.chef.Cookbook`, and `blueprint.frontend.sh.Script` all implement similar interfaces to code generation.
+
+`blueprint.frontend.puppet.puppet`, `blueprint.frontend.chef.chef`, and `blueprint.frontend.sh.sh` all accept a `blueprint.Blueprint` as their argument and return one of the above types, which have the following methods.
 
 `dumps()` returns a string containing code in the language implemented by the class that received the call.  If the blueprint contains source tarballs, `dumps()` may raise `ValueError`.
 

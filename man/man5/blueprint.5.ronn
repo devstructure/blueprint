@@ -4,6 +4,16 @@ blueprint(5) -- blueprint JSON format
 ## SYNOPSIS
 
 	{
+	  "arch": "ARCHITECTURE",
+	  "files": {
+	    "PATHNAME": {
+	      "owner": "OWNER",
+	      "group": "GROUP",
+	      "mode": "MODE",
+	      "content": "CONTENT",
+	      "encoding": "ENCODING"
+	    }
+	  },
 	  "packages": {
 	    "MANAGER": {
 	      "PACKAGE": ["VERSION"],
@@ -14,44 +24,49 @@ blueprint(5) -- blueprint JSON format
 	      "PACKAGE": ["VERSION"]
 	    }
 	  },
-	  "files": {
-        "PATHNAME": {
-          "owner": "OWNER",
-          "group": "GROUP",
-          "mode": "MODE",
-          "content": "CONTENT",
-	      "encoding": "ENCODING"
-        }
+	  "services": {
+	    "MANAGER": {
+	      "SERVICENAME": {
+	        "files": ["PATHNAME"],
+	        "packages": {
+	          "MANAGER": ["PACKAGE"]
+	        },
+	        "sources": ["DIRNAME"]
+	      }
+	    }
 	  },
 	  "sources": {
 	    "DIRNAME": "FILENAME"
-	  },
-	  "arch": "ARCHITECTURE"
+	  }
 	}
 
 (Keys and values written in CAPITALS represent variable data.)
 
 ## DESCRIPTION
 
-`blueprint-create`(1) commits `blueprint.json` to the appropriate branch in the local blueprint repository.  The format described here is used to generate Puppet modules, Chef cookbooks, and POSIX shell scripts in `blueprint-show`(1) and `blueprint-apply`(1).
-
-### Packages
-
-Each key within the `packages` names a package manager.  Each manager contains keys that name packages to be installed by that manager.  Each package name is associated with an array of versions that should be installed.  In most cases, for most managers, this array will have only one element.
-
-Each manager is itself the name of a package that appears elsewhere.  `packages` should be processed by starting with the `apt` manager, installing its dependencies.  Any manager that was installed during this pass should next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.
-
-### Files
-
-Each key in the optional `files` object is the fully-qualified pathname to a file.  The associated value contains the `owner`, owning `group`, `mode` (a string containing the full 6-digit octal representation), `content`, and the `encoding` of content (one of _plain_ or _base64_).
+`blueprint-create`(1) commits `blueprint.json` to the appropriate branch in the local blueprint repository.  The format described here is used to generate Puppet modules, Chef cookbooks, and POSIX shell scripts in `blueprint-show`(1) and `blueprint-apply`(1).  These sections must be followed in order.
 
 ### Sources
 
-Each key in the optional `sources` object is the fully-qualified path to a directory.  The associated value is the name of a tarball of the contents of that directory at the time the blueprint was created.  It should be extracted there when the blueprint is applied.  The tarball is stored in Git alongside `blueprint.json` and is included in Puppet modules and Chef cookbooks, and referenced from POSIX shell scripts.
+Each key in the optional `sources` object is the fully-qualified path to a directory.  These directory names should be traversed in alphabetical order.  The associated value is the name of a tarball of the contents of that directory at the time the blueprint was created.  It must be extracted there when the blueprint is applied.  The tarball is stored in Git alongside `blueprint.json`.
 
-### Architecture
+If `sources` is present and non-empty, `arch` will also be present indicating the architecture of the server that created the blueprint.  If present, this value will be _amd64_ or _i386_ on Debian-based systems or _x86_64_ or _x86_ on RPM-based systems.  It is legal to refuse to apply a blueprint with a mismatched architecture.  The architecture can be found by running `dpkg --print-architecture` or `rpm --eval %_arch` as appropriate.
 
-If `sources` is present and non-empty, `arch` will also be present indicating the architecture of the server that created the blueprint.  If present, this value will be _amd64_ or _i386_.
+### Files
+
+Each key in the optional `files` object is the fully-qualified pathname to a file.  These pathnames should be traversed in alphabetical order.  The associated value contains the `owner`, owning `group`, `mode` (a string containing the full 6-digit octal representation), `content`, and the `encoding` of content (one of _plain_ or _base64_).  Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied.
+
+### Packages
+
+Each key within `packages` names a package manager.  Each manager contains keys that name packages to be installed by that manager.  Each package name is associated with an array of versions that must be installed.  In most cases, for most managers, this array will have only one element.
+
+Each manager is itself the name of a package that appears elsewhere.  `packages` must be processed by starting with the `apt` and `yum` managers, installing their dependencies.  Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.
+
+### Services
+
+Each key within `services` names a service manager.  Each manager contains keys that name services on the system.  Each service name is associated with a set of dependencies which themselves take a form much like a blueprint: `files` may be present and point to a list of pathnames; `packages` may be present and point to a set of package managers which each point to a list of packages; `sources` may be present and point to a list of directory names.
+
+If any of the resources on which the service depends are changed, upgraded, initailized, or otherwise acted upon, the service should be restarted.
 
 ## THEME SONG
 

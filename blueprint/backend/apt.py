@@ -3,10 +3,10 @@ Search for `apt` packages to include in the blueprint.
 """
 
 import logging
-import os
 import subprocess
 
 from blueprint import ignore
+from blueprint import util
 
 
 def apt(b):
@@ -27,4 +27,18 @@ def apt(b):
         package, version = line.strip().split()
         if ignore.package('apt', package):
             continue
-        b.packages['apt'][package].append(version)
+
+        b.add_package('apt', package, version)
+
+        # Create service resources for each service init script or config
+        # found in this package.
+        p = subprocess.Popen(['dpkg-query', '-L', package],
+                             close_fds=True, stdout=subprocess.PIPE)
+        for line in p.stdout:
+            try:
+                manager, service = util.parse_service(line.rstrip())
+                if not ignore.service(manager, service):
+                    b.add_service(manager, service)
+                    b.add_service_package(manager, service, 'apt', package)
+            except ValueError:
+                pass

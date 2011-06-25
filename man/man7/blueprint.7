@@ -53,6 +53,10 @@ This blueprint\'s name\.
 A dictionary of package managers that map to dictionaries of managed packages mapped to a list of version numbers to be installed\.
 .
 .TP
+\fBservices\fR
+A dictionary of service managers that map to dictionaries of managed services mapped to resources on which the service depends\.
+.
+.TP
 \fBsources\fR
 A dictionary that maps directory names to the name of the tarball that contains the files to be extracted there\.
 .
@@ -66,13 +70,76 @@ A dictionary that maps directory names to the name of the tarball that contains 
 \fBpuppet()\fR, \fBchef()\fR, \fBsh()\fR return \fBManifest\fR, \fBCookbook\fR, and \fBScript\fR objects, respectively\. See the next section\.
 .
 .P
-\fBwalk()\fR is a generic implementation of the package walking algorithm described in \fBblueprint\fR(5)\.
+\fBwalk()\fR is a generic implementation of the algorithm described in \fBblueprint\fR(5) which accepts callbacks as keyword arguments:
+.
+.TP
+\fBbefore_sources():\fR Executed before source tarballs are enumerated\.
+
+.
+.TP
+\fBsource(dirname, filename, gen_content):\fR Executed when a source tarball is enumerated\. \fBgen_content\fR is a callable that will return the file\'s contents\.
+
+.
+.TP
+\fBafter_sources():\fR Executed after source tarballs are enumerated\.
+
+.
+.TP
+\fBbefore_files():\fR Executed before files are enumerated\.
+
+.
+.TP
+\fBfile(pathname, f):\fR Executed when a file is enumerated\.
+
+.
+.TP
+\fBafter_files():\fR Executed after files are enumerated\.
+
+.
+.TP
+\fBbefore_packages(manager):\fR Executed before a package manager\'s dependencies are enumerated\.
+
+.
+.TP
+\fBpackage(manager, package, version):\fR Executed when a package version is enumerated\.
+
+.
+.TP
+\fBafter_packages(manager):\fR Executed after a package manager\'s dependencies are enumerated\.
+
+.
+.TP
+\fBbefore_services(manager):\fR Executed before a service manager\'s dependencies are enumerated\.
+
+.
+.TP
+\fBservice(manager, service, deps):\fR Executed when a service is enumerated\.
+
+.
+.TP
+\fBservice_file(manager, service, pathname):\fR Executed when a file dependency is enumerated\.
+
+.
+.TP
+\fBservice_package(manager, service, package_managername, package):\fR Executed when a package dependency is enumerated\.
+
+.
+.TP
+\fBservice_source(manager, service, dirname):\fR Executed when a source tarball dependency is enumerated\.
+
+.
+.TP
+\fBafter_services(manager):\fR Executed after a service manager\'s dependencies are enumerated\.
+
 .
 .P
-The \fBblueprint\.Blueprint\fR class (not individual instances) supports \fBdestroy(\fR\fIname\fR\fB)\fR to destroy blueprints and \fBiter()\fR to iterate over the names of blueprints\.
+The \fBblueprint\.Blueprint\fR class (not individual instances) supports \fBdestroy(\fR\fIname\fR\fB)\fR to destroy a blueprint and \fBiter()\fR to iterate over the names of blueprints\.
 .
-.SS "blueprint\.puppet, blueprint\.chef, and blueprint\.sh"
-\fBblueprint\.puppet\.Manifest\fR, \fBblueprint\.chef\.Cookbook\fR, and \fBblueprint\.sh\.Script\fR all implement similar interfaces to code generation\.
+.SS "blueprint\.frontend"
+\fBblueprint\.frontend\.puppet\.Manifest\fR, \fBblueprint\.frontend\.chef\.Cookbook\fR, and \fBblueprint\.frontend\.sh\.Script\fR all implement similar interfaces to code generation\.
+.
+.P
+\fBblueprint\.frontend\.puppet\.puppet\fR, \fBblueprint\.frontend\.chef\.chef\fR, and \fBblueprint\.frontend\.sh\.sh\fR all accept a \fBblueprint\.Blueprint\fR as their argument and return one of the above types, which have the following methods\.
 .
 .P
 \fBdumps()\fR returns a string containing code in the language implemented by the class that received the call\. If the blueprint contains source tarballs, \fBdumps()\fR may raise \fBValueError\fR\.

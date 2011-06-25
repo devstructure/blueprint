@@ -83,8 +83,8 @@ def pypi(b):
                             continue
                         versions = b.packages['apt'][manager]
                         if stdout not in versions:
-                            versions.append(stdout)
-                        b.packages[manager][package].append(version)
+                            versions.add(stdout)
+                        b.add_package(manager, package, version)
 
                     # This package was installed via `pip`.  Figure out how
                     # `pip` was installed and use that as this package's
@@ -99,9 +99,9 @@ def pypi(b):
                                              stderr=subprocess.PIPE)
                         p.communicate()
                         if 0 != p.returncode:
-                            b.packages['pip'][package].append(version)
+                            b.add_package('pip', package, version)
                         else:
-                            b.packages['python-pip'][package].append(version)
+                            b.add_package('python-pip', package, version)
 
                 except OSError:
 
@@ -130,8 +130,8 @@ def pypi(b):
                             continue
                         versions = b.packages['yum']['python']
                         if stdout not in versions:
-                            versions.append(stdout)
-                        b.packages['python'][package].append(version)
+                            versions.add(stdout)
+                        b.add_package('python', package, version)
 
                     # This package was installed via `pip`.  Figure out how
                     # `pip` was installed and use that as this package's
@@ -145,6 +145,6 @@ def pypi(b):
                             stderr=subprocess.PIPE)
                         p.communicate()
                         if 0 != p.returncode:
-                            b.packages['pip'][package].append(version)
+                            b.add_package('pip', package, version)
                         else:
-                            b.packages['python-pip'][package].append(version)
+                            b.add_package('python-pip', package, version)

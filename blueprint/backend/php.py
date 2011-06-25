@@ -36,4 +36,4 @@ def php(b):
             if match is None:
                 continue
             package, version = match.group(1), match.group(2)
-            b.packages[manager][package].append(version)
+            b.add_package(manager, package, version)
