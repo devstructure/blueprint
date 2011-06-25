@@ -43,16 +43,13 @@ install-bin:
 install-lib:
 	install -d $(DESTDIR)$(pydir)/blueprint/
 	install -m644 \
-		blueprint/chef.py \
 		blueprint/context_managers.py \
 		blueprint/deps.py \
 		blueprint/git.py \
 		blueprint/ignore.py \
 		blueprint/__init__.py \
-		blueprint/manager.py \
-		blueprint/puppet.py \
+		blueprint/managers.py \
 		blueprint/services.py \
-		blueprint/sh.py \
 		blueprint/util.py \
 		$(DESTDIR)$(pydir)/blueprint/
 	install -d $(DESTDIR)$(pydir)/blueprint/backend/
@@ -66,6 +63,13 @@ install-lib:
 		blueprint/backend/sources.py \
 		blueprint/backend/yum.py \
 		$(DESTDIR)$(pydir)/blueprint/backend/
+	install -d $(DESTDIR)$(pydir)/blueprint/frontend/
+	install -m644 \
+		blueprint/frontend/chef.py \
+		blueprint/frontend/__init__.py \
+		blueprint/frontend/puppet.py \
+		blueprint/frontend/sh.py \
+		$(DESTDIR)$(pydir)/blueprint/frontend/
 	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall \
 		$(DESTDIR)$(pydir)/blueprint
 
@@ -108,8 +112,6 @@ uninstall-bin:
 
 uninstall-lib:
 	rm -f \
-		$(DESTDIR)$(pydir)/blueprint/chef.py \
-		$(DESTDIR)$(pydir)/blueprint/chef.pyc \
 		$(DESTDIR)$(pydir)/blueprint/context_managers.py \
 		$(DESTDIR)$(pydir)/blueprint/context_managers.pyc \
 		$(DESTDIR)$(pydir)/blueprint/deps.py \
@@ -120,14 +122,10 @@ uninstall-lib:
 		$(DESTDIR)$(pydir)/blueprint/ignore.pyc \
 		$(DESTDIR)$(pydir)/blueprint/__init__.py \
 		$(DESTDIR)$(pydir)/blueprint/__init__.pyc \
-		$(DESTDIR)$(pydir)/blueprint/manager.py \
-		$(DESTDIR)$(pydir)/blueprint/manager.pyc \
-		$(DESTDIR)$(pydir)/blueprint/puppet.py \
-		$(DESTDIR)$(pydir)/blueprint/puppet.pyc \
+		$(DESTDIR)$(pydir)/blueprint/managers.py \
+		$(DESTDIR)$(pydir)/blueprint/managers.pyc \
 		$(DESTDIR)$(pydir)/blueprint/services.py \
 		$(DESTDIR)$(pydir)/blueprint/services.pyc \
-		$(DESTDIR)$(pydir)/blueprint/sh.py \
-		$(DESTDIR)$(pydir)/blueprint/sh.pyc \
 		$(DESTDIR)$(pydir)/blueprint/util.py \
 		$(DESTDIR)$(pydir)/blueprint/util.pyc \
 		$(DESTDIR)$(pydir)/blueprint/backend/apt.py \
@@ -145,8 +143,17 @@ uninstall-lib:
 		$(DESTDIR)$(pydir)/blueprint/backend/sources.py \
 		$(DESTDIR)$(pydir)/blueprint/backend/sources.pyc \
 		$(DESTDIR)$(pydir)/blueprint/backend/yum.py \
-		$(DESTDIR)$(pydir)/blueprint/backend/yum.pyc
+		$(DESTDIR)$(pydir)/blueprint/backend/yum.pyc \
+		$(DESTDIR)$(pydir)/blueprint/frontend/chef.py \
+		$(DESTDIR)$(pydir)/blueprint/frontend/chef.pyc \
+		$(DESTDIR)$(pydir)/blueprint/frontend/__init__.py \
+		$(DESTDIR)$(pydir)/blueprint/frontend/__init__.pyc \
+		$(DESTDIR)$(pydir)/blueprint/frontend/puppet.py \
+		$(DESTDIR)$(pydir)/blueprint/frontend/puppet.pyc \
+		$(DESTDIR)$(pydir)/blueprint/frontend/sh.py \
+		$(DESTDIR)$(pydir)/blueprint/frontend/sh.pyc
 	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(pydir)/blueprint/backend
+	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(pydir)/blueprint/frontend
 
 uninstall-man:
 	rm -f \
