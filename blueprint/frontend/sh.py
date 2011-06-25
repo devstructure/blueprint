@@ -120,7 +120,7 @@ def sh(b, server='https://devstructure.com', secret=None):
         if manager.name not in ('apt', 'yum'):
             return
 
-        # See comments on this section in `puppet` above.
+        # See comments on this section in `blueprint.frontend.puppet`.
         match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
         if match is not None and util.rubygems_update():
             s.add('/usr/bin/gem{0} install --no-rdoc --no-ri ' # No ,
