@@ -29,6 +29,7 @@ install-bin:
 		blueprint-apply \
 		blueprint-create \
 		blueprint-destroy \
+		blueprint-diff \
 		blueprint-list \
 		blueprint-show \
 	; do \
@@ -75,6 +76,7 @@ install-man:
 		man/man1/blueprint-apply.1 \
 		man/man1/blueprint-create.1 \
 		man/man1/blueprint-destroy.1 \
+		man/man1/blueprint-diff.1 \
 		man/man1/blueprint-list.1 \
 		man/man1/blueprint-show.1 \
 		$(DESTDIR)$(mandir)/man1/
@@ -99,6 +101,7 @@ uninstall-bin:
 		$(DESTDIR)$(bindir)/blueprint-apply \
 		$(DESTDIR)$(bindir)/blueprint-create \
 		$(DESTDIR)$(bindir)/blueprint-destroy \
+		$(DESTDIR)$(bindir)/blueprint-diff \
 		$(DESTDIR)$(bindir)/blueprint-list \
 		$(DESTDIR)$(bindir)/blueprint-show
 	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(bindir)
@@ -151,6 +154,7 @@ uninstall-man:
 		$(DESTDIR)$(mandir)/man1/blueprint-apply.1 \
 		$(DESTDIR)$(mandir)/man1/blueprint-create.1 \
 		$(DESTDIR)$(mandir)/man1/blueprint-destroy.1 \
+		$(DESTDIR)$(mandir)/man1/blueprint-diff.1 \
 		$(DESTDIR)$(mandir)/man1/blueprint-list.1 \
 		$(DESTDIR)$(mandir)/man1/blueprint-show.1 \
 		$(DESTDIR)$(mandir)/man5/blueprint.5 \
