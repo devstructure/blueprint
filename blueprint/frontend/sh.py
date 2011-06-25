@@ -46,22 +46,25 @@ def sh(b, server='https://devstructure.com', secret=None):
                     service_package=service_package,
                     service_source=service_source)
 
-    if secret is not None:
-        def source(dirname, filename, gen_content):
-            """
-            Extract a source tarball.
-            """
-            s.add('wget "{0}/{1}/{2}/{3}"', server, secret, b.name, filename)
-            s.add('tar xf "{0}" -C "{1}"', filename, dirname)
-    else:
-        def source(dirname, filename, gen_content):
-            """
-            Extract a source tarball.
-            """
+    def source(dirname, filename, gen_content):
+        """
+        Extract a source tarball.
+        """
+        if dirname in lut['sources']:
+            s.add('MD5SUM="$(find "{0}" -printf %T@\\\\n | md5sum)"', dirname)
+        if secret is None:
             s.add('tar xf "{0}" -C "{1}"',
                   filename,
                   dirname,
                   sources={filename: gen_content()})
+        else:
+            s.add('wget "{0}/{1}/{2}/{3}"', server, secret, b.name, filename)
+            s.add('tar xf "{0}" -C "{1}"', filename, dirname)
+        for manager, service in lut['sources'][dirname]:
+            s.add('[ "$MD5SUM" != "$(find "{0}" -printf %T@\\\\n ' # No ,
+                  '| md5sum)" ] && {1}=1',
+                  dirname,
+                  _service_env(manager, service))
 
     def file(pathname, f):
         """
