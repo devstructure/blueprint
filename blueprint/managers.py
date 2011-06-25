@@ -1,15 +1,21 @@
 """
+Managers are callable strings that can generate the commands needed by
+resources.  They're mostly useful in the context of generated shell code.
 """
 
 import re
 
 
-class Manager(unicode):
+class PackageManager(unicode):
     """
+    Package managers each have their own syntax.  All supported package
+    managers are encapsulated in this manager class.
     """
 
     def __call__(self, package, version):
         """
+        Return a shell command that installs the given version of the given
+        package via this package manager.
         """
 
         if 'apt' == self:

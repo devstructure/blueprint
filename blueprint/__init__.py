@@ -15,7 +15,7 @@ logging.basicConfig(format='# [blueprint] %(message)s',
 
 import context_managers
 import git
-from manager import Manager
+import managers
 import util
 
 
@@ -465,21 +465,21 @@ class Blueprint(dict):
             return
 
         # Get the full manager from its name.
-        manager = Manager(managername)
+        manager = managers.PackageManager(managername)
 
         # Give the manager a chance to setup for its dependencies.
         kwargs.get('before_packages', lambda *args: None)(manager)
 
         # Each package gets its chance to take action.  Note which packages
         # are themselves managers so they may be visited recursively later.
-        managers = []
+        next_managers = []
         callable = kwargs.get('package', lambda *args: None)
         for package, versions in sorted(self.packages.get(managername,
                                                           {}).iteritems()):
             for version in versions:
                 callable(manager, package, version)
             if managername != package and package in self.packages:
-                managers.append(package)
+                next_managers.append(package)
 
         # Give the manager a change to cleanup after itself.
         kwargs.get('after_packages', lambda *args: None)(manager)
@@ -488,7 +488,7 @@ class Blueprint(dict):
         # here is safer because there may be secondary dependencies that are
         # not expressed in the hierarchy (for example the `mysql2` gem
         # depends on `libmysqlclient-dev` in addition to its manager).
-        for managername in managers:
+        for managername in next_managers:
             self.walk_packages(managername, **kwargs)
 
     def walk_services(self, managername=None, **kwargs):
