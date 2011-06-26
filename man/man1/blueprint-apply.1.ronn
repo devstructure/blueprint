@@ -3,7 +3,7 @@ blueprint-apply(1) -- run a blueprint's generated shell code
 
 ## SYNOPSIS
 
-`blueprint apply` [`-q`] _name_  
+`blueprint apply` [`-r`] [`-q`] _name_  
 
 ## DESCRIPTION
 
@@ -15,6 +15,8 @@ and provided for convenience and completeness.
 
 ## OPTIONS
 
+* `-r`, `--relaxed`:
+  Relax version constraints in generated code.
 * `-q`, `--quiet`:
   Operate quietly.
 * `-h`, `--help`:

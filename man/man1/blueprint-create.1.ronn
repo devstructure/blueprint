@@ -3,7 +3,7 @@ blueprint-create(1) -- create a blueprint
 
 ## SYNOPSIS
 
-`blueprint create` [`-P`|`-C`|`-S`|`-I`] [`-m` _message_] [`-q`] _name_  
+`blueprint create` [`-P`|`-C`|`-S`|`-I`] [`-m` _message_] [`-r`] [`-q`] _name_  
 
 ## DESCRIPTION
 
@@ -31,6 +31,8 @@ Anything installed in `/usr/local` will be archived and included in the blueprin
   Show the blueprint's ~/.blueprintignore.
 * `-m` _message_, `--message=`_message_:
   Commit message.
+* `-r`, `--relaxed`:
+  Relax version constraints in generated code.
 * `-q`, `--quiet`:
   Operate quietly.
 * `-h`, `--help`:

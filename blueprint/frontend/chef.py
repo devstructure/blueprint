@@ -15,7 +15,7 @@ from blueprint import git
 from blueprint import util
 
 
-def chef(b):
+def chef(b, relaxed=False):
     """
     Generate Chef code.
     """
@@ -83,7 +83,10 @@ def chef(b):
             return
 
         if manager in ('apt', 'yum'):
-            c.package(package, version=version)
+            if relaxed:
+                c.package(package)
+            else:
+                c.package(package, version=version)
 
             # See comments on this section in `puppet` above.
             match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)

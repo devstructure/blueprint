@@ -11,7 +11,7 @@ import blueprint
 from blueprint import context_managers
 
 parser = optparse.OptionParser(
-    'Usage: %prog [-P|-C|-S|-I] [-m <message>] [-q] <name>')
+    'Usage: %prog [-P|-C|-S|-I] [-m <message>] [-r] [-q] <name>')
 parser.add_option('-P', '--puppet',
                   dest='generate',
                   action='store_const',
@@ -36,6 +36,11 @@ parser.add_option('-m', '--message',
                   dest='message',
                   default=None,
                   help='commit message')
+parser.add_option('-r', '--relaxed',
+                  dest='relaxed',
+                  default=False,
+                  action='store_true',
+                  help='relax version constraints in generated code')
 parser.add_option('-q', '--quiet',
                   dest='quiet',
                   default=False,
@@ -66,7 +71,7 @@ try:
         sys.stdout.write(b.blueprintignore().dumps())
     else:
         try:
-            filename = getattr(b, options.generate)().dumpf()
+            filename = getattr(b, options.generate)(options.relaxed).dumpf()
         except OSError as e:
             if errno.EEXIST == e.errno:
                 logging.error('{0} already exists'.format(name))

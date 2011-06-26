@@ -3,7 +3,7 @@ blueprint-show(1) -- generate code from a blueprint
 
 ## SYNOPSIS
 
-`blueprint show` [`-P`|`-C`|`-S`|`-I`] [`-q`] _name_  
+`blueprint show` [`-P`|`-C`|`-S`|`-I`] [`-r`] [`-q`] _name_  
 
 ## DESCRIPTION
 
@@ -21,6 +21,8 @@ If none of `--puppet`, `--chef`, or `--sh` are given, the raw JSON data structur
   Generate POSIX shell code.
 * `-I`, `--ignore`:
   Show the blueprint's ~/.blueprintignore.
+* `-r`, `--relaxed`:
+  Relax version constraints in generated code.
 * `-q`, `--quiet`:
   Operate quietly.
 * `-h`, `--help`:

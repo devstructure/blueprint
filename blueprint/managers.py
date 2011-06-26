@@ -12,37 +12,61 @@ class PackageManager(unicode):
     managers are encapsulated in this manager class.
     """
 
-    def __call__(self, package, version):
+    def gate(self, package, version, relaxed=False):
+        """
+        Return a shell command that checks for the given version of the
+        given package via this package manager.  It should exit non-zero
+        if the package is not in the desired state.
+        """
+
+        if 'apt' == self:
+            if relaxed:
+                return 'dpkg-query -W {0} >/dev/null'.format(package)
+            else:
+                return ('[ "$(dpkg-query -f\'${{{{Version}}}}\\n\' -W {0})" '
+                        '= "{1}" ]').format(package, version)
+
+        if 'yum' == self:
+            if relaxed:
+                arg = package
+            else:
+                match = re.match(r'^\d+:(.+)$', version)
+                if match is None:
+                    arg = '{0}-{1}'.format(package, version)
+                else:
+                    arg = '{0}-{1}'.format(package, match.group(1))
+            return 'rpm -q {0} >/dev/null'.format(arg)
+
+        return None
+
+    def install(self, package, version, relaxed=False):
         """
         Return a shell command that installs the given version of the given
         package via this package manager.
         """
 
         if 'apt' == self:
-            return ('[ "$(dpkg-query -f\'${{{{Version}}}}\\n\' -W {0})" '
-                    '!= "{1}" ] && apt-get -y -q '
-                    '-o DPkg::Options::=--force-confold install {0}={1}'
-                   ).format(package, version)
+            arg = package if relaxed else '{0}={1}'.format(package, version)
+            return ('apt-get -y -q -o DPkg::Options::=--force-confold '
+                    'install {0}').format(arg)
 
         if 'yum' == self:
-            match = re.match(r'^\d+:(.+)$', version)
-            if match is None:
-                return ('rpm -q {0}-{1} >/dev/null '
-                        '|| yum -y install {0}-{1}').format(package, version)
-            else:
-                return ('rpm -q {0}-{1} >/dev/null '
-                        '|| yum -y install {0}-{2}').format(package,
-                                                            match.group(1),
-                                                            version)
+            arg = package if relaxed else '{0}-{1}'.format(package, version)
+            return 'yum -y install {1}'.format(arg)
 
         if 'rubygems' == self:
-            return 'gem install {0} -v{1}'.format(package, version)
+            if relaxed:
+                return 'gem install {0}'.format(package)
+            else:
+                return 'gem install {0} -v{1}'.format(package, version)
         match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)', self)
         if match is not None:
-            # FIXME PATH might have a thing to say about this.
-            return 'gem{0} install {1} -v{2}'.format(match.group(1),
-                                                     package,
-                                                     version)
+            if relaxed:
+                return 'gem{0} install {1}'.format(match.group(1), package)
+            else:
+                return 'gem{0} install {1} -v{2}'.format(match.group(1),
+                                                         package,
+                                                         version)
 
         if 'python' == self:
             return 'easy_install {0}'.format(package)
@@ -50,16 +74,33 @@ class PackageManager(unicode):
         if match is not None:
             return 'easy_install-{0} {1}'.format(match.group(1), package)
         if 'pip' == self or 'python-pip' == self:
-            return 'pip install {0}=={1}'.format(package, version)
+            arg = package if relaxed else '{0}=={1}'.format(package, version)
+            return 'pip install {0}'.format(arg)
 
         if 'php-pear' == self:
-            return 'pear install {0}-{1}'.format(package, version)
+            arg = package if relaxed else '{0}-{1}'.format(package, version)
+            return 'pear install {0}'.format(arg)
         if self in ('php5-dev', 'php-devel'):
-            return 'pecl install {0}-{1}'.format(package, version)
+            arg = package if relaxed else '{0}-{1}'.format(package, version)
+            return 'pecl install {0}'.format(arg)
 
-        return ': unknown manager {0} for {1} {2}'.format(self,
-                                                          package,
-                                                          version)
+        if relaxed:
+            return ': unknown manager {0} for {1}'.format(self, package)
+        else:
+            return ': unknown manager {0} for {1} {2}'.format(self,
+                                                              package,
+                                                              version)
+
+    def __call__(self, package, version, relaxed=False):
+        """
+        Return a shell command that checks for and possibly installs
+        the given version of the given package.
+        """
+        gate = self.gate(package, version, relaxed)
+        install = self.install(package, version, relaxed)
+        if gate is None:
+            return install
+        return gate + ' || ' + install
 
 
 class ServiceManager(unicode):

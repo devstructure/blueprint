@@ -9,7 +9,12 @@ import sys
 import blueprint
 from blueprint import context_managers
 
-parser = optparse.OptionParser('Usage: %prog [-q] <name>')
+parser = optparse.OptionParser('Usage: %prog [-r] [-q] <name>')
+parser.add_option('-r', '--relaxed',
+                  dest='relaxed',
+                  default=False,
+                  action='store_true',
+                  help='relax version constraints in generated code')
 parser.add_option('-q', '--quiet',
                   dest='quiet',
                   default=False,
@@ -35,7 +40,7 @@ except ValueError:
     sys.exit(1)
 
 with context_managers.mkdtemp():
-    filename = b.sh().dumpf()
+    filename = b.sh(options.relaxed).dumpf()
     p = subprocess.Popen(['sudo', 'sh', filename], close_fds=True)
     p.communicate()
     sys.exit(p.returncode)

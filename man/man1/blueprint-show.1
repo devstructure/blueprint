@@ -7,7 +7,7 @@
 \fBblueprint\-show\fR \- generate code from a blueprint
 .
 .SH "SYNOPSIS"
-\fBblueprint show\fR [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR|\fB\-I\fR] [\fB\-q\fR] \fIname\fR
+\fBblueprint show\fR [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR|\fB\-I\fR] [\fB\-r\fR] [\fB\-q\fR] \fIname\fR
 .
 .SH "DESCRIPTION"
 \fBblueprint\-show\fR generates code from the blueprint \fIname\fR as a Puppet module, a Chef cookbook, or POSIX shell code as indicated by the \fB\-\-puppet\fR, \fB\-\-chef\fR, or \fB\-\-sh\fR option\. The generated code will be written to a file or directory in the current working directory and its name will be printed to \fBstdout\fR\. If \fB\-\-ignore\fR is given, the \fBblueprintignore\fR(5) rules used to create the blueprint will be printed to \fBstdout\fR\.
@@ -32,6 +32,10 @@ Generate POSIX shell code\.
 .TP
 \fB\-I\fR, \fB\-\-ignore\fR
 Show the blueprint\'s ~/\.blueprintignore\.
+.
+.TP
+\fB\-r\fR, \fB\-\-relaxed\fR
+Relax version constraints in generated code\.
 .
 .TP
 \fB\-q\fR, \fB\-\-quiet\fR

@@ -7,7 +7,7 @@
 \fBblueprint\-create\fR \- create a blueprint
 .
 .SH "SYNOPSIS"
-\fBblueprint create\fR [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR|\fB\-I\fR] [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIname\fR
+\fBblueprint create\fR [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR|\fB\-I\fR] [\fB\-m\fR \fImessage\fR] [\fB\-r\fR] [\fB\-q\fR] \fIname\fR
 .
 .SH "DESCRIPTION"
 \fBblueprint\-create\fR creates a list of all installed packages and modified configuration files and stores it in the branch \fIname\fR in the local blueprint repository with the commit \fImessage\fR (if given)\.
@@ -48,6 +48,10 @@ Show the blueprint\'s ~/\.blueprintignore\.
 .TP
 \fB\-m\fR \fImessage\fR, \fB\-\-message=\fR\fImessage\fR
 Commit message\.
+.
+.TP
+\fB\-r\fR, \fB\-\-relaxed\fR
+Relax version constraints in generated code\.
 .
 .TP
 \fB\-q\fR, \fB\-\-quiet\fR

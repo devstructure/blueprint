@@ -350,26 +350,29 @@ class Blueprint(dict):
                 del self[key]
         return util.JSONEncoder(indent=2, sort_keys=True).encode(self)
 
-    def puppet(self):
+    def puppet(self, relaxed=False):
         """
         Generate Puppet code.
         """
         import frontend.puppet
-        return frontend.puppet.puppet(self)
+        return frontend.puppet.puppet(self, relaxed)
 
-    def chef(self):
+    def chef(self, relaxed=False):
         """
         Generate Chef code.
         """
         import frontend.chef
-        return frontend.chef.chef(self)
+        return frontend.chef.chef(self, relaxed)
 
-    def sh(self, server='https://devstructure.com', secret=None):
+    def sh(self,
+           relaxed=False,
+           server='https://devstructure.com',
+           secret=None):
         """
         Generate shell code.
         """
         import frontend.sh
-        return frontend.sh.sh(self, server, secret)
+        return frontend.sh.sh(self, relaxed, server, secret)
 
     def blueprintignore(self):
         """

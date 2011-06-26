@@ -15,7 +15,7 @@ from blueprint import git
 from blueprint import util
 
 
-def puppet(b):
+def puppet(b, relaxed=False):
     """
     Generate Puppet code.
     """
@@ -98,7 +98,8 @@ def puppet(b):
         # `apt` and `yum` are easy since they're the default for their
         # respective platforms.
         if manager in ('apt', 'yum'):
-            m['packages'][manager].add(Package(package, ensure=version))
+            ensure = 'installed' if relaxed else version
+            m['packages'][manager].add(Package(package, ensure=ensure))
 
             # If APT is installing RubyGems, get complicated.  This would
             # make sense to do with Yum, too, but there's no consensus on

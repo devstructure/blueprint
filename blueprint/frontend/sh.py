@@ -15,7 +15,7 @@ from blueprint import git
 from blueprint import util
 
 
-def sh(b, server='https://devstructure.com', secret=None):
+def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
     """
     Generate shell code.
     """
@@ -108,11 +108,13 @@ def sh(b, server='https://devstructure.com', secret=None):
             return
 
         if manager in lut['packages'] and package in lut['packages'][manager]:
-            s.add(manager(package, version) + ' && ' + ' && '.join(
-                ['{0}=1'.format(m.env_var(service))
-                 for m, service in lut['packages'][manager][package]]))
+            env_vars = ['{0}=1'.format(m.env_var(service))
+                        for m, service in lut['packages'][manager][package]]
+            s.add(manager.gate(package, version, relaxed) + ' || {{ ' \
+                  + manager.install(package, version, relaxed) + '; ' \
+                  + '; '.join(env_vars) + '; }}')
         else:
-            s.add(manager(package, version))
+            s.add(manager(package, version, relaxed))
 
         if manager not in ('apt', 'yum'):
             return
@@ -156,7 +158,7 @@ class Script(object):
                 replace(u'$', u'\\$').
                 replace(u'`', u'\\`'))
         else:
-            self.out.append(u'{0}\n'.format(s).format(*args))
+            self.out.append((unicode(s) + u'\n').format(*args))
         for filename, content in kwargs.get('sources', {}).iteritems():
             self.sources[filename] = content
 
