@@ -30,6 +30,10 @@ from blueprint import util
 MD5SUMS = {'/etc/adduser.conf': ['/usr/share/adduser/adduser.conf'],
            '/etc/apparmor.d/tunables/home.d/ubuntu':
                ['2a88811f7b763daa96c20b20269294a4'],
+           '/etc/apt/apt.conf.d/00CDMountPoint':
+               ['cb46a4e03f8c592ee9f56c948c14ea4e'],
+           '/etc/apt/apt.conf.d/00trustcdrom':
+               ['a8df82e6e6774f817b500ee10202a968'],
            '/etc/chatscripts/provider': ['/usr/share/ppp/provider.chatscript'],
            '/etc/default/console-setup':
                ['0fb6cec686d0410993bdf17192bee7d6',

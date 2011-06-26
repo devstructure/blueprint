@@ -82,6 +82,8 @@ The following files are ignored if their content matches an expected hash.  They
 
 * `/etc/adduser.conf`
 * `/etc/apparmor.d/tunables/home.d/ubuntu`
+* `/etc/apt/apt.conf.d/00CDMountPoint`
+* `/etc/apt/apt.conf.d/00trustcdrom`
 * `/etc/chatscripts/provider`
 * `/etc/default/console-setup`
 * `/etc/default/grub`
