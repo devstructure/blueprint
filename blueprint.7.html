@@ -107,6 +107,7 @@ b.sh().dumpf(gzip=True)
 <dt><code>managers</code></dt><dd>A computed dictionary of each package manager mapped to its package manager.  Useful for reversing the algorithm described in <code>blueprint</code>(5).</dd>
 <dt class="flush"><code>name</code></dt><dd>This blueprint's name.</dd>
 <dt><code>packages</code></dt><dd>A dictionary of package managers that map to dictionaries of managed packages mapped to a list of version numbers to be installed.</dd>
+<dt><code>services</code></dt><dd>A dictionary of service managers that map to dictionaries of managed services mapped to resources on which the service depends.</dd>
 <dt class="flush"><code>sources</code></dt><dd>A dictionary that maps directory names to the name of the tarball that contains the files to be extracted there.</dd>
 </dl>
 
@@ -117,13 +118,49 @@ b.sh().dumpf(gzip=True)
 
 <p><code>puppet()</code>, <code>chef()</code>, <code>sh()</code> return <code>Manifest</code>, <code>Cookbook</code>, and <code>Script</code> objects, respectively.  See the next section.</p>
 
-<p><code>walk()</code> is a generic implementation of the package walking algorithm described in <code>blueprint</code>(5).</p>
+<p><code>walk()</code> is a generic implementation of the algorithm described in <code>blueprint</code>(5) which accepts callbacks as keyword arguments:</p>
 
-<p>The <code>blueprint.Blueprint</code> class (not individual instances) supports <code>destroy(</code><em>name</em><code>)</code> to destroy blueprints and <code>iter()</code> to iterate over the names of blueprints.</p>
+<dl>
+<dt><code>before_sources():</code>
+Executed before source tarballs are enumerated.</dt><dd></dd>
+<dt><code>source(dirname, filename, gen_content):</code>
+Executed when a source tarball is enumerated.  <code>gen_content</code> is a callable that will return the file's contents.</dt><dd></dd>
+<dt><code>after_sources():</code>
+Executed after source tarballs are enumerated.</dt><dd></dd>
+<dt><code>before_files():</code>
+Executed before files are enumerated.</dt><dd></dd>
+<dt><code>file(pathname, f):</code>
+Executed when a file is enumerated.</dt><dd></dd>
+<dt><code>after_files():</code>
+Executed after files are enumerated.</dt><dd></dd>
+<dt><code>before_packages(manager):</code>
+Executed before a package manager's dependencies are enumerated.</dt><dd></dd>
+<dt><code>package(manager, package, version):</code>
+Executed when a package version is enumerated.</dt><dd></dd>
+<dt><code>after_packages(manager):</code>
+Executed after a package manager's dependencies are enumerated.</dt><dd></dd>
+<dt><code>before_services(manager):</code>
+Executed before a service manager's dependencies are enumerated.</dt><dd></dd>
+<dt><code>service(manager, service, deps):</code>
+Executed when a service is enumerated.</dt><dd></dd>
+<dt><code>service_file(manager, service, pathname):</code>
+Executed when a file dependency is enumerated.</dt><dd></dd>
+<dt><code>service_package(manager, service, package_managername, package):</code>
+Executed when a package dependency is enumerated.</dt><dd></dd>
+<dt><code>service_source(manager, service, dirname):</code>
+Executed when a source tarball dependency is enumerated.</dt><dd></dd>
+<dt><code>after_services(manager):</code>
+Executed after a service manager's dependencies are enumerated.</dt><dd></dd>
+</dl>
 
-<h3 id="blueprint-puppet-blueprint-chef-and-blueprint-sh">blueprint.puppet, blueprint.chef, and blueprint.sh</h3>
 
-<p><code>blueprint.puppet.Manifest</code>, <code>blueprint.chef.Cookbook</code>, and <code>blueprint.sh.Script</code> all implement similar interfaces to code generation.</p>
+<p>The <code>blueprint.Blueprint</code> class (not individual instances) supports <code>destroy(</code><em>name</em><code>)</code> to destroy a blueprint and <code>iter()</code> to iterate over the names of blueprints.</p>
+
+<h3 id="blueprint-frontend">blueprint.frontend</h3>
+
+<p><code>blueprint.frontend.puppet.Manifest</code>, <code>blueprint.frontend.chef.Cookbook</code>, and <code>blueprint.frontend.sh.Script</code> all implement similar interfaces to code generation.</p>
+
+<p><code>blueprint.frontend.puppet.puppet</code>, <code>blueprint.frontend.chef.chef</code>, and <code>blueprint.frontend.sh.sh</code> all accept a <code>blueprint.Blueprint</code> as their argument and return one of the above types, which have the following methods.</p>
 
 <p><code>dumps()</code> returns a string containing code in the language implemented by the class that received the call.  If the blueprint contains source tarballs, <code>dumps()</code> may raise <code>ValueError</code>.</p>
 
@@ -182,7 +219,7 @@ for funcname in blueprint.backend.__all__:
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#58;&#114;&#x69;&#x63;&#104;&#x61;&#x72;&#100;&#x40;&#x64;&#x65;&#118;&#115;&#116;&#x72;&#x75;&#99;&#116;&#x75;&#x72;&#101;&#46;&#x63;&#111;&#x6d;" data-bare-link="true">&#114;&#x69;&#99;&#x68;&#x61;&#114;&#x64;&#x40;&#x64;&#x65;&#118;&#115;&#116;&#114;&#x75;&#x63;&#x74;&#117;&#x72;&#101;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#109;&#97;&#x69;&#x6c;&#116;&#x6f;&#58;&#x72;&#x69;&#99;&#104;&#97;&#x72;&#100;&#x40;&#100;&#x65;&#x76;&#x73;&#116;&#x72;&#117;&#99;&#x74;&#x75;&#x72;&#101;&#46;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#105;&#99;&#x68;&#97;&#x72;&#x64;&#x40;&#100;&#x65;&#x76;&#x73;&#116;&#x72;&#117;&#99;&#116;&#x75;&#114;&#x65;&#x2e;&#99;&#x6f;&#109;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
