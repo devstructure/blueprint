@@ -116,6 +116,16 @@ def files(b):
 
         for pathname, s, ignored in files:
 
+            # Make sure this pathname will actually be able to be included
+            # in the blueprint.  This is a bit of a cop-out since the file
+            # could be important but at least it's not a crashing bug.
+            try:
+                pathname = unicode(pathname)
+            except UnicodeDecodeError:
+                logging.warning('{0} not UTF-8 - skipping it'.
+                                format(repr(pathname)[1:-1]))
+                continue
+
             # Ignore ignored files and files that share their ctime with other
             # files in the directory.  This is a very strong indication that
             # the file is original to the system and should be ignored.
