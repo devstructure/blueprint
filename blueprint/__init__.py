@@ -19,6 +19,14 @@ import managers
 import util
 
 
+class NameError(ValueError):
+    pass
+
+
+class NotFoundError(KeyError):
+    pass
+
+
 class Blueprint(dict):
 
     DISCLAIMER = """#
@@ -32,11 +40,11 @@ class Blueprint(dict):
         Destroy the named blueprint.
         """
         if not os.path.isdir(git.repo()):
-            raise KeyError(name)
+            raise NotFoundError(name)
         try:
             git.git('branch', '-D', name)
         except:
-            raise KeyError(name)
+            raise NotFoundError(name)
 
     @classmethod
     def iter(cls):
@@ -72,7 +80,7 @@ class Blueprint(dict):
             if self._commit is None:
                 self._commit = git.rev_parse('refs/heads/{0}'.format(name))
                 if self._commit is None:
-                    raise KeyError(name)
+                    raise NotFoundError(name)
             tree = git.tree(self._commit)
             blob = git.blob(tree, 'blueprint.json')
             content = git.content(blob)
@@ -185,7 +193,7 @@ class Blueprint(dict):
         Validate and set the blueprint name.
         """
         if name is not None and re.search(r'[/ \t\r\n]', name):
-            raise ValueError('invalid blueprint name')
+            raise NameError('invalid blueprint name')
         self._name = name
     name = property(get_name, set_name)
 

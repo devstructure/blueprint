@@ -32,10 +32,10 @@ name = args[0]
 
 try:
     b = blueprint.Blueprint(name=name)
-except KeyError:
+except blueprint.NotFoundError:
     logging.error('blueprint {0} does not exist'.format(name))
     sys.exit(1)
-except ValueError:
+except blueprint.NameError:
     logging.error('invalid blueprint name')
     sys.exit(1)
 

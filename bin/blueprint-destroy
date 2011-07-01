@@ -25,9 +25,9 @@ name = args[0]
 
 try:
     blueprint.Blueprint.destroy(name)
-except KeyError:
+except blueprint.NotFoundError:
     logging.error('blueprint {0} does not exist'.format(name))
     sys.exit(1)
-except ValueError:
+except blueprint.NameError:
     logging.error('invalid blueprint name')
     sys.exit(1)

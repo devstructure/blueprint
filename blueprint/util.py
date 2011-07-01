@@ -61,12 +61,12 @@ def parse_service(pathname):
 
         # Ignore extraneous files in /etc/init.
         if '.conf' != ext:
-            raise ValueError("not an Upstart config")
+            raise ValueError('not an Upstart config')
 
         # Ignore services that don't operate on the (faked) main runlevels.
         if not re.search(r'start on .*runlevel \[[2345]',
                          open(pathname).read()):
-            raise ValueError("not a running service")
+            raise ValueError('not a running service')
 
         return ('upstart', service)
     elif '/etc/init.d' == dirname:
@@ -74,15 +74,15 @@ def parse_service(pathname):
         # Let Upstart handle its services.
         if os.path.islink(pathname) \
             and '/lib/init/upstart-job' == os.readlink(pathname):
-            raise ValueError("proxy for an Upstart config")
+            raise ValueError('proxy for an Upstart config')
 
         # Ignore services that don't operate on the main runlevels.
         if not re.search(r'Default-Start:\s*[2345]', open(pathname).read()):
-            raise ValueError("not a running service")
+            raise ValueError('not a running service')
 
         return ('sysvinit', basename)
     else:
-        raise ValueError("not a service")
+        raise ValueError('not a service')
 
 
 def rubygems_update():

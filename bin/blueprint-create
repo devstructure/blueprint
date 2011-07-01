@@ -59,7 +59,7 @@ name = args[0]
 with context_managers.mkdtemp():
     try:
         b = blueprint.Blueprint(name=name, create=True)
-    except ValueError:
+    except blueprint.NameError:
         logging.error('invalid blueprint name')
         sys.exit(1)
     b.commit(options.message or '')
