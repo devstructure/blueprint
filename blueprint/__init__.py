@@ -545,8 +545,6 @@ class Blueprint(dict):
         if 'files' not in deps:
             return
         callable = kwargs.get('service_file', lambda *args: None)
-        import pprint
-        pprint.pprint(deps)
         for pathname in list(deps['files']):
             callable(manager, servicename, pathname)
 
