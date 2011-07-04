@@ -547,7 +547,7 @@ class Blueprint(dict):
         callable = kwargs.get('service_file', lambda *args: None)
         import pprint
         pprint.pprint(deps)
-        for pathname in deps['files']:
+        for pathname in list(deps['files']):
             callable(manager, servicename, pathname)
 
     def walk_service_packages(self, manager, servicename, **kwargs):
@@ -582,5 +582,5 @@ class Blueprint(dict):
         if 'sources' not in deps:
             return
         callable = kwargs.get('service_source', lambda *args: None)
-        for dirname in deps['sources']:
+        for dirname in list(deps['sources']):
             callable(manager, servicename, dirname)
