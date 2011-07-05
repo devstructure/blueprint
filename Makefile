@@ -178,22 +178,21 @@ uninstall-sysconf:
 		$(DESTDIR)$(sysconfdir)/bash_completion.d
 
 build:
-	sudo make deb
-	make pypi
+	sudo make build-deb
+	make build-pypi
 
-deb:
-	[ "$$(whoami)" = "root" ] || false
-	m4 \
-		-D__PYTHON__=python$(PYTHON_VERSION) \
-		-D__VERSION__=$(VERSION)-$(BUILD)py$(PYTHON_VERSION) \
-		control.m4 >control
-	debra create debian control
+build-deb:
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
-	chown -R root:root debian
-	debra build debian blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb
-	debra destroy debian
+	fpm -s dir -t deb -C debian \
+		-n blueprint -v $(VERSION)-$(BUILD)py$(PYTHON_VERSION) -a all \
+		-d git-core \
+		-d python$(PYTHON_VERSION) \
+		-m "Richard Crowley <richard@devstructure.com>" \
+		--url "https://github.com/devstructure/blueprint" \
+		--description "Reverse-engineer server configuration."
+	make uninstall prefix=/usr sysconfdir=/etc DESTDIR=debian
 
-pypi:
+build-pypi:
 	m4 -D__VERSION__=$(VERSION) setup.py.m4 >setup.py
 	$(PYTHON) setup.py bdist_egg
 
@@ -230,4 +229,4 @@ gh-pages: man
 	git push origin gh-pages
 	git checkout -q master
 
-.PHONY: all build clean install install-bin install-lib install-man install-sysconf uninstall uninstall-bin uninstall-lib uninstall-man uninstall-sysconf deb deploy deploy-deb deploy-deb-2.6 deploy-deb-2.7 deploy-pypi man gh-pages
+.PHONY: all clean install install-bin install-lib install-man install-sysconf uninstall uninstall-bin uninstall-lib uninstall-man uninstall-sysconf build build-deb build-pypi deploy deploy-deb deploy-deb-2.6 deploy-deb-2.7 deploy-pypi man gh-pages
