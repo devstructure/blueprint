@@ -289,7 +289,7 @@ def _dpkg_md5sum(package, pathname):
         try:
             for line in open('/var/lib/dpkg/info/{0}.md5sums'.format(package)):
                 md5sum, rel_pathname = line.split(None, 1)
-                cache_ref['/{0}'.format(rel_pathname)] = md5sum
+                cache_ref['/{0}'.format(rel_pathname.rstrip())] = md5sum
         except IOError:
             pass
 
