@@ -52,7 +52,7 @@ class PackageManager(unicode):
 
         if 'yum' == self:
             arg = package if relaxed else '{0}-{1}'.format(package, version)
-            return 'yum -y install {1}'.format(arg)
+            return 'yum -y install {0}'.format(arg)
 
         if 'rubygems' == self:
             if relaxed:
