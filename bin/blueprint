@@ -9,5 +9,5 @@ COMMAND="$0-$1"
 }
 
 echo "Usage: $(basename $0) <command> [...]" >&2
-echo "Common commands: list, create, show, apply, destroy" >&2
+echo "Common commands: list, create, show, apply, destroy, git" >&2
 exit 1
