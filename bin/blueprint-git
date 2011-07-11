@@ -11,9 +11,6 @@ trap "rm -rf \"$WORK_TREE\"" 0
 CMD="$1"
 shift
 
-echo "CMD: $CMD"
-echo "@: $@"
-
 case "$CMD" in
 	clone)
 		exec git clone "$GIT_DIR" "$@" blueprints;;
