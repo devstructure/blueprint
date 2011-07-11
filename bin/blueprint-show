@@ -62,6 +62,7 @@ try:
     if options.generate is None:
         print(b.dumps())
     elif 'ignore' == options.generate:
+        logging.warning('-I is deprecated, use blueprint-show-ignore instead')
         sys.stdout.write(b.blueprintignore().dumps())
     else:
         try:
