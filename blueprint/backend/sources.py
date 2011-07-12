@@ -143,6 +143,8 @@ def _source(b, dirname, old_cwd):
         try:
             os.rmdir(dirpath)
         except OSError:
+            s = os.lstat(os.path.join(dirname, os.path.relpath(dirpath,
+                                                               tmpname)))
             os.utime(dirpath, (s.st_atime, s.st_mtime))
 
     # If the shallow copy of still exists, create a tarball named by its
@@ -167,7 +169,27 @@ def sources(b):
     logging.info('searching for software built from source')
     for pathname, negate in ignore.cache['source']:
         if negate and os.path.isdir(pathname) and not ignore.source(pathname):
+
+            # Note before creating a working directory within pathname what
+            # it's atime and mtime should be.
+            s = os.lstat(pathname)
+
+            # Create a working directory within pathname to avoid potential
+            # EXDEV when creating the shallow copy and tarball.
             with context_managers.mkdtemp(pathname) as c:
+
+                # Restore the parent of the working directory to its original
+                # atime and mtime, as if pretending the working directory
+                # never actually existed.
+                os.utime(pathname, (s.st_atime, s.st_mtime))
+
+                # Create the shallow copy and possibly tarball of the
+                # relevant parts of pathname.
                 _source(b, pathname, c.cwd)
+
+            # Once more restore the atime and mtime after the working
+            # directory is destroyed.
+            os.utime(pathname, (s.st_atime, s.st_mtime))
+
     if 0 < len(b.sources):
         b.arch = util.arch()
