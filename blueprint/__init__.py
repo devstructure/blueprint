@@ -315,7 +315,7 @@ class Blueprint(dict):
         # source tarballs from the parent commit.
         if parent is not None:
             for mode, type, sha, pathname in git.ls_tree(git.tree(parent)):
-                git.git('update-index', '--remove', pathname)
+                git.git('update-index', '--force-remove', pathname)
 
         # Add `blueprint.json` to the index.
         f = open('blueprint.json', 'w')
