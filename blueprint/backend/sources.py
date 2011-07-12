@@ -9,15 +9,17 @@ import logging
 import os
 import os.path
 import re
+import shutil
 import stat
 import subprocess
 import tarfile
 
+from blueprint import context_managers
 from blueprint import ignore
 from blueprint import util
 
 
-def _source(b, dirname):
+def _source(b, dirname, old_cwd):
     tmpname = os.path.join(os.getcwd(), dirname[1:].replace('/', '-'))
 
     exclude = []
@@ -30,6 +32,10 @@ def _source(b, dirname):
 
     # Create a partial shallow copy of the directory.
     for dirpath, dirnames, filenames in os.walk(dirname):
+
+        # Definitely ignore the shallow copy directory.
+        if dirpath.startswith(tmpname):
+            continue
 
         # Determine if this entire directory should be ignored by default.
         ignored = ignore.file(dirpath)
@@ -153,7 +159,7 @@ def _source(b, dirname):
     [sha1.update(buf) for buf in iter(lambda: f.read(4096), '')]
     f.close()
     tarname = '{0}.tar'.format(sha1.hexdigest())
-    os.rename('tmp.tar', tarname)
+    shutil.move('tmp.tar', os.path.join(old_cwd, tarname))
     b.add_source(dirname, tarname)
 
 
@@ -161,6 +167,7 @@ def sources(b):
     logging.info('searching for software built from source')
     for pathname, negate in ignore.cache['source']:
         if negate and os.path.isdir(pathname) and not ignore.source(pathname):
-            _source(b, pathname)
+            with context_managers.mkdtemp(pathname) as c:
+                _source(b, pathname, c.cwd)
     if 0 < len(b.sources):
         b.arch = util.arch()
