@@ -1,3 +1,4 @@
+import logging
 import os
 import os.path
 import subprocess
@@ -36,11 +37,19 @@ def init():
             os.chown(dirname, uid, gid)
     except OSError:
         pass
-    p = subprocess.Popen(['git', '--git-dir', repo(), 'init', '--bare', '-q'],
-                         close_fds=True,
-                         preexec_fn=unroot,
-                         stdout=sys.stderr,
-                         stderr=sys.stderr)
+    try:
+        p = subprocess.Popen(['git',
+                              '--git-dir', repo(),
+                              'init',
+                              '--bare',
+                              '-q'],
+                             close_fds=True,
+                             preexec_fn=unroot,
+                             stdout=sys.stderr,
+                             stderr=sys.stderr)
+    except OSError:
+        logging.error('git not found on PATH - exiting')
+        sys.exit(1)
     p.communicate()
     if 0 != p.returncode:
         #sys.exit(p.returncode)
@@ -52,13 +61,17 @@ def git(*args, **kwargs):
     Execute a Git command.  Raises GitError on non-zero exits unless the
     raise_exc keyword argument is falsey.
     """
-    p = subprocess.Popen(['git',
-                          '--git-dir', repo(),
-                          '--work-tree', os.getcwd()] + list(args),
-                         close_fds=True,
-                         preexec_fn=unroot,
-                         stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE)
+    try:
+        p = subprocess.Popen(['git',
+                              '--git-dir', repo(),
+                              '--work-tree', os.getcwd()] + list(args),
+                             close_fds=True,
+                             preexec_fn=unroot,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE)
+    except OSError:
+        logging.error('git not found on PATH - exiting')
+        sys.exit(1)
     stdout, stderr = p.communicate(kwargs.get('stdin'))
     if 0 != p.returncode and kwargs.get('raise_exc', True):
         raise GitError(p.returncode)
