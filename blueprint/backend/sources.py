@@ -51,8 +51,8 @@ def _source(b, dirname, old_cwd):
             try:
                 os.lchown(dirpath2, s.st_uid, s.st_gid)
             except OverflowError:
-                logging.warning('{0} has uid:gid {1}:{2} - using chown(1)'
-                                ''.format(dirpath, s.st_uid, s.st_gid))
+                logging.warning('{0} has uid:gid {1}:{2} - using chown(1)'.
+                                format(dirpath, s.st_uid, s.st_gid))
                 p = subprocess.Popen(['chown',
                                       '{0}:{1}'.format(s.st_uid, s.st_gid),
                                       dirpath2],
@@ -60,8 +60,8 @@ def _source(b, dirname, old_cwd):
                 p.communicate()
             os.chmod(dirpath2, s.st_mode)
         except OSError as e:
-            logging.warning('{0} caused {1} - try running as root'
-                            ''.format(dirpath, errno.errorcode[e.errno]))
+            logging.warning('{0} caused {1} - try running as root'.
+                            format(dirpath, errno.errorcode[e.errno]))
             return
 
         for filename in filenames:
@@ -95,13 +95,29 @@ def _source(b, dirname, old_cwd):
                 continue
 
             # Exclude executable placed by Python packages.
-            if pathname.startswith('/usr/local/bin/') and pattern_bin.search(
-                open(pathname).read()):
-                continue
+            if pathname.startswith('/usr/local/bin/'):
+                try:
+                    if pattern_bin.search(open(pathname).read()):
+                        continue
+                except IOError as e:
+                    pass
 
             # Exclude share/applications/mimeinfo.cache, whatever that is.
             if '/usr/local/share/applications/mimeinfo.cache' == pathname:
                 continue
+
+            # Clean up dangling symbolic links.  This makes the assumption
+            # that no one intends to leave dangling symbolic links hanging
+            # around, which I think is a good assumption.
+            s = os.lstat(pathname)
+            if stat.S_ISLNK(s.st_mode):
+                try:
+                    os.stat(pathname)
+                except OSError as e:
+                    if errno.ENOENT == e.errno:
+                        logging.warning('ignored dangling symbolic link {0}'.
+                                        format(pathname))
+                        continue
 
             # Hard link this file into the shallow copy.  Suggest running as
             # `root` if this doesn't work though in practice the check above
@@ -109,9 +125,8 @@ def _source(b, dirname, old_cwd):
             try:
                 os.link(pathname, pathname2)
             except OSError as e:
-                logging.warning('{0} caused {1} - try running as root'
-                                ''.format(pathname,
-                                          errno.errorcode[e.errno]))
+                logging.warning('{0} caused {1} - try running as root'.
+                                format(pathname, errno.errorcode[e.errno]))
                 return
 
     # Unlink files that were remembered for exclusion above.
@@ -121,20 +136,6 @@ def _source(b, dirname, old_cwd):
         except OSError as e:
             if e.errno not in (errno.EISDIR, errno.ENOENT):
                 raise e
-
-    # Clean up dangling symbolic links.  This makes the assumption that
-    # no one intends to leave dangling symbolic links hanging around,
-    # which I think is a good assumption.
-    for dirpath, dirnames, filenames in os.walk(tmpname):
-        for filename in filenames:
-            pathname = os.path.join(dirpath, filename)
-            s = os.lstat(pathname)
-            if stat.S_ISLNK(s.st_mode):
-                try:
-                    os.stat(pathname)
-                except OSError as e:
-                    if errno.ENOENT == e.errno:
-                        os.unlink(pathname)
 
     # Remove empty directories.  For any that hang around, match their
     # access and modification times to the source, otherwise the hash of
