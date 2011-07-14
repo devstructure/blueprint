@@ -64,8 +64,11 @@ def parse_service(pathname):
             raise ValueError('not an Upstart config')
 
         # Ignore services that don't operate on the (faked) main runlevels.
-        if not re.search(r'start on .*runlevel \[[2345]',
-                         open(pathname).read()):
+        try:
+            content = open(pathname).read()
+        except IOError:
+            raise ValueError('not a readable Upstart config')
+        if not re.search(r'start on .*runlevel \[[2345]', content):
             raise ValueError('not a running service')
 
         return ('upstart', service)
@@ -77,7 +80,11 @@ def parse_service(pathname):
             raise ValueError('proxy for an Upstart config')
 
         # Ignore services that don't operate on the main runlevels.
-        if not re.search(r'Default-Start:\s*[2345]', open(pathname).read()):
+        try:
+            content = open(pathname).read()
+        except IOError:
+            raise ValueError('not a readable SysV init script')
+        if not re.search(r'Default-Start:\s*[2345]', content):
             raise ValueError('not a running service')
 
         return ('sysvinit', basename)
