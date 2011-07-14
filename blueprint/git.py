@@ -39,7 +39,7 @@ def init():
         pass
     try:
         p = subprocess.Popen(['git',
-                              '--git-dir', repo(),
+                              '--git-dir', dirname,
                               'init',
                               '--bare',
                               '-q'],
@@ -56,15 +56,21 @@ def init():
         raise GitError(p.returncode)
 
 
+def git_args():
+    """
+    Return the basic arguments for running Git commands against
+    the blueprints repository.
+    """
+    return ['git', '--git-dir', repo(), '--work-tree', os.getcwd()]
+
+
 def git(*args, **kwargs):
     """
     Execute a Git command.  Raises GitError on non-zero exits unless the
     raise_exc keyword argument is falsey.
     """
     try:
-        p = subprocess.Popen(['git',
-                              '--git-dir', repo(),
-                              '--work-tree', os.getcwd()] + list(args),
+        p = subprocess.Popen(git_args() + list(args),
                              close_fds=True,
                              preexec_fn=unroot,
                              stdin=subprocess.PIPE,
@@ -138,6 +144,17 @@ def content(blob):
     if 0 != status:
         return None
     return stdout
+
+
+def cat_file(blob):
+    """
+    Return an open file handle to a blob in Git's object store, via the
+    git-cat-file(1) command.
+    """
+    return subprocess.Popen(git_args() + ['cat-file', 'blob', blob],
+                            close_fds=True,
+                            preexec_fn=unroot,
+                            stdout=subprocess.PIPE).stdout
 
 
 def write_tree():

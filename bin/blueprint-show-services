@@ -1,0 +1,42 @@
+#!/usr/bin/python
+
+import errno
+import logging
+import optparse
+import subprocess
+import sys
+
+import blueprint
+from blueprint import git
+
+parser = optparse.OptionParser('Usage: %prog [-q] <name>')
+parser.add_option('-q', '--quiet',
+                  dest='quiet',
+                  default=False,
+                  action='store_true',
+                  help='operate quietly')
+options, args = parser.parse_args()
+
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
+
+if 1 != len(args):
+    parser.print_usage()
+    sys.exit(1)
+name = args[0]
+
+try:
+    b = blueprint.Blueprint(name=name)
+except blueprint.NotFoundError:
+    logging.error('blueprint {0} does not exist'.format(name))
+    sys.exit(1)
+except blueprint.NameError:
+    logging.error('invalid blueprint name')
+    sys.exit(1)
+
+try:
+    def service(manager, service):
+        print('{0} {1}'.format(manager, service))
+    b.walk_services(service=service)
+except IOError:
+    pass

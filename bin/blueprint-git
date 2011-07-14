@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+[ -z "$*" ] && exit 0
+
+GIT_DIR="$HOME/.blueprints.git"
+WORK_TREE="$(mktemp -d)"
+trap "rm -rf \"$WORK_TREE\"" 0
+
+CMD="$1"
+shift
+
+case "$CMD" in
+	clone)
+		exec git clone "$GIT_DIR" "$@" blueprints;;
+	*)
+		exec git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" "$CMD" "$@";;
+esac
