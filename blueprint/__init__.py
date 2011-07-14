@@ -427,10 +427,12 @@ class Blueprint(dict):
         kwargs.get('before_sources', lambda *args: None)()
 
         callable = kwargs.get('source', lambda *args: None)
-        tree = git.tree(self._commit)
         for dirname, filename in sorted(self.sources.iteritems()):
-            blob = git.blob(tree, filename)
-            callable(dirname, filename, lambda: git.content(blob))
+            def gen_content():
+                tree = git.tree(self._commit)
+                blob = git.blob(tree, filename)
+                return git.content(blob)
+            callable(dirname, filename, gen_content)
 
         kwargs.get('before_sources', lambda *args: None)()
 
