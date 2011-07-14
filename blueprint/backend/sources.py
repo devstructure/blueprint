@@ -177,20 +177,26 @@ def sources(b):
 
             # Create a working directory within pathname to avoid potential
             # EXDEV when creating the shallow copy and tarball.
-            with context_managers.mkdtemp(pathname) as c:
+            try:
+                with context_managers.mkdtemp(pathname) as c:
 
-                # Restore the parent of the working directory to its original
-                # atime and mtime, as if pretending the working directory
-                # never actually existed.
+                    # Restore the parent of the working directory to its
+                    # original atime and mtime, as if pretending the working
+                    # directory never actually existed.
+                    os.utime(pathname, (s.st_atime, s.st_mtime))
+
+                    # Create the shallow copy and possibly tarball of the
+                    # relevant parts of pathname.
+                    _source(b, pathname, c.cwd)
+
+                # Once more restore the atime and mtime after the working
+                # directory is destroyed.
                 os.utime(pathname, (s.st_atime, s.st_mtime))
 
-                # Create the shallow copy and possibly tarball of the
-                # relevant parts of pathname.
-                _source(b, pathname, c.cwd)
-
-            # Once more restore the atime and mtime after the working
-            # directory is destroyed.
-            os.utime(pathname, (s.st_atime, s.st_mtime))
+            # If creating the temporary directory fails, bail with a warning.
+            except OSError as e:
+                logging.warning('{0} caused {1} - try running as root'.
+                                format(pathname, errno.errorcode[e.errno]))
 
     if 0 < len(b.sources):
         b.arch = util.arch()
