@@ -217,6 +217,7 @@ deploy-pypi:
 man:
 	find man -name \*.ronn | xargs -n1 ronn \
 		--manual=Blueprint --organization=DevStructure --style=toc
+	find man -name \*.[12345678] | xargs gzip
 
 gh-pages: man
 	mkdir -p gh-pages
