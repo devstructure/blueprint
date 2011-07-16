@@ -1,0 +1,41 @@
+blueprint-io(7) -- push and pull blueprints
+===========================================
+
+## SYNOPSIS
+
+	blueprint push foo
+	blueprint pull https://devstructure.com/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-/foo
+
+## DESCRIPTION
+
+Blueprint I/O pushes and pulls blueprints to and from a remote Blueprint I/O Server, making it easy to share and reuse blueprints on different machines.  DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3.  Alternatively, you can supply your own backend server.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+* `/etc/blueprint-io.cfg`, `~/.blueprint-io.cfg`:
+  Optional INI-style configuration files for specifying a `server` and `secret` value.
+
+## EXAMPLES
+
+Example `~/.blueprint-io.cfg`:
+
+	[default]
+	server = https://devstructure.com
+	secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-
+
+The _server_ in this case specifies the default and may be omitted.
+
+## THEME SONG
+
+Girl Talk - "Let It Out"
+
+## AUTHOR
+
+* Matt Tanase <matt@devstructure.com>
+* Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

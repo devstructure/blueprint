@@ -97,8 +97,8 @@ The `blueprint.manager.Manager` class is a `dict` subclass that is used as the v
 The `blueprint.backend` module implements `blueprint-create`(1).  Each module within (for example, `blueprint.backend.apt`) must contain a function by the same name (in the example, `blueprint.backend.apt.apt`) which accepts a `blueprint.Blueprint` object as its only argument.  When `blueprint.backend` is imported, it finds all such functions, lists them in `blueprint.backend.__all__`, and imports the function.  Use the backend functions thus:
 
 	import blueprint
+	b = blueprint.Blueprint()
 	import blueprint.backend
-	b = blueprint.Blueprint(name='foo')
 	for funcname in blueprint.backend.__all__:
 	    getattr(blueprint.backend, funcname)(b)
 

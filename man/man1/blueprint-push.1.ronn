@@ -1,0 +1,49 @@
+blueprint-push(1) -- push a blueprint to the Internet
+=====================================================
+
+## SYNOPSIS
+
+`blueprint push` [`-q`] _name_  
+
+## DESCRIPTION
+
+`blueprint-push` stores the blueprint _name_ and all associated tarballs as _name_ on the configured server (which is `https://devstructure.com` by default) and prints the URL from which it may be fetched.
+
+If no _secret_ is configured in `/etc/blueprint-io.cfg` or `~/.blueprint-io.cfg`, one is created and a sample configuration is printed.
+
+## OPTIONS
+
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+* `/etc/blueprint-io.cfg`, `~/.blueprint-io.cfg`:
+  Optional INI-style configuration files for specifying a `server` and `secret` value.
+
+## EXAMPLES
+
+Example `~/.blueprint-io.cfg`:
+
+	[default]
+	server = https://devstructure.com
+	secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-
+
+The _server_ in this case specifies the default and may be omitted.
+
+## THEME SONG
+
+Girl Talk - "Let It Out"
+
+## AUTHOR
+
+* Matt Tanase <matt@devstructure.com>
+* Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

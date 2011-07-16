@@ -17,6 +17,10 @@ blueprint(1) -- reverse engineer server configuration
   Generate code from a blueprint.
 * `blueprint-apply`(1):
   Run a blueprint's generated shell code.
+* `blueprint-push`(1):
+  Push a blueprint to the Internet.
+* `blueprint-pull`(1):
+  Pull a blueprint from the Internet.
 * `blueprint-destroy`(1):
   Destroy a blueprint.
 * `blueprint`(5):
@@ -25,6 +29,8 @@ blueprint(1) -- reverse engineer server configuration
   Ignore specific files when creating blueprints.
 * `blueprint`(7):
   Blueprint Python library.
+* `blueprint-io`(7):
+  Push and pull blueprints.
 
 ### Plumbing
 
