@@ -155,6 +155,7 @@ class Script(object):
     def add(self, s='', *args, **kwargs):
         if 'raw' in kwargs:
             self.out.append(kwargs['raw'].
+                replace(u'\\', u'\\\\').
                 replace(u'$', u'\\$').
                 replace(u'`', u'\\`'))
         else:
