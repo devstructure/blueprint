@@ -3,12 +3,12 @@ import httplib
 import socket
 import urlparse
 
-import cfg
+from blueprint import cfg
 
 
 def _connect(server=None):
     if server is None:
-        server = cfg.server()
+        server = cfg.get('io', 'server')
     url = urlparse.urlparse(server)
     if -1 == url.netloc.find(':'):
         port = url.port or 443 if 'https' == url.scheme else 80

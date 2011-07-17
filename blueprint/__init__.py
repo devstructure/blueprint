@@ -1,3 +1,4 @@
+from ConfigParser import ConfigParser
 from collections import defaultdict
 import copy
 import json
@@ -17,6 +18,25 @@ import context_managers
 import git
 import managers
 import util
+
+
+DEFAULTS = {'io': {'server': 'https://devstructure.com'}}
+
+
+cfg = ConfigParser()
+for section, options in DEFAULTS.iteritems():
+    cfg.add_section(section)
+    for option, value in options.iteritems():
+        cfg.set(section, option, str(value))
+legacy_cfg = ConfigParser()
+legacy_cfg.read(['/etc/blueprint-io.cfg',
+                 os.path.expanduser('~/.blueprint-io.cfg')])
+for section in legacy_cfg.sections():
+    for option in legacy_cfg.options(section):
+        cfg.set('io', option, legacy_cfg.get(section, option))
+del legacy_cfg
+cfg.read(['/etc/blueprint.cfg',
+          os.path.expanduser('~/.blueprint.cfg')])
 
 
 class NameError(ValueError):

@@ -7,9 +7,9 @@ import sys
 import urlparse
 
 import blueprint
+from blueprint import cfg
 from blueprint import context_managers
 import blueprint.io
-from blueprint.io import cfg
 
 parser = optparse.OptionParser(
     'Usage: %prog [-m <message>] [-q] <name>|<url>')
@@ -36,7 +36,7 @@ if url.scheme and url.netloc:
     server = urlparse.urlunparse((url.scheme, url.netloc, '', '', '', ''))
     secret, name = match.group(1, 2)
 else:
-    server, secret = cfg.server(), cfg.secret()
+    server, secret = cfg.get('io', 'server'), cfg.get('io', 'secret')
     if secret is None:
         logging.error(
             'secret not found - use a blueprint URL or configure your secret')

@@ -13,7 +13,7 @@ With server and secret configured:
 
 `blueprint-pull` fetches a blueprint and all associated tarballs from the configured server (which is `https://devstructure.com` by default) and stores them in the local repository as _name_ or the final component of _url_.
 
-If _name_ is given, the _secret_ must be configured in `/etc/blueprint-io.cfg` or `~/.blueprint-io.cfg`.  See `EXAMPLES` below.
+If _name_ is given, the _secret_ must be configured in `/etc/blueprint.cfg` or `~/.blueprint.cfg`.  See `EXAMPLES` below.
 
 If _url_ is given, it must be a fully-qualified HTTP or HTTPS URL of the form _server_/_secret_/_name_.
 
@@ -30,14 +30,14 @@ If _url_ is given, it must be a fully-qualified HTTP or HTTPS URL of the form _s
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
-* `/etc/blueprint-io.cfg`, `~/.blueprint-io.cfg`:
+* `/etc/blueprint.cfg`, `~/.blueprint.cfg`:
   Optional INI-style configuration files for specifying a `server` and `secret` value.
 
 ## EXAMPLES
 
-Example `~/.blueprint-io.cfg`:
+Example `~/.blueprint.cfg`:
 
-	[default]
+	[io]
 	server = https://devstructure.com
 	secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-
 

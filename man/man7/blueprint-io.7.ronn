@@ -14,14 +14,14 @@ Blueprint I/O pushes and pulls blueprints to and from a remote Blueprint I/O Ser
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
-* `/etc/blueprint-io.cfg`, `~/.blueprint-io.cfg`:
+* `/etc/blueprint.cfg`, `~/.blueprint.cfg`:
   Optional INI-style configuration files for specifying a `server` and `secret` value.
 
 ## EXAMPLES
 
-Example `~/.blueprint-io.cfg`:
+Example `~/.blueprint.cfg`:
 
-	[default]
+	[io]
 	server = https://devstructure.com
 	secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-
 

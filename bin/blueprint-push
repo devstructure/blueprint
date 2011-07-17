@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
+from ConfigParser import NoOptionError
 import logging
 import optparse
 import re
 import sys
 
 import blueprint
+from blueprint import cfg
 import blueprint.io
-from blueprint.io import cfg
 
 parser = optparse.OptionParser('Usage: %prog [-q] <name>')
 parser.add_option('-q', '--quiet',
@@ -34,8 +35,11 @@ except ValueError:
     logging.error('invalid blueprint name')
     sys.exit(1)
 
-server = cfg.server()
-secret = cfg.secret() or blueprint.io.secret(server)
+server = cfg.get('io', 'server')
+try:
+    secret = cfg.get('io', 'secret')
+except NoOptionError:
+    secret = blueprint.io.secret(server)
 if secret is None:
     sys.exit(1)
 url = blueprint.io.push(server, secret, b)
