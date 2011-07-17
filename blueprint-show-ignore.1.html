@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv='content-type' value='text/html;charset=utf8'>
   <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
-  <title>blueprint-list(1) - list all blueprints</title>
+  <title>blueprint-show-ignore(1) - show .blueprintignore rules from a blueprint</title>
   <style type='text/css' media='all'>
   /* style: man */
   body#manpage {margin:0}
@@ -70,23 +70,25 @@
   </div>
 
   <ol class='man-decor man-head man head'>
-    <li class='tl'>blueprint-list(1)</li>
+    <li class='tl'>blueprint-show-ignore(1)</li>
     <li class='tc'>Blueprint</li>
-    <li class='tr'>blueprint-list(1)</li>
+    <li class='tr'>blueprint-show-ignore(1)</li>
   </ol>
 
   <h2 id="NAME">NAME</h2>
 <p class="man-name">
-  <code>blueprint-list</code> - <span class="man-whatis">list all blueprints</span>
+  <code>blueprint-show-ignore</code> - <span class="man-whatis">show .blueprintignore rules from a blueprint</span>
 </p>
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>blueprint list</code> [<code>-q</code>]</p>
+<p><code>blueprint show-ignore</code> [<code>-q</code>] <em>name</em></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p><code>blueprint-list</code> lists all blueprints.  That is, all branches in the local blueprint repository.</p>
+<p><code>blueprint-show-ignore</code> prints the contents of the <code>~/.blueprintignore</code> file at the time the blueprint <em>name</em> was created.</p>
+
+<p>This command is preferred over <code>blueprint-show</code>(1)'s <code>-I</code> option.</p>
 
 <h2 id="OPTIONS">OPTIONS</h2>
 
@@ -100,6 +102,7 @@
 
 <dl>
 <dt><code>~/.blueprints.git</code></dt><dd>The local repsitory where blueprints are stored, each on its own branch.</dd>
+<dt><code>~/.blueprintignore</code></dt><dd>A list of filename patterns to be ignored when creating blueprints.  See <code>blueprintignore</code>(5).</dd>
 </dl>
 
 
@@ -109,7 +112,7 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#109;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#114;&#105;&#x63;&#x68;&#97;&#114;&#x64;&#x40;&#x64;&#101;&#118;&#x73;&#x74;&#114;&#117;&#99;&#x74;&#x75;&#114;&#101;&#x2e;&#x63;&#111;&#109;" data-bare-link="true">&#114;&#x69;&#99;&#104;&#x61;&#x72;&#100;&#x40;&#x64;&#101;&#x76;&#x73;&#116;&#114;&#x75;&#99;&#116;&#x75;&#x72;&#x65;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x72;&#x69;&#x63;&#x68;&#x61;&#114;&#100;&#x40;&#x64;&#x65;&#118;&#x73;&#116;&#114;&#117;&#x63;&#116;&#x75;&#114;&#101;&#46;&#99;&#x6f;&#109;" data-bare-link="true">&#x72;&#x69;&#99;&#104;&#97;&#x72;&#x64;&#64;&#x64;&#101;&#x76;&#115;&#116;&#x72;&#x75;&#x63;&#x74;&#117;&#114;&#x65;&#46;&#x63;&#x6f;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -119,7 +122,7 @@
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
     <li class='tc'>July 2011</li>
-    <li class='tr'>blueprint-list(1)</li>
+    <li class='tr'>blueprint-show-ignore(1)</li>
   </ol>
 
   </div>
