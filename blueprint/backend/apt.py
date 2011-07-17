@@ -17,14 +17,16 @@ def apt(b):
     # system.
     try:
         p = subprocess.Popen(['dpkg-query',
-                              '-f=${Package} ${Version}\n',
+                              '-f=${Status}\x1E${Package}\x1E${Version}\n',
                               '-W'],
                              close_fds=True, stdout=subprocess.PIPE)
     except OSError:
         return
 
     for line in p.stdout:
-        package, version = line.strip().split()
+        status, package, version = line.strip().split('\x1E')
+        if 'install ok installed' != status:
+            continue
         if ignore.package('apt', package):
             continue
 
