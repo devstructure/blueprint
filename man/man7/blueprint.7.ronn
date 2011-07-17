@@ -130,6 +130,15 @@ The `blueprint.context_managers` module implements context managers used through
 * `blueprint.context_managers.mkdtemp(dir=`_None_`)`:
   Create a temporary directory and execute with it as the working directory.  The property `cwd` is available on the context object containing the previous working directory.  When the context closes, the temporary directory and all its contents are removed recursively.
 
+### blueprint.io
+
+* `blueprint.io.pull(`_server_`, `_secret_`, `_name_`)`:
+  Pull a blueprint from _secret_ and _name_ on _server_.
+* `blueprint.io.push(`_server_`, `_secret_`, `_b_`)`:
+  Push a blueprint to _secret_ and _b.name_ on _server_.
+* `blueprint.io.secret(`_server_`)`:
+  Fetch a new secret from _server_.
+
 ## FILES
 
 * `~/.blueprints.git`:
