@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import json
 import logging
 import optparse
 import re
@@ -9,7 +10,7 @@ import sys
 import blueprint
 from blueprint import context_managers
 
-parser = optparse.OptionParser('Usage: %prog [-r] [-q] <name>')
+parser = optparse.OptionParser('Usage: %prog [-r] [-q] [<name>]')
 parser.add_option('-r', '--relaxed',
                   dest='relaxed',
                   default=False,
@@ -25,13 +26,26 @@ options, args = parser.parse_args()
 if options.quiet:
     logging.root.setLevel(logging.CRITICAL)
 
-if 1 != len(args):
-    parser.print_usage()
-    sys.exit(1)
-name = args[0]
-
 try:
-    b = blueprint.Blueprint(name=name)
+
+    # Named blueprints are read from the local repository.
+    if 1 == len(args) and '-' != args[0]:
+        b = blueprint.Blueprint(name=args[0])
+
+    # Standard input is assumed to be blueprint JSON.
+    # FIXME This implementation won't be able to find source tarballs that
+    # should be associated with the blueprint on standard input.
+    elif 0 == len(args) or 1 == len(args) and '-' == args[0]:
+        b = blueprint.Blueprint()
+        try:
+            b.update(json.load(sys.stdin))
+        except ValueError:
+            logging.error('standard input contains invalid blueprint JSON')
+            sys.exit(1)
+
+    else:
+        parser.print_usage()
+        sys.exit(1)
 except blueprint.NotFoundError:
     logging.error('blueprint {0} does not exist'.format(name))
     sys.exit(1)

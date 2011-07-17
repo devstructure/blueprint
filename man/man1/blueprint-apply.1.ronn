@@ -3,7 +3,7 @@ blueprint-apply(1) -- run a blueprint's generated shell code
 
 ## SYNOPSIS
 
-`blueprint apply` [`-r`] [`-q`] _name_  
+`blueprint apply` [`-r`] [`-q`] [_name_]  
 
 ## DESCRIPTION
 
@@ -12,6 +12,8 @@ blueprint-apply(1) -- run a blueprint's generated shell code
 	blueprint show <name> --sh | sudo sh
 
 and provided for convenience and completeness.
+
+If _name_ is omitted or `-`, a blueprint is read from standard input and applied in the same manner.  See `blueprint`(5) for the details of the format.
 
 ## OPTIONS
 

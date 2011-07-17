@@ -7,7 +7,7 @@
 \fBblueprint\-apply\fR \- run a blueprint\'s generated shell code
 .
 .SH "SYNOPSIS"
-\fBblueprint apply\fR [\fB\-r\fR] [\fB\-q\fR] \fIname\fR
+\fBblueprint apply\fR [\fB\-r\fR] [\fB\-q\fR] [\fIname\fR]
 .
 .SH "DESCRIPTION"
 \fBblueprint\-apply\fR generated POSIX shell code for the blueprint \fIname\fR and executes it\. It is equivalent to
@@ -24,6 +24,9 @@ blueprint show <name> \-\-sh | sudo sh
 .
 .P
 and provided for convenience and completeness\.
+.
+.P
+If \fIname\fR is omitted or \fB\-\fR, a blueprint is read from standard input and applied in the same manner\. See \fBblueprint\fR(5) for the details of the format\.
 .
 .SH "OPTIONS"
 .
