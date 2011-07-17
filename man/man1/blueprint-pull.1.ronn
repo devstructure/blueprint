@@ -17,6 +17,8 @@ If _name_ is given, the _secret_ must be configured in `/etc/blueprint.cfg` or `
 
 If _url_ is given, it must be a fully-qualified HTTP or HTTPS URL of the form _server_/_secret_/_name_.
 
+DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3.  Alternatively, you can supply your own backend server.
+
 ## OPTIONS
 
 * `-m` _message_, `--message=`_message_:
@@ -31,7 +33,7 @@ If _url_ is given, it must be a fully-qualified HTTP or HTTPS URL of the form _s
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
 * `/etc/blueprint.cfg`, `~/.blueprint.cfg`:
-  Optional INI-style configuration files for specifying a `server` and `secret` value.
+  Optional INI-style configuration files for specifying a `server` and `secret` value.  See `blueprint`(5).
 
 ## EXAMPLES
 

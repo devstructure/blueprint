@@ -1,6 +1,6 @@
 # Blueprint
 
-## Blueprint reverse engineers servers
+### Blueprint reverse-engineers servers
 
 * Easy configuration management.
 * Detect relevant packages, files, and source installs.
@@ -10,18 +10,27 @@
 
 Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7.  Move blueprints around with [Blueprint I/O](https://github.com/devstructure/blueprint-io).
 
+### Blueprint I/O moves blueprints around
+
+* Centralized configuration management.
+* Export and backup server configurations.
+* Push and pull blueprints anywhere.
+* Bootstrap servers painlessly.
+
+Blueprint I/O pushes and pulls blueprints to and from a Blueprint I/O Server, making it easy to use blueprints anywhere. DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3. Alternatively, you can build your own backend server using the Blueprint I/O API.
+
 ## Usage
 
 ### Create a blueprint
 
     blueprint create my-first-blueprint
-    
+
 Blueprint inspects your server and stores the results in its local repository.  `blueprint list` shows all the blueprints you've created on this server.
-	
+
 ### Apply a blueprint
 
     blueprint apply my-first-blueprint
-    
+
 Blueprint generates shell code from my-first-blueprint and executes it on the server. 
 
 ### Generate POSIX shell code from a blueprint
@@ -31,10 +40,30 @@ Blueprint generates shell code from my-first-blueprint and executes it on the se
 `my-first-blueprint.sh` is written to your working directory.  Try out `-P` or `-C` to generate a Puppet module or a Chef cookbook.
 
 ### Diff a blueprint
-	
+
 	blueprint diff foo bar baz
 
 Blueprint subtracts bar from foo. Files, packages and source that appears in foo but not bar will be carried over to baz and everything else will be dropped.
+
+### Push a blueprint
+
+    blueprint push my-first-blueprint
+
+The blueprint and its files are stored remotely.  You get a secret URL for accessing it.
+
+### Pull a blueprint
+
+    blueprint pull https://devstructure.com/MY-SECRET-KEY/my-first-blueprint
+
+The blueprint is stored locally and ready for use.
+
+## Installation
+
+Prerequisites:
+
+* A Debian- or RPM-based Linux distribution
+* Python >= 2.6
+* [Blueprint](https://github.com/devstructure/blueprint)
 
 ## Installation
 
@@ -66,6 +95,8 @@ DevStructure maintains Debian packages and Python eggs for Blueprint.  See [Inst
 
 The [Blueprint tutorial](https://devstructure.com/docs/tutorial.html) works through creating and deploying a simple web application via Blueprint.
 
+The HTTP [endpoints](https://devstructure.com/docs/endpoints.html) and [protocols](https://devstructure.com/docs/protocols.html) used by `blueprint-push`(1) and `blueprint-pull`(1) are documented so that others may run compatible servers.
+
 ## Manuals
 
 * [`blueprint`(1)](http://devstructure.github.com/blueprint/blueprint.1.html)
@@ -73,6 +104,8 @@ The [Blueprint tutorial](https://devstructure.com/docs/tutorial.html) works thro
 * [`blueprint-create`(1)](http://devstructure.github.com/blueprint/blueprint-create.1.html)
 * [`blueprint-show`(1)](http://devstructure.github.com/blueprint/blueprint-show.1.html)
 * [`blueprint-apply`(1)](http://devstructure.github.com/blueprint/blueprint-apply.1.html)
+* [`blueprint-push`(1)](http://devstructure.github.com/blueprint/blueprint-push.1.html)
+* [`blueprint-pull`(1)](http://devstructure.github.com/blueprint/blueprint-pull.1.html)
 * [`blueprint-destroy`(1)](http://devstructure.github.com/blueprint/blueprint-destroy.1.html)
 * [`blueprint`(5)](http://devstructure.github.com/blueprint/blueprint.5.html)
 * [`blueprintignore`(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html)
