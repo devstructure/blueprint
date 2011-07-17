@@ -78,6 +78,15 @@ The [Blueprint tutorial](https://devstructure.com/docs/tutorial.html) works thro
 * [`blueprintignore`(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html)
 * [`blueprint`(7)](http://devstructure.github.com/blueprint/blueprint.7.html)
 
+### Plumbing
+
+* [`blueprint-git`(1)](http://devstructure.github.com/blueprint/blueprint-git.1.html)
+* [`blueprint-show-files`(1)](http://devstructure.github.com/blueprint/blueprint-show-files.1.html)
+* [`blueprint-show-ignore`(1)](http://devstructure.github.com/blueprint/blueprint-show-ignore.1.html)
+* [`blueprint-show-packages`(1)](http://devstructure.github.com/blueprint/blueprint-show-packages.1.html)
+* [`blueprint-show-services`(1)](http://devstructure.github.com/blueprint/blueprint-show-services.1.html)
+* [`blueprint-show-sources`(1)](http://devstructure.github.com/blueprint/blueprint-show-sources.1.html)
+
 ## Contribute
 
 Blueprint is [BSD-licensed](https://github.com/devstructure/blueprint/blob/master/LICENSE).
