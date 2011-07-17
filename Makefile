@@ -15,9 +15,9 @@ all:
 
 clean:
 	rm -rf \
-		control *.deb \
+		*.deb \
 		setup.py build dist *.egg *.egg-info \
-		man/man*/*.htm
+		man/man*/*.html
 	find . -name \*.pyc -delete
 
 install: install-bin install-lib install-man install-sysconf
