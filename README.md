@@ -49,7 +49,7 @@ Prerequisites:
 	git clone git://github.com/devstructure/blueprint.git
 	cd blueprint && make && sudo make install
 
-### From source on CentOS and RHEL
+### From source on CentOS and RHEL 5
 
 	rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
 	yum install python26
