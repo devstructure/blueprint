@@ -56,17 +56,18 @@ class PackageManager(unicode):
 
         if 'rubygems' == self:
             if relaxed:
-                return 'gem install {0}'.format(package)
+                return 'gem install --no-rdoc --no-ri {0}'.format(package)
             else:
-                return 'gem install {0} -v{1}'.format(package, version)
+                return ('gem install --no-rdoc --no-ri -v{1} {0}'.
+                        format(package, version))
         match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)', self)
         if match is not None:
             if relaxed:
-                return 'gem{0} install {1}'.format(match.group(1), package)
+                return ('gem{0} install --no-rdoc --no-ri {1}'.
+                        format(match.group(1), package))
             else:
-                return 'gem{0} install {1} -v{2}'.format(match.group(1),
-                                                         package,
-                                                         version)
+                return ('gem{0} install --no-rdoc --no-ri -v{2} {1}'.
+                        format(match.group(1), package, version))
 
         if 'python' == self:
             return 'easy_install {0}'.format(package)
