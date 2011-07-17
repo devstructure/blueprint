@@ -1,0 +1,36 @@
+blueprint-show-services(1) -- show services in a blueprint
+==========================================================
+
+## SYNOPSIS
+
+`blueprint show-services` [`-q`] _name_  
+
+## DESCRIPTION
+
+`blueprint-show-servies` prints the manager and name (separated by spaces) of each service in the blueprint _name_.  They are printed one-per-line to make this command useful in pipelines.
+
+## OPTIONS
+
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+* `~/.blueprintignore`:
+  A list of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

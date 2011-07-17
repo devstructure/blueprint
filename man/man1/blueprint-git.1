@@ -1,0 +1,47 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\-GIT" "1" "July 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\-git\fR \- low\-level access to blueprints
+.
+.SH "SYNOPSIS"
+\fBblueprint git clone\fR [\fIoptions\fR][\fI\.\.\.\fR]
+.
+.br
+\fBblueprint git\fR [\fIcommand\fR] [\fIoptions\fR][\fI\.\.\.\fR]
+.
+.SH "DESCRIPTION"
+\fBblueprint\-git\fR is a convenience wrapper around \fBgit\fR(1) that provides low\-level access to blueprints stored in the \fB~/\.blueprints\.git\fR repository\.
+.
+.P
+\fBblueprint git clone\fR will clone the entire repository into the \fBblueprints\fR directory within the current working directory\. Since it is unlikely this repository has a \fBmaster\fR branch, it is recommended you use \fBblueprint git clone \-b\fR\fIname\fR to clone the blueprint \fIname\fR\.
+.
+.P
+All other \fBgit\fR(1) subcommands are executed as given with the appropriate \fB\-\-git\-dir\fR set and a temporary working directory which is cleaned up after the command exits\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Operate quietly\.
+.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show a help message\.
+.
+.SH "FILES"
+.
+.TP
+\fB~/\.blueprints\.git\fR
+The local repsitory where blueprints are stored, each on its own branch\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.

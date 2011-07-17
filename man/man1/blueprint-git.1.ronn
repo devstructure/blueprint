@@ -1,0 +1,39 @@
+blueprint-git(1) -- low-level access to blueprints
+==================================================
+
+## SYNOPSIS
+
+`blueprint git clone` [_options_][_..._]  
+`blueprint git` [_command_] [_options_][_..._]  
+
+## DESCRIPTION
+
+`blueprint-git` is a convenience wrapper around `git`(1) that provides low-level access to blueprints stored in the `~/.blueprints.git` repository.
+
+`blueprint git clone` will clone the entire repository into the `blueprints` directory within the current working directory.  Since it is unlikely this repository has a `master` branch, it is recommended you use `blueprint git clone -b`_name_ to clone the blueprint _name_.
+
+All other `git`(1) subcommands are executed as given with the appropriate `--git-dir` set and a temporary working directory which is cleaned up after the command exits.
+
+## OPTIONS
+
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

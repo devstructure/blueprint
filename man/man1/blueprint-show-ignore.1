@@ -1,0 +1,45 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\-SHOW\-IGNORE" "1" "July 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\-show\-ignore\fR \- show \.blueprintignore rules from a blueprint
+.
+.SH "SYNOPSIS"
+\fBblueprint show\-ignore\fR [\fB\-q\fR] \fIname\fR
+.
+.SH "DESCRIPTION"
+\fBblueprint\-show\-ignore\fR prints the contents of the \fB~/\.blueprintignore\fR file at the time the blueprint \fIname\fR was created\.
+.
+.P
+This command is preferred over \fBblueprint\-show\fR(1)\'s \fB\-I\fR option\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Operate quietly\.
+.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show a help message\.
+.
+.SH "FILES"
+.
+.TP
+\fB~/\.blueprints\.git\fR
+The local repsitory where blueprints are stored, each on its own branch\.
+.
+.TP
+\fB~/\.blueprintignore\fR
+A list of filename patterns to be ignored when creating blueprints\. See \fBblueprintignore\fR(5)\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.

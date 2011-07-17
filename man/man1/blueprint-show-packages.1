@@ -1,0 +1,42 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\-SHOW\-PACKAGES" "1" "July 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\-show\-packages\fR \- show packages in a blueprint
+.
+.SH "SYNOPSIS"
+\fBblueprint show\-packages\fR [\fB\-q\fR] \fIname\fR
+.
+.SH "DESCRIPTION"
+\fBblueprint\-show\-packages\fR prints the manager, name, and version (separated by spaces) of each package in the blueprint \fIname\fR\. They are printed one\-per\-line to make this command useful in pipelines\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Operate quietly\.
+.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show a help message\.
+.
+.SH "FILES"
+.
+.TP
+\fB~/\.blueprints\.git\fR
+The local repsitory where blueprints are stored, each on its own branch\.
+.
+.TP
+\fB~/\.blueprintignore\fR
+A list of filename patterns to be ignored when creating blueprints\. See \fBblueprintignore\fR(5)\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.

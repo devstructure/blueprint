@@ -26,6 +26,23 @@ blueprint(1) -- reverse engineer server configuration
 * `blueprint`(7):
   Blueprint Python library.
 
+### Plumbing
+
+Much like `git`(1) itself, `blueprint` includes many plumbing tools that make it convenient to inspect blueprints.
+
+* `blueprint-git`(1):
+  Low-level access to blueprints.
+* `blueprint-show-files`(1):
+  Show files in a blueprint.
+* `blueprint-show-ignore`(1):
+  Show .blueprintignore rules from a blueprint.
+* `blueprint-show-packages`(1):
+  Show packages in a blueprint.
+* `blueprint-show-services`(1):
+  Show services in a blueprint.
+* `blueprint-show-sources`(1):
+  Show source tarballs in a blueprint.
+
 ## FILES
 
 * `~/.blueprints.git`:
