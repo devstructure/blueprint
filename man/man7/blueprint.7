@@ -158,8 +158,8 @@ The \fBblueprint\.backend\fR module implements \fBblueprint\-create\fR(1)\. Each
 .nf
 
 import blueprint
+b = blueprint\.Blueprint()
 import blueprint\.backend
-b = blueprint\.Blueprint(name=\'foo\')
 for funcname in blueprint\.backend\.__all__:
     getattr(blueprint\.backend, funcname)(b)
 .

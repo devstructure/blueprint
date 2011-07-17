@@ -1,0 +1,86 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\-PULL" "1" "July 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\-pull\fR \- pull a blueprint from the Internet
+.
+.SH "SYNOPSIS"
+\fBblueprint pull\fR [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIurl\fR
+.
+.P
+With server and secret configured:
+.
+.P
+\fBblueprint pull\fR [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIname\fR
+.
+.SH "DESCRIPTION"
+\fBblueprint\-pull\fR fetches a blueprint and all associated tarballs from the configured server (which is \fBhttps://devstructure\.com\fR by default) and stores them in the local repository as \fIname\fR or the final component of \fIurl\fR\.
+.
+.P
+If \fIname\fR is given, the \fIsecret\fR must be configured in \fB/etc/blueprint\.cfg\fR or \fB~/\.blueprint\.cfg\fR\. See \fBEXAMPLES\fR below\.
+.
+.P
+If \fIurl\fR is given, it must be a fully\-qualified HTTP or HTTPS URL of the form \fIserver\fR/\fIsecret\fR/\fIname\fR\.
+.
+.P
+DevStructure provides a free Blueprint I/O Server at \fIhttps://devstructure\.com\fR, which stores blueprints in Amazon S3\. Alternatively, you can supply your own backend server\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-m\fR \fImessage\fR, \fB\-\-message=\fR\fImessage\fR
+Commit message\.
+.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Operate quietly\.
+.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show a help message\.
+.
+.SH "FILES"
+.
+.TP
+\fB~/\.blueprints\.git\fR
+The local repsitory where blueprints are stored, each on its own branch\.
+.
+.TP
+\fB/etc/blueprint\.cfg\fR, \fB~/\.blueprint\.cfg\fR
+Optional INI\-style configuration files for specifying a \fBserver\fR and \fBsecret\fR value\. See \fBblueprint\fR(5)\.
+.
+.SH "EXAMPLES"
+Example \fB~/\.blueprint\.cfg\fR:
+.
+.IP "" 4
+.
+.nf
+
+[io]
+server = https://devstructure\.com
+secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_\-
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The \fIserver\fR in this case specifies the default and may be omitted\.
+.
+.SH "THEME SONG"
+Girl Talk \- "Let It Out"
+.
+.SH "AUTHOR"
+.
+.IP "\(bu" 4
+Matt Tanase \fImatt@devstructure\.com\fR
+.
+.IP "\(bu" 4
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.IP "" 0
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.
