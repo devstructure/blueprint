@@ -37,6 +37,20 @@ class PackageManager(unicode):
                     arg = '{0}-{1}'.format(package, match.group(1))
             return 'rpm -q {0} >/dev/null'.format(arg)
 
+        if 'rubygems' == self:
+            if relaxed:
+                return 'gem list -i {0} >/dev/null'.format(package)
+            else:
+                return 'gem -i -v{1} {0} >/dev/null'.format(package, version)
+        match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)', self)
+        if match is not None:
+            if relaxed:
+                return ('gem{0} list -i {1} >/dev/null'.
+                        format(match.group(1), package))
+            else:
+                return ('gem{0} list -i -v{2} {1} >/dev/null'.
+                        format(match.group(1), package, version))
+
         return None
 
     def install(self, package, version, relaxed=False):
