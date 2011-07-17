@@ -7,7 +7,7 @@
 \fBblueprint\fR \- reverse engineer server configuration
 .
 .SH "SYNOPSIS"
-\fBblueprint\fR [\fIcommand\fR] [\fIoptions\fR][\fI\.\.\.\fR]
+\fBblueprint\fR [\fIcommand\fR] [\fIoptions\fR][\fI\|\.\|\.\|\.\fR]
 .
 .SH "DESCRIPTION"
 \fBblueprint\fR programs track packages and system files in Git\. Use stored blueprints to build new environments anytime\. Blueprints can be used to generate Puppet modules, Chef cookbooks, or POSIX shell code\.
@@ -49,12 +49,12 @@ Blueprint JSON format\.
 Ignore specific files when creating blueprints\.
 .
 .TP
-\fBblueprint\fR(7)
-Blueprint Python library\.
+\fBblueprint\.cfg\fR(5)
+Centralized blueprint service configuration\.
 .
 .TP
-\fBblueprint\-io\fR(7)
-Push and pull blueprints\.
+\fBblueprint\fR(7)
+Blueprint Python library\.
 .
 .SS "Plumbing"
 Much like \fBgit\fR(1) itself, \fBblueprint\fR includes many plumbing tools that make it convenient to inspect blueprints\.

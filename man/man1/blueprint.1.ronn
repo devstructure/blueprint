@@ -27,10 +27,10 @@ blueprint(1) -- reverse engineer server configuration
   Blueprint JSON format.
 * `blueprintignore`(5):
   Ignore specific files when creating blueprints.
+* `blueprint.cfg`(5):
+  Centralized blueprint service configuration.
 * `blueprint`(7):
   Blueprint Python library.
-* `blueprint-io`(7):
-  Push and pull blueprints.
 
 ### Plumbing
 

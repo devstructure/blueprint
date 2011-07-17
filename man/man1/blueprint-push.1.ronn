@@ -25,7 +25,7 @@ DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>,
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
 * `/etc/blueprint.cfg`, `~/.blueprint.cfg`:
-  Optional INI-style configuration files for specifying a `server` and `secret` value.  See `blueprint`(5).
+  Optional INI-style configuration files.  See `blueprint.cfg`(5).
 
 ## EXAMPLES
 

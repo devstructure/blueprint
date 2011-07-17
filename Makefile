@@ -106,8 +106,7 @@ deploy-pypi:
 	$(PYTHON) setup.py sdist upload
 
 man:
-	find man -name \*.ronn | xargs -n1 ronn \
-		--manual=Blueprint --organization=DevStructure --style=toc
+	find man -name \*.ronn | PATH="$(HOME)/work/ronn/bin:$(PATH)" RUBYLIB="$(HOME)/work/ronn/lib" xargs -n1 ronn --manual=Blueprint --organization=DevStructure --style=toc
 
 gh-pages: man
 	mkdir -p gh-pages

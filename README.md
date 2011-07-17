@@ -109,6 +109,7 @@ The HTTP [endpoints](https://devstructure.com/docs/endpoints.html) and [protocol
 * [`blueprint-destroy`(1)](http://devstructure.github.com/blueprint/blueprint-destroy.1.html)
 * [`blueprint`(5)](http://devstructure.github.com/blueprint/blueprint.5.html)
 * [`blueprintignore`(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html)
+* [`blueprint.cfg`(5)](http://devstructure.github.com/blueprint/blueprint.cfg.5.html)
 * [`blueprint`(7)](http://devstructure.github.com/blueprint/blueprint.7.html)
 
 ## Contribute
