@@ -8,7 +8,7 @@
 * Convert blueprints to Puppet or Chef.
 * No DSLs, no extra servers, no workflow changes.
 
-Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7.  Move blueprints around with [Blueprint I/O](https://github.com/devstructure/blueprint-io).
+Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7.
 
 ### Blueprint I/O moves blueprints around
 
@@ -17,7 +17,7 @@ Blueprint looks inside popular package managers, finds changes you made to confi
 * Push and pull blueprints anywhere.
 * Bootstrap servers painlessly.
 
-Blueprint I/O pushes and pulls blueprints to and from a Blueprint I/O Server, making it easy to use blueprints anywhere. DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3. Alternatively, you can build your own backend server using the Blueprint I/O API.
+Blueprint I/O pushes and pulls blueprints to and from a Blueprint I/O Server, making it easy to use blueprints anywhere. DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3. Alternatively, you can build your own backend server implementing the Blueprint I/O API.
 
 ## Usage
 

@@ -1,5 +1,5 @@
-VERSION=3.0.6
-BUILD=2
+VERSION=3.0.7
+BUILD=1
 
 PYTHON=$(shell which python2.7 || which python27 || which python2.6 || which python26 || which python)
 PYTHON_VERSION=$(shell ${PYTHON} -c "from distutils.sysconfig import get_python_version; print(get_python_version())")
@@ -74,13 +74,14 @@ build:
 
 build-deb:
 	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
-	fpm -s dir -t deb -C debian \
+	FPM_EDITOR="echo 'Replaces: blueprint-io' >>" fpm -s dir -t deb -C debian \
 		-n blueprint -v $(VERSION)-$(BUILD)py$(PYTHON_VERSION) -a all \
 		-d git-core \
 		-d python$(PYTHON_VERSION) \
 		-m "Richard Crowley <richard@devstructure.com>" \
 		--url "https://github.com/devstructure/blueprint" \
-		--description "Reverse-engineer server configuration."
+		--description "Reverse-engineer server configuration." \
+		--edit
 	make uninstall prefix=/usr sysconfdir=/etc DESTDIR=debian
 
 build-pypi:
