@@ -91,17 +91,17 @@ baz*
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p>Lines in <code>~/.blueprintignore</code> are interpreted as in <code>gitignore</code>(5).  Blank lines and lines that begin with a <code>#</code> will be ignored.  Patterns that begin with a <code>!</code> are negated.  As resources are considered for inclusion in a blueprint, the last matching line in <code>~/.blueprintignore</code> wins.</p>
+<p>Lines in <code>~/.blueprintignore</code> are interpreted as in <span class="man-ref"><code>gitignore</code><span class="s">(5)</span></span>.  Blank lines and lines that begin with a <code>#</code> will be ignored.  Patterns that begin with a <code>!</code> are negated.  As resources are considered for inclusion in a blueprint, the last matching line in <code>~/.blueprintignore</code> wins.</p>
 
 <p>The general form of each line is <code>:</code><em>type</em><code>:</code><em>resource</em>, where <em>type</em> is one of <code>file</code>, <code>package</code>, or <code>source</code>.  The <code>file</code> type is assumed and typically seen without the full <code>:</code>-prefixed form.</p>
 
-<p>File resources that do not contain a <code>/</code> are matched using <code>fnmatch</code>(3) against the last component of each file considered.  Patterns that contain a <code>/</code> but do not begin with a <code>/</code> are expanded relative to <code>/etc</code> before being matched using <code>glob</code>(3).</p>
+<p>File resources that do not contain a <code>/</code> are matched using <span class="man-ref"><code>fnmatch</code><span class="s">(3)</span></span> against the last component of each file considered.  Patterns that contain a <code>/</code> but do not begin with a <code>/</code> are expanded relative to <code>/etc</code> before being matched using <span class="man-ref"><code>glob</code><span class="s">(3)</span></span>.</p>
 
 <p>Package resources are of the form <code>:package:</code><em>manager</em><code>/</code><em>package</em>.  Ignored packages implicitly ignore their dependencies as well.  Unignored packages (that is, package resources prefixed with <code>!</code>) affect only themselves and not their dependencies.</p>
 
 <p>Source resources must use the full <code>:source:</code><em>resource</em> format and must be fully-qualified (that is, begin with a <code>/</code>).  By default, all directories except <code>/usr/local</code> are ignored as source resources.  If it is necessary to build and install software from source in another directory, use a negated source resource such as <em>!:source:/opt</em>.</p>
 
-<p>As part of <code>blueprint-create</code>(1), the <code>~/.blueprintignore</code> file that was used to create the blueprint is stored in the local blueprint repository.</p>
+<p>As part of <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>, the <code>~/.blueprintignore</code> file that was used to create the blueprint is stored in the local blueprint repository.</p>
 
 <p>All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.</p>
 
@@ -221,11 +221,11 @@ baz*
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#x72;&#x69;&#x63;&#x68;&#97;&#114;&#100;&#x40;&#100;&#101;&#x76;&#115;&#116;&#x72;&#117;&#x63;&#x74;&#x75;&#114;&#101;&#x2e;&#99;&#x6f;&#109;" data-bare-link="true">&#114;&#105;&#99;&#104;&#x61;&#114;&#100;&#64;&#x64;&#101;&#x76;&#x73;&#116;&#x72;&#x75;&#99;&#116;&#117;&#114;&#101;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#114;&#105;&#99;&#x68;&#97;&#x72;&#100;&#64;&#x64;&#101;&#118;&#x73;&#116;&#x72;&#x75;&#x63;&#x74;&#117;&#x72;&#x65;&#46;&#x63;&#x6f;&#109;" data-bare-link="true">&#114;&#105;&#99;&#104;&#97;&#x72;&#100;&#64;&#100;&#101;&#118;&#115;&#116;&#114;&#117;&#x63;&#116;&#117;&#114;&#x65;&#46;&#x63;&#111;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p><code>blueprint</code>(1).</p>
+<p><span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
 
 
   <ol class='man-decor man-foot man foot'>
