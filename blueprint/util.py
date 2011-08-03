@@ -48,6 +48,12 @@ def lsb_release_codename():
     return lsb_release_codename._cache
 
 
+# Patterns for determining which Upstart services should be included, based
+# on the events used to start them.
+pattern_upstart_1 = re.compile(r'start\s+on\s+runlevel\s+\[[2345]', re.S)
+pattern_upstart_2 = re.compile(r'start\s+on\s+\([^)]*(?:filesystem|filesystems|local-filesystems|mounted|net-device-up|remote-filesystems|startup|virtual-filesystems)[^)]*\)', re.S)
+
+
 def parse_service(pathname):
     """
     Parse a potential service init script or config file into the
@@ -68,7 +74,8 @@ def parse_service(pathname):
             content = open(pathname).read()
         except IOError:
             raise ValueError('not a readable Upstart config')
-        if not re.search(r'start on .*runlevel \[[2345]', content):
+        if not (pattern_upstart_1.search(content) \
+                or pattern_upstart_2.search(content)):
             raise ValueError('not a running service')
 
         return ('upstart', service)
