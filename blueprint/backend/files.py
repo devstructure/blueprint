@@ -197,7 +197,7 @@ def files(b):
             # UTF-8, which is required for JSON serialization.
             elif stat.S_ISREG(s.st_mode):
                 try:
-                    content = content.decode('UTF-8')
+                    content = content.decode('utf_8')
                     encoding = 'plain'
                 except UnicodeDecodeError:
                     content = base64.b64encode(content)
