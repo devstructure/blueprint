@@ -1,0 +1,48 @@
+#!/usr/bin/python
+
+from ConfigParser import NoOptionError
+import logging
+import optparse
+import re
+import sys
+
+import blueprint
+from blueprint import cfg
+import blueprint.io
+
+parser = optparse.OptionParser('Usage: %prog [-q] <name>')
+parser.add_option('-q', '--quiet',
+                  dest='quiet',
+                  default=False,
+                  action='store_true',
+                  help='operate quietly')
+options, args = parser.parse_args()
+
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
+
+if 1 != len(args):
+    parser.print_usage()
+    sys.exit(1)
+name = args[0]
+
+try:
+    b = blueprint.Blueprint(name=name)
+except KeyError:
+    logging.error('blueprint {0} does not exist'.format(name))
+    sys.exit(1)
+except ValueError:
+    logging.error('invalid blueprint name')
+    sys.exit(1)
+
+server = cfg.get('io', 'server')
+try:
+    secret = cfg.get('io', 'secret')
+except NoOptionError:
+    secret = blueprint.io.secret(server)
+if secret is None:
+    sys.exit(1)
+url = blueprint.io.push(server, secret, b)
+if url is not None:
+    logging.info('completed - blueprint URL:')
+    print(url)

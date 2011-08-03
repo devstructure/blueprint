@@ -1,0 +1,59 @@
+blueprint-pull(1) -- pull a blueprint from the Internet
+=======================================================
+
+## SYNOPSIS
+
+`blueprint pull` [`-m` _message_] [`-q`] _url_  
+
+With server and secret configured:
+
+`blueprint pull` [`-m` _message_] [`-q`] _name_  
+
+## DESCRIPTION
+
+`blueprint-pull` fetches a blueprint and all associated tarballs from the configured server (which is `https://devstructure.com` by default) and stores them in the local repository as _name_ or the final component of _url_.
+
+If _name_ is given, the _secret_ must be configured in `/etc/blueprint.cfg` or `~/.blueprint.cfg`.  See `EXAMPLES` below.
+
+If _url_ is given, it must be a fully-qualified HTTP or HTTPS URL of the form _server_/_secret_/_name_.
+
+DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3.  Alternatively, you can supply your own backend server.
+
+## OPTIONS
+
+* `-m` _message_, `--message=`_message_:
+  Commit message.
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+* `/etc/blueprint.cfg`, `~/.blueprint.cfg`:
+  Optional INI-style configuration files.  See `blueprint.cfg`(5).
+
+## EXAMPLES
+
+Example `~/.blueprint.cfg`:
+
+	[io]
+	server = https://devstructure.com
+	secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-
+
+The _server_ in this case specifies the default and may be omitted.
+
+## THEME SONG
+
+Girl Talk - "Let It Out"
+
+## AUTHOR
+
+* Matt Tanase <matt@devstructure.com>
+* Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

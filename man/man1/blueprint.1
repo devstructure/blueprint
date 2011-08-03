@@ -7,7 +7,7 @@
 \fBblueprint\fR \- reverse engineer server configuration
 .
 .SH "SYNOPSIS"
-\fBblueprint\fR [\fIcommand\fR] [\fIoptions\fR][\fI\.\.\.\fR]
+\fBblueprint\fR [\fIcommand\fR] [\fIoptions\fR][\fI\|\.\|\.\|\.\fR]
 .
 .SH "DESCRIPTION"
 \fBblueprint\fR programs track packages and system files in Git\. Use stored blueprints to build new environments anytime\. Blueprints can be used to generate Puppet modules, Chef cookbooks, or POSIX shell code\.
@@ -29,6 +29,14 @@ Generate code from a blueprint\.
 Run a blueprint\'s generated shell code\.
 .
 .TP
+\fBblueprint\-push\fR(1)
+Push a blueprint to the Internet\.
+.
+.TP
+\fBblueprint\-pull\fR(1)
+Pull a blueprint from the Internet\.
+.
+.TP
 \fBblueprint\-destroy\fR(1)
 Destroy a blueprint\.
 .
@@ -39,6 +47,10 @@ Blueprint JSON format\.
 .TP
 \fBblueprintignore\fR(5)
 Ignore specific files when creating blueprints\.
+.
+.TP
+\fBblueprint\.cfg\fR(5)
+Centralized blueprint service configuration\.
 .
 .TP
 \fBblueprint\fR(7)

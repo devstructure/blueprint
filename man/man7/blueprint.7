@@ -158,8 +158,8 @@ The \fBblueprint\.backend\fR module implements \fBblueprint\-create\fR(1)\. Each
 .nf
 
 import blueprint
+b = blueprint\.Blueprint()
 import blueprint\.backend
-b = blueprint\.Blueprint(name=\'foo\')
 for funcname in blueprint\.backend\.__all__:
     getattr(blueprint\.backend, funcname)(b)
 .
@@ -208,6 +208,20 @@ Execute in a different working directory\. The property \fBold_cwd\fR is availab
 .TP
 \fBblueprint\.context_managers\.mkdtemp(dir=\fR\fINone\fR\fB)\fR
 Create a temporary directory and execute with it as the working directory\. The property \fBcwd\fR is available on the context object containing the previous working directory\. When the context closes, the temporary directory and all its contents are removed recursively\.
+.
+.SS "blueprint\.io"
+.
+.TP
+\fBblueprint\.io\.pull(\fR\fIserver\fR\fB,\fR\fIsecret\fR\fB,\fR\fIname\fR\fB)\fR
+Pull a blueprint from \fIsecret\fR and \fIname\fR on \fIserver\fR\.
+.
+.TP
+\fBblueprint\.io\.push(\fR\fIserver\fR\fB,\fR\fIsecret\fR\fB,\fR\fIb\fR\fB)\fR
+Push a blueprint to \fIsecret\fR and \fIb\.name\fR on \fIserver\fR\.
+.
+.TP
+\fBblueprint\.io\.secret(\fR\fIserver\fR\fB)\fR
+Fetch a new secret from \fIserver\fR\.
 .
 .SH "FILES"
 .

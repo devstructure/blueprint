@@ -1,0 +1,54 @@
+#!/usr/bin/python
+
+import logging
+import optparse
+import re
+import sys
+import urlparse
+
+import blueprint
+from blueprint import cfg
+from blueprint import context_managers
+import blueprint.io
+
+parser = optparse.OptionParser(
+    'Usage: %prog [-m <message>] [-q] <name>|<url>')
+parser.add_option('-m', '--message',
+                  dest='message',
+                  default=None,
+                  help='commit message')
+parser.add_option('-q', '--quiet',
+                  dest='quiet',
+                  default=False,
+                  action='store_true',
+                  help='operate quietly')
+options, args = parser.parse_args()
+
+if 1 != len(args):
+    parser.print_usage()
+    sys.exit(1)
+url = urlparse.urlparse(args[0])
+if url.scheme and url.netloc:
+    match = re.match(r'^/([0-9A-Za-z_-]{64})/([^/ \t\r\n]+)$', url.path)
+    if match is None:
+        logging.error('invalid blueprint URL')
+        sys.exit(1)
+    server = urlparse.urlunparse((url.scheme, url.netloc, '', '', '', ''))
+    secret, name = match.group(1, 2)
+else:
+    server, secret = cfg.get('io', 'server'), cfg.get('io', 'secret')
+    if secret is None:
+        logging.error(
+            'secret not found - use a blueprint URL or configure your secret')
+        sys.exit(1)
+    name = args[0]
+
+with context_managers.mkdtemp():
+    try:
+        b = blueprint.io.pull(server, secret, name)
+    except ValueError:
+        logging.error('invalid blueprint name')
+        sys.exit(1)
+    if b is not None:
+        b.commit(options.message or '')
+        logging.info('completed - blueprint stored locally and ready for use')

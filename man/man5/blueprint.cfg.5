@@ -1,0 +1,55 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\.CFG" "5" "July 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\.cfg\fR \- centralized blueprint service configuration
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+[io]
+server = https://devstructure\.com
+secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_\-
+.
+.fi
+.
+.SH "DESCRIPTION"
+\fB/etc/blueprint\.cfg\fR or \fB~/\.blueprint\.cfg\fR allow customizing the configuration of Blueprint and Blueprint I/O\. Blueprint I/O will prompt you with snippets that can be used in these files when you perform pushes and pulls for the first time\.
+.
+.P
+The file is INI\-style and divided into sections, of which there is only one, currently\.
+.
+.SS "[io]"
+.
+.TP
+\fBsecret\fR
+The 64\-byte secret key used for all \fBblueprint\-push\fR(1) calls and \fBblueprint\-pull\fR(1) calls that don\'t specify a full URL\.
+.
+.TP
+\fBserver\fR
+The Blueprint I/O Server that receives push and pull calls\. \fBhttps://devstructure\.com\fR by default\.
+.
+.SH "FILES"
+.
+.TP
+\fB/etc/blueprint\.cfg\fR, \fB~/\.blueprint\.cfg\fR
+Optional INI\-style configuration files\.
+.
+.SH "THEME SONG"
+Girl Talk \- "Let It Out"
+.
+.SH "AUTHOR"
+.
+.IP "\(bu" 4
+Matt Tanase \fImatt@devstructure\.com\fR
+.
+.IP "\(bu" 4
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.IP "" 0
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.
