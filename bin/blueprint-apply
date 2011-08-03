@@ -3,6 +3,7 @@
 import json
 import logging
 import optparse
+import os
 import re
 import subprocess
 import sys
@@ -53,8 +54,11 @@ except blueprint.NameError:
     logging.error('invalid blueprint name')
     sys.exit(1)
 
+if 0 != os.geteuid():
+    logging.warning('applying a blueprint may not work as a normal user')
+
 with context_managers.mkdtemp():
     filename = b.sh(options.relaxed).dumpf()
-    p = subprocess.Popen(['sudo', 'sh', filename], close_fds=True)
+    p = subprocess.Popen(['sh', filename], close_fds=True)
     p.communicate()
     sys.exit(p.returncode)
