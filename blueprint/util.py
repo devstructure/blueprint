@@ -126,7 +126,7 @@ def via_sudo():
     """
     return 'SUDO_UID' in os.environ \
         and 'SUDO_GID' in os.environ \
-        and -1 != os.environ.get('SUDO_COMMAND', '').find('blueprint')
+        and 'blueprint' in os.environ.get('SUDO_COMMAND', '')
 
 
 class BareString(unicode):

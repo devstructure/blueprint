@@ -303,7 +303,7 @@ def _ignore_pathname(restype, dirname, pathname, ignored=False):
     def match(filename, pathname, pattern):
         dir_only = '/' == pattern[-1]
         pattern = pattern.rstrip('/')
-        if -1 == pattern.find('/'):
+        if '/' not in pattern:
             if fnmatch.fnmatch(filename, pattern):
                 return os.path.isdir(pathname) if dir_only else True
         else:
