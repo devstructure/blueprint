@@ -44,5 +44,10 @@ def gem(b):
                 manager = 'rubygems{0}'.format(match.group(1))
 
             for entry in os.listdir(dirname):
-                package, version = entry.rsplit('-', 1)
+                try:
+                    package, version = entry.rsplit('-', 1)
+                except ValueError:
+                    logging.warning('skipping questionably named gem {0}'.
+                                    format(entry))
+                    continue
                 b.add_package(manager, package, version)
