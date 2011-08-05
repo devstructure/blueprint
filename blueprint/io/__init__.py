@@ -3,6 +3,7 @@ import logging
 import sys
 import urlparse
 
+from blueprint import cfg
 from blueprint import git
 from blueprint import Blueprint
 from blueprint import context_managers
@@ -114,7 +115,7 @@ def secret(server):
         logging.warning('created secret {0}'.format(secret))
         logging.warning('to set as the default secret, store it in ~/.blueprint.cfg:')
         sys.stderr.write('\n[io]\nsecret = {0}\nserver = {1}\n\n'.
-            format(secret, cfg.server()))
+            format(secret, cfg.get('io', 'server')))
         return secret
     elif 502 == r.status:
         logging.error('upstream storage service failed')
