@@ -159,7 +159,7 @@ def yum_exclusions():
     logging.info('searching for Yum packages to exclude')
 
     # Start with a few groups that install common packages.
-    s = set([('gpg-pubkey', 'gpg-pubkey')])
+    s = set(['gpg-pubkey'])
     pattern = re.compile(r'^   (\S+)')
     try:
         p = subprocess.Popen(['yum', 'groupinfo',
@@ -172,15 +172,8 @@ def yum_exclusions():
         return s
     for line in p.stdout:
         match = pattern.match(line)
-        if match is None:
-            continue
-        p2 = subprocess.Popen(['rpm',
-                               '-q',
-                               '--qf=%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}',
-                               match.group(1)],
-                              close_fds=True, stdout=subprocess.PIPE)
-        stdout, stderr = p2.communicate()
-        s.add((match.group(1), stdout))
+        if match is not None:
+            s.add(match.group(1))
 
     # Walk the dependency tree all the way to the leaves.
     s = deps.yum(s)

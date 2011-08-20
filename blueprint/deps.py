@@ -45,20 +45,54 @@ def yum(s):
     the leaves.  Return the set of s plus all their dependencies.
     """
     logging.debug('searching for Yum dependencies')
+
+    if not hasattr(yum, '_cache'):
+        yum._cache = {}
+        try:
+            p = subprocess.Popen(['rpm',
+                                  '-qa',
+                                  '--qf=%{NAME}\x1E[%{PROVIDES}\x1F]\n'],
+                                 close_fds=True,
+                                 stdout=subprocess.PIPE)
+            for line in p.stdout:
+                name, caps = line.rstrip().split('\x1E')
+                yum._cache.update([(cap, name) for cap in caps.split('\x1F')])
+        except OSError:
+            pass
+
     if not isinstance(s, set):
         s = set([s])
+
     tmp_s = s
-    pattern = re.compile(r'provider: ([^.]+)\.\S+ (\S+)')
     while 1:
         new_s = set()
-        for package, spec in tmp_s:
-            p = subprocess.Popen(['yum', 'deplist', spec],
-                close_fds=True, stdout=subprocess.PIPE)
+        for package in tmp_s:
+            try:
+                p = subprocess.Popen(['rpm', '-qR', package],
+                                     close_fds=True,
+                                     stdout=subprocess.PIPE)
+            except OSError:
+                continue
             for line in p.stdout:
-                match = pattern.search(line)
-                if match is None:
+                cap = line.rstrip()[0:line.find(' ')]
+                if 'rpmlib' == cap[0:6]:
                     continue
-                new_s.add((match.group(1), '-'.join(match.group(1, 2))))
+                try:
+                    new_s.add(yum._cache[cap])
+                except KeyError:
+                    try:
+                        p2 = subprocess.Popen(['rpm',
+                                               '-q',
+                                               '--qf=%{NAME}',
+                                               '--whatprovides',
+                                               cap],
+                                              close_fds=True,
+                                              stdout=subprocess.PIPE)
+                        stdout, stderr = p2.communicate()
+                        yum._cache[cap] = stdout
+                        new_s.add(stdout)
+                    except OSError:
+                        pass
 
         # If there is to be a next iteration, `new_s` must contain some
         # packages not yet in `s`.
@@ -67,6 +101,4 @@ def yum(s):
             break
         s |= new_s
 
-    # Now that the tree has been walked, discard the version-qualified names,
-    # leaving just the package names.
-    return set([package for package, spec in s])
+    return s
