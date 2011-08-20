@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINTIGNORE" "5" "July 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINTIGNORE" "5" "August 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
 \fBblueprintignore\fR \- ignore specific resources when creating blueprints
@@ -59,6 +59,9 @@ The following files and directories are part of the default ignore list\. They c
 \fB/etc/X11/default\-display\-manager\fR
 .
 .IP "\(bu" 4
+\fB/etc/adjtime\fR
+.
+.IP "\(bu" 4
 \fB/etc/alternatives\fR
 .
 .IP "\(bu" 4
@@ -66,6 +69,9 @@ The following files and directories are part of the default ignore list\. They c
 .
 .IP "\(bu" 4
 \fB/etc/apparmor\.d\fR
+.
+.IP "\(bu" 4
+\fB/etc/blkid/blkid\.tab\fR
 .
 .IP "\(bu" 4
 \fB/etc/ca\-certificates\.conf\fR
@@ -107,6 +113,9 @@ The following files and directories are part of the default ignore list\. They c
 \fB/etc/localtime\fR
 .
 .IP "\(bu" 4
+\fB/etc/lvm/cache\fR
+.
+.IP "\(bu" 4
 \fB/etc/mailcap\fR
 .
 .IP "\(bu" 4
@@ -126,9 +135,6 @@ The following files and directories are part of the default ignore list\. They c
 .
 .IP "\(bu" 4
 \fB/etc/passwd\fR
-.
-.IP "\(bu" 4
-\fB/etc/pki/rpm\-gpg\fR
 .
 .IP "\(bu" 4
 \fB/etc/popularity\-contest\.conf\fR
@@ -173,13 +179,28 @@ The following files and directories are part of the default ignore list\. They c
 \fB/etc/shadow\fR
 .
 .IP "\(bu" 4
+\fB/etc/ssh/ssh_host_key*\fR
+.
+.IP "\(bu" 4
 \fB/etc/ssh/ssh_host_*_key*\fR
 .
 .IP "\(bu" 4
 \fB/etc/ssl/certs\fR
 .
 .IP "\(bu" 4
+\fB/etc/sysconfig/clock\fR
+.
+.IP "\(bu" 4
+\fB/etc/sysconfig/i18n\fR
+.
+.IP "\(bu" 4
+\fB/etc/sysconfig/keyboard\fR
+.
+.IP "\(bu" 4
 \fB/etc/sysconfig/network\fR
+.
+.IP "\(bu" 4
+\fB/etc/sysconfig/network\-scripts\fR
 .
 .IP "\(bu" 4
 \fB/etc/timezone\fR
@@ -253,10 +274,55 @@ The following files are ignored if their content matches an expected hash\. They
 \fB/etc/ld\.so\.conf\fR
 .
 .IP "\(bu" 4
+\fB/etc/ld\.so\.conf\.d/nosegneg\.conf\fR
+.
+.IP "\(bu" 4
 \fB/etc/networks\fR
 .
 .IP "\(bu" 4
 \fB/etc/nsswitch\.conf\fR
+.
+.IP "\(bu" 4
+`/etc/nsswitch\.conf
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/common\-account\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/common\-auth\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/common\-password\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/common\-session\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/common\-session\-noninteractive\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/fingerprint\-auth\-ac\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/fingerprint\-auth\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/password\-auth\-ac\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/password\-auth\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/smartcard\-auth\-ac\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/smartcard\-auth\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/system\-auth\-ac\fR
+.
+.IP "\(bu" 4
+\fB/etc/pam\.d/system\-auth\fR
 .
 .IP "\(bu" 4
 \fB/etc/ppp/chap\-secrets\fR
@@ -281,6 +347,129 @@ The following files are ignored if their content matches an expected hash\. They
 .
 .IP "\(bu" 4
 \fB/etc/security/opasswd\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/restorecond\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/semanage\.trans\.LOCK\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/file_contexts\.template\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/file_contexts\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/users_extra\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/*\.pp\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/netfilter_contexts\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/seusers\.final\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/file_contexts\.homedirs\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/commit_num\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/policy\.kern\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/active/homedir_template\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/modules/semanage\.read\.LOCK\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/failsafe_context\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/virtual_domain_context\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/removable_context\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/netfilter_contexts\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/userhelper_context\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/virtual_image_context\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/securetty_types\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/default_type\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/dbus_contexts\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/files/file_contexts\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/files/file_contexts\.homedirs\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/files/media\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/initrc_context\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/x_contexts\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/customizable_types\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/users/xguest_u\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/users/unconfined_u\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/users/staff_u\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/users/root\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/users/user_u\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/users/guest_u\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/contexts/default_contexts\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/policy/policy\.24\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/setrans\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/targeted/seusers\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/config\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/restorecond_user\.conf\fR
+.
+.IP "\(bu" 4
+\fB/etc/selinux/semanage\.conf\fR
 .
 .IP "\(bu" 4
 \fB/etc/sgml/xml\-core\.cat\fR
