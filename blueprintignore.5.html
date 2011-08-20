@@ -91,17 +91,17 @@ baz*
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p>Lines in <code>~/.blueprintignore</code> are interpreted as in <span class="man-ref"><code>gitignore</code><span class="s">(5)</span></span>.  Blank lines and lines that begin with a <code>#</code> will be ignored.  Patterns that begin with a <code>!</code> are negated.  As resources are considered for inclusion in a blueprint, the last matching line in <code>~/.blueprintignore</code> wins.</p>
+<p>Lines in <code>~/.blueprintignore</code> are interpreted as in <code>gitignore</code>(5).  Blank lines and lines that begin with a <code>#</code> will be ignored.  Patterns that begin with a <code>!</code> are negated.  As resources are considered for inclusion in a blueprint, the last matching line in <code>~/.blueprintignore</code> wins.</p>
 
 <p>The general form of each line is <code>:</code><em>type</em><code>:</code><em>resource</em>, where <em>type</em> is one of <code>file</code>, <code>package</code>, or <code>source</code>.  The <code>file</code> type is assumed and typically seen without the full <code>:</code>-prefixed form.</p>
 
-<p>File resources that do not contain a <code>/</code> are matched using <span class="man-ref"><code>fnmatch</code><span class="s">(3)</span></span> against the last component of each file considered.  Patterns that contain a <code>/</code> but do not begin with a <code>/</code> are expanded relative to <code>/etc</code> before being matched using <span class="man-ref"><code>glob</code><span class="s">(3)</span></span>.</p>
+<p>File resources that do not contain a <code>/</code> are matched using <code>fnmatch</code>(3) against the last component of each file considered.  Patterns that contain a <code>/</code> but do not begin with a <code>/</code> are expanded relative to <code>/etc</code> before being matched using <code>glob</code>(3).</p>
 
 <p>Package resources are of the form <code>:package:</code><em>manager</em><code>/</code><em>package</em>.  Ignored packages implicitly ignore their dependencies as well.  Unignored packages (that is, package resources prefixed with <code>!</code>) affect only themselves and not their dependencies.</p>
 
 <p>Source resources must use the full <code>:source:</code><em>resource</em> format and must be fully-qualified (that is, begin with a <code>/</code>).  By default, all directories except <code>/usr/local</code> are ignored as source resources.  If it is necessary to build and install software from source in another directory, use a negated source resource such as <em>!:source:/opt</em>.</p>
 
-<p>As part of <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>, the <code>~/.blueprintignore</code> file that was used to create the blueprint is stored in the local blueprint repository.</p>
+<p>As part of <code>blueprint-create</code>(1), the <code>~/.blueprintignore</code> file that was used to create the blueprint is stored in the local blueprint repository.</p>
 
 <p>All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.</p>
 
@@ -113,9 +113,11 @@ baz*
 <li><code>/etc/.git</code></li>
 <li><code>/etc/.pwd.lock</code></li>
 <li><code>/etc/X11/default-display-manager</code></li>
+<li><code>/etc/adjtime</code></li>
 <li><code>/etc/alternatives</code></li>
 <li><code>/etc/apparmor</code></li>
 <li><code>/etc/apparmor.d</code></li>
+<li><code>/etc/blkid/blkid.tab</code></li>
 <li><code>/etc/ca-certificates.conf</code></li>
 <li><code>/etc/console-setup</code></li>
 <li><code>/etc/dpkg/origins/default</code></li>
@@ -129,6 +131,7 @@ baz*
 <li><code>/etc/initramfs-tools/conf.d/resume</code></li>
 <li><code>/etc/ld.so.cache</code></li>
 <li><code>/etc/localtime</code></li>
+<li><code>/etc/lvm/cache</code></li>
 <li><code>/etc/mailcap</code></li>
 <li><code>/etc/mtab</code></li>
 <li><code>/etc/modules</code></li>
@@ -136,7 +139,6 @@ baz*
 <li><code>/etc/network/interfaces</code></li>
 <li><code>/etc/passwd-</code></li>
 <li><code>/etc/passwd</code></li>
-<li><code>/etc/pki/rpm-gpg</code></li>
 <li><code>/etc/popularity-contest.conf</code></li>
 <li><code>/etc/prelink.cache</code></li>
 <li><code>/etc/resolv.conf</code></li>
@@ -151,9 +153,14 @@ baz*
 <li><code>/etc/rcS.d</code></li>
 <li><code>/etc/shadow-</code></li>
 <li><code>/etc/shadow</code></li>
+<li><code>/etc/ssh/ssh_host_key*</code></li>
 <li><code>/etc/ssh/ssh_host_*_key*</code></li>
 <li><code>/etc/ssl/certs</code></li>
+<li><code>/etc/sysconfig/clock</code></li>
+<li><code>/etc/sysconfig/i18n</code></li>
+<li><code>/etc/sysconfig/keyboard</code></li>
 <li><code>/etc/sysconfig/network</code></li>
+<li><code>/etc/sysconfig/network-scripts</code></li>
 <li><code>/etc/timezone</code></li>
 <li><code>/etc/udev/rules.d/70-persistent-*.rules</code></li>
 <li><code>/etc/yum.repos.d</code></li>
@@ -182,8 +189,23 @@ baz*
 <li><code>/etc/iscsi/iscsid.conf</code></li>
 <li><code>/etc/kernel-img.conf</code></li>
 <li><code>/etc/ld.so.conf</code></li>
+<li><code>/etc/ld.so.conf.d/nosegneg.conf</code></li>
 <li><code>/etc/networks</code></li>
 <li><code>/etc/nsswitch.conf</code></li>
+<li>`/etc/nsswitch.conf</li>
+<li><code>/etc/pam.d/common-account</code></li>
+<li><code>/etc/pam.d/common-auth</code></li>
+<li><code>/etc/pam.d/common-password</code></li>
+<li><code>/etc/pam.d/common-session</code></li>
+<li><code>/etc/pam.d/common-session-noninteractive</code></li>
+<li><code>/etc/pam.d/fingerprint-auth-ac</code></li>
+<li><code>/etc/pam.d/fingerprint-auth</code></li>
+<li><code>/etc/pam.d/password-auth-ac</code></li>
+<li><code>/etc/pam.d/password-auth</code></li>
+<li><code>/etc/pam.d/smartcard-auth-ac</code></li>
+<li><code>/etc/pam.d/smartcard-auth</code></li>
+<li><code>/etc/pam.d/system-auth-ac</code></li>
+<li><code>/etc/pam.d/system-auth</code></li>
 <li><code>/etc/ppp/chap-secrets</code></li>
 <li><code>/etc/ppp/pap-secrets</code></li>
 <li><code>/etc/ppp/peers/provider</code></li>
@@ -192,6 +214,47 @@ baz*
 <li><code>/etc/rc.local</code></li>
 <li><code>/etc/rsyslog.d/50-default.conf</code></li>
 <li><code>/etc/security/opasswd</code></li>
+<li><code>/etc/selinux/restorecond.conf</code></li>
+<li><code>/etc/selinux/targeted/modules/semanage.trans.LOCK</code></li>
+<li><code>/etc/selinux/targeted/modules/active/file_contexts.template</code></li>
+<li><code>/etc/selinux/targeted/modules/active/file_contexts</code></li>
+<li><code>/etc/selinux/targeted/modules/active/users_extra</code></li>
+<li><code>/etc/selinux/targeted/modules/active/*.pp</code></li>
+<li><code>/etc/selinux/targeted/modules/active/netfilter_contexts</code></li>
+<li><code>/etc/selinux/targeted/modules/active/seusers.final</code></li>
+<li><code>/etc/selinux/targeted/modules/active/file_contexts.homedirs</code></li>
+<li><code>/etc/selinux/targeted/modules/active/commit_num</code></li>
+<li><code>/etc/selinux/targeted/modules/active/policy.kern</code></li>
+<li><code>/etc/selinux/targeted/modules/active/homedir_template</code></li>
+<li><code>/etc/selinux/targeted/modules/semanage.read.LOCK</code></li>
+<li><code>/etc/selinux/targeted/contexts/failsafe_context</code></li>
+<li><code>/etc/selinux/targeted/contexts/virtual_domain_context</code></li>
+<li><code>/etc/selinux/targeted/contexts/removable_context</code></li>
+<li><code>/etc/selinux/targeted/contexts/netfilter_contexts</code></li>
+<li><code>/etc/selinux/targeted/contexts/userhelper_context</code></li>
+<li><code>/etc/selinux/targeted/contexts/virtual_image_context</code></li>
+<li><code>/etc/selinux/targeted/contexts/securetty_types</code></li>
+<li><code>/etc/selinux/targeted/contexts/default_type</code></li>
+<li><code>/etc/selinux/targeted/contexts/dbus_contexts</code></li>
+<li><code>/etc/selinux/targeted/contexts/files/file_contexts</code></li>
+<li><code>/etc/selinux/targeted/contexts/files/file_contexts.homedirs</code></li>
+<li><code>/etc/selinux/targeted/contexts/files/media</code></li>
+<li><code>/etc/selinux/targeted/contexts/initrc_context</code></li>
+<li><code>/etc/selinux/targeted/contexts/x_contexts</code></li>
+<li><code>/etc/selinux/targeted/contexts/customizable_types</code></li>
+<li><code>/etc/selinux/targeted/contexts/users/xguest_u</code></li>
+<li><code>/etc/selinux/targeted/contexts/users/unconfined_u</code></li>
+<li><code>/etc/selinux/targeted/contexts/users/staff_u</code></li>
+<li><code>/etc/selinux/targeted/contexts/users/root</code></li>
+<li><code>/etc/selinux/targeted/contexts/users/user_u</code></li>
+<li><code>/etc/selinux/targeted/contexts/users/guest_u</code></li>
+<li><code>/etc/selinux/targeted/contexts/default_contexts</code></li>
+<li><code>/etc/selinux/targeted/policy/policy.24</code></li>
+<li><code>/etc/selinux/targeted/setrans.conf</code></li>
+<li><code>/etc/selinux/targeted/seusers</code></li>
+<li><code>/etc/selinux/config</code></li>
+<li><code>/etc/selinux/restorecond_user.conf</code></li>
+<li><code>/etc/selinux/semanage.conf</code></li>
 <li><code>/etc/sgml/xml-core.cat</code></li>
 <li><code>/etc/shells</code></li>
 <li><code>/etc/ssh/sshd_config</code></li>
@@ -221,16 +284,16 @@ baz*
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#114;&#105;&#99;&#x68;&#97;&#x72;&#100;&#64;&#x64;&#101;&#118;&#x73;&#116;&#x72;&#x75;&#x63;&#x74;&#117;&#x72;&#x65;&#46;&#x63;&#x6f;&#109;" data-bare-link="true">&#114;&#105;&#99;&#104;&#97;&#x72;&#100;&#64;&#100;&#101;&#118;&#115;&#116;&#114;&#117;&#x63;&#116;&#117;&#114;&#x65;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#114;&#x69;&#99;&#x68;&#97;&#x72;&#x64;&#64;&#100;&#x65;&#118;&#x73;&#116;&#x72;&#117;&#x63;&#116;&#x75;&#x72;&#x65;&#x2e;&#x63;&#111;&#109;" data-bare-link="true">&#x72;&#x69;&#99;&#104;&#x61;&#x72;&#x64;&#64;&#100;&#x65;&#x76;&#115;&#116;&#114;&#117;&#x63;&#x74;&#x75;&#114;&#x65;&#46;&#x63;&#x6f;&#109;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p><span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
+<p><code>blueprint</code>(1).</p>
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>July 2011</li>
+    <li class='tc'>August 2011</li>
     <li class='tr'>blueprintignore(5)</li>
   </ol>
 

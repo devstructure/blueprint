@@ -87,31 +87,31 @@
 <p><code>blueprint</code> programs track packages and system files in Git.  Use stored blueprints to build new environments anytime.  Blueprints can be used to generate Puppet modules, Chef cookbooks, or POSIX shell code.</p>
 
 <dl>
-<dt><span class="man-ref"><code>blueprint-list</code><span class="s">(1)</span></span></dt><dd>List all blueprints.</dd>
-<dt><span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span></dt><dd>Create a blueprint.</dd>
-<dt><span class="man-ref"><code>blueprint-show</code><span class="s">(1)</span></span></dt><dd>Generate code from a blueprint.</dd>
-<dt><span class="man-ref"><code>blueprint-apply</code><span class="s">(1)</span></span></dt><dd>Run a blueprint's generated shell code.</dd>
-<dt><span class="man-ref"><code>blueprint-push</code><span class="s">(1)</span></span></dt><dd>Push a blueprint to the Internet.</dd>
-<dt><span class="man-ref"><code>blueprint-pull</code><span class="s">(1)</span></span></dt><dd>Pull a blueprint from the Internet.</dd>
-<dt><span class="man-ref"><code>blueprint-destroy</code><span class="s">(1)</span></span></dt><dd>Destroy a blueprint.</dd>
-<dt><span class="man-ref"><code>blueprint</code><span class="s">(5)</span></span></dt><dd>Blueprint JSON format.</dd>
-<dt><span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span></dt><dd>Ignore specific files when creating blueprints.</dd>
-<dt><span class="man-ref"><code>blueprint.cfg</code><span class="s">(5)</span></span></dt><dd>Centralized blueprint service configuration.</dd>
-<dt><span class="man-ref"><code>blueprint</code><span class="s">(7)</span></span></dt><dd>Blueprint Python library.</dd>
+<dt><code>blueprint-list</code>(1)</dt><dd>List all blueprints.</dd>
+<dt><code>blueprint-create</code>(1)</dt><dd>Create a blueprint.</dd>
+<dt><code>blueprint-show</code>(1)</dt><dd>Generate code from a blueprint.</dd>
+<dt><code>blueprint-apply</code>(1)</dt><dd>Run a blueprint's generated shell code.</dd>
+<dt><code>blueprint-push</code>(1)</dt><dd>Push a blueprint to the Internet.</dd>
+<dt><code>blueprint-pull</code>(1)</dt><dd>Pull a blueprint from the Internet.</dd>
+<dt><code>blueprint-destroy</code>(1)</dt><dd>Destroy a blueprint.</dd>
+<dt><code>blueprint</code>(5)</dt><dd>Blueprint JSON format.</dd>
+<dt><code>blueprintignore</code>(5)</dt><dd>Ignore specific files when creating blueprints.</dd>
+<dt><code>blueprint.cfg</code>(5)</dt><dd>Centralized blueprint service configuration.</dd>
+<dt><code>blueprint</code>(7)</dt><dd>Blueprint Python library.</dd>
 </dl>
 
 
 <h3 id="Plumbing">Plumbing</h3>
 
-<p>Much like <span class="man-ref"><code>git</code><span class="s">(1)</span></span> itself, <code>blueprint</code> includes many plumbing tools that make it convenient to inspect blueprints.</p>
+<p>Much like <code>git</code>(1) itself, <code>blueprint</code> includes many plumbing tools that make it convenient to inspect blueprints.</p>
 
 <dl>
-<dt><span class="man-ref"><code>blueprint-git</code><span class="s">(1)</span></span></dt><dd>Low-level access to blueprints.</dd>
-<dt><span class="man-ref"><code>blueprint-show-files</code><span class="s">(1)</span></span></dt><dd>Show files in a blueprint.</dd>
-<dt><span class="man-ref"><code>blueprint-show-ignore</code><span class="s">(1)</span></span></dt><dd>Show .blueprintignore rules from a blueprint.</dd>
-<dt><span class="man-ref"><code>blueprint-show-packages</code><span class="s">(1)</span></span></dt><dd>Show packages in a blueprint.</dd>
-<dt><span class="man-ref"><code>blueprint-show-services</code><span class="s">(1)</span></span></dt><dd>Show services in a blueprint.</dd>
-<dt><span class="man-ref"><code>blueprint-show-sources</code><span class="s">(1)</span></span></dt><dd>Show source tarballs in a blueprint.</dd>
+<dt><code>blueprint-git</code>(1)</dt><dd>Low-level access to blueprints.</dd>
+<dt><code>blueprint-show-files</code>(1)</dt><dd>Show files in a blueprint.</dd>
+<dt><code>blueprint-show-ignore</code>(1)</dt><dd>Show .blueprintignore rules from a blueprint.</dd>
+<dt><code>blueprint-show-packages</code>(1)</dt><dd>Show packages in a blueprint.</dd>
+<dt><code>blueprint-show-services</code>(1)</dt><dd>Show services in a blueprint.</dd>
+<dt><code>blueprint-show-sources</code>(1)</dt><dd>Show source tarballs in a blueprint.</dd>
 </dl>
 
 
@@ -119,7 +119,7 @@
 
 <dl>
 <dt><code>~/.blueprints.git</code></dt><dd>The local repsitory where blueprints are stored, each on its own branch.</dd>
-<dt><code>~/.blueprintignore</code></dt><dd>A list of filename patterns to be ignored when creating blueprints.  See <span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span>.</dd>
+<dt><code>~/.blueprintignore</code></dt><dd>A list of filename patterns to be ignored when creating blueprints.  See <code>blueprintignore</code>(5).</dd>
 </dl>
 
 
@@ -129,7 +129,7 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#114;&#x69;&#x63;&#104;&#x61;&#114;&#100;&#64;&#x64;&#x65;&#118;&#115;&#116;&#x72;&#x75;&#99;&#x74;&#x75;&#114;&#101;&#x2e;&#99;&#x6f;&#109;" data-bare-link="true">&#x72;&#x69;&#99;&#104;&#97;&#x72;&#x64;&#64;&#100;&#101;&#118;&#x73;&#116;&#114;&#x75;&#x63;&#x74;&#117;&#114;&#x65;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#x72;&#105;&#99;&#x68;&#97;&#114;&#x64;&#x40;&#100;&#x65;&#118;&#115;&#x74;&#114;&#117;&#x63;&#x74;&#117;&#x72;&#101;&#x2e;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#x69;&#x63;&#x68;&#97;&#114;&#100;&#64;&#100;&#101;&#x76;&#115;&#x74;&#x72;&#x75;&#x63;&#116;&#x75;&#114;&#x65;&#46;&#99;&#111;&#x6d;</a></p>
 
 
   <ol class='man-decor man-foot man foot'>

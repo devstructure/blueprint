@@ -88,7 +88,7 @@
 
 <p><code>blueprint-create</code> creates a list of all installed packages and modified configuration files and stores it in the branch <em>name</em> in the local blueprint repository with the commit <em>message</em> (if given).</p>
 
-<p>If one of <code>--puppet</code>, <code>--chef</code>, or <code>--sh</code> is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to <code>stdout</code>.  If <code>--ignore</code> is given, the <span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span> rules used to create the blueprint will be printed to <code>stdout</code>.</p>
+<p>If one of <code>--puppet</code>, <code>--chef</code>, or <code>--sh</code> is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to <code>stdout</code>.  If <code>--ignore</code> is given, the <code>blueprintignore</code>(5) rules used to create the blueprint will be printed to <code>stdout</code>.</p>
 
 <p>Debian packages, Ruby gems, Python packages, and PHP PEAR/PECL packages are enumerated in the blueprint.  Debian packages that are listed as <code>essential</code>, <code>important</code>, <code>required</code>, or <code>standard</code> and those that are depended upon by <code>ubuntu-minimal</code>, <code>ubuntu-standard</code>, or <code>ubuntu-desktop</code> are ignored.</p>
 
@@ -96,7 +96,7 @@
 
 <p>Anything installed in <code>/usr/local</code> will be archived and included in the blueprint, tagged with the architecture (<em>amd64</em> or <em>i386</em>) of the server.</p>
 
-<p><span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span> provides means for ignoring specific files and packages plus treating arbitrary directories as <code>/usr/local</code> is treated.</p>
+<p><code>blueprintignore</code>(5) provides means for ignoring specific files and packages plus treating arbitrary directories as <code>/usr/local</code> is treated.</p>
 
 <h2 id="OPTIONS">OPTIONS</h2>
 
@@ -116,7 +116,7 @@
 
 <dl>
 <dt><code>~/.blueprints.git</code></dt><dd>The local repsitory where blueprints are stored, each on its own branch.</dd>
-<dt><code>~/.blueprintignore</code></dt><dd>A list of filename patterns to be ignored when creating blueprints.  See <span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span>.</dd>
+<dt><code>~/.blueprintignore</code></dt><dd>A list of filename patterns to be ignored when creating blueprints.  See <code>blueprintignore</code>(5).</dd>
 </dl>
 
 
@@ -126,16 +126,16 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#x72;&#x69;&#99;&#x68;&#x61;&#x72;&#x64;&#x40;&#100;&#101;&#x76;&#x73;&#x74;&#114;&#x75;&#x63;&#116;&#117;&#x72;&#101;&#46;&#x63;&#111;&#x6d;" data-bare-link="true">&#114;&#x69;&#x63;&#x68;&#x61;&#114;&#100;&#64;&#x64;&#x65;&#x76;&#115;&#116;&#114;&#x75;&#x63;&#116;&#x75;&#114;&#x65;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#111;&#58;&#114;&#x69;&#99;&#104;&#97;&#114;&#x64;&#64;&#100;&#x65;&#118;&#x73;&#116;&#x72;&#x75;&#x63;&#x74;&#117;&#x72;&#101;&#x2e;&#99;&#x6f;&#109;" data-bare-link="true">&#x72;&#x69;&#x63;&#x68;&#97;&#114;&#100;&#64;&#x64;&#101;&#118;&#x73;&#116;&#114;&#117;&#x63;&#x74;&#117;&#114;&#x65;&#46;&#x63;&#111;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p>Part of <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
+<p>Part of <code>blueprint</code>(1).</p>
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>July 2011</li>
+    <li class='tc'>August 2011</li>
     <li class='tr'>blueprint-create(1)</li>
   </ol>
 
