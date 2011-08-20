@@ -775,7 +775,7 @@ def files(b):
                     b.add_service_package(manager,
                                           service,
                                           'yum',
-                                          *yum_packages)
+                                          *_rpm_qf(pathname))
             except ValueError:
                 pass
 
@@ -856,6 +856,25 @@ def _dpkg_md5sum(package, pathname):
         pass
 
     return None
+
+
+def _rpm_qf(pathname):
+    """
+    Return a list of package names that contain `pathname` or `[]`.  RPM
+    might not actually support a single pathname being claimed by more
+    than one package but `dpkg` does so the interface is maintained.
+    """
+    try:
+        p = subprocess.Popen(['rpm', '--qf=%{NAME}', '-qf', pathname],
+                             close_fds=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+    except OSError:
+        return []
+    stdout, stderr = p.communicate()
+    if 0 != p.returncode:
+        return []
+    return [stdout]
 
 
 def _rpm_md5sum(pathname):
