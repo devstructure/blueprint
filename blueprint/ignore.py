@@ -29,8 +29,10 @@ IGNORE = {'*~': False,
           '/etc/blkid/blkid.tab': False,
           '/etc/ca-certificates.conf': False,
           '/etc/console-setup': False,
+
           # TODO Only if it's a symbolic link to ubuntu.
           '/etc/dpkg/origins/default': False,
+
           '/etc/fstab': False,
           '/etc/group-': False,
           '/etc/group': False,
@@ -45,7 +47,10 @@ IGNORE = {'*~': False,
           '/etc/mailcap': False,
           '/etc/mtab': False,
           '/etc/modules': False,
-          '/etc/motd': False,  # TODO Only if it's a symbolic link to /var/run/motd.
+
+          # TODO Only if it's a symbolic link to /var/run/motd.
+          '/etc/motd': False,
+
           '/etc/network/interfaces': False,
           '/etc/passwd-': False,
           '/etc/passwd': False,
@@ -67,7 +72,11 @@ IGNORE = {'*~': False,
           '/etc/ssh/ssh_host_key*': False,
           '/etc/ssh/ssh_host_*_key*': False,
           '/etc/ssl/certs': False,
+          '/etc/sysconfig/clock': False,
+          '/etc/sysconfig/i18n': False,
+          '/etc/sysconfig/keyboard': False,
           '/etc/sysconfig/network': False,
+          '/etc/sysconfig/network-scripts': False,
           '/etc/timezone': False,
           '/etc/udev/rules.d/70-persistent-*.rules': False,
           '/etc/yum.repos.d': True}
