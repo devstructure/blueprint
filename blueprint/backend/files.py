@@ -83,6 +83,15 @@ MD5SUMS = {'/etc/adduser.conf': ['/usr/share/adduser/adduser.conf'],
            '/etc/ufw/before6.rules': ['/usr/share/ufw/before6.rules'],
            '/etc/ufw/ufw.conf': ['/usr/share/ufw/ufw.conf']}
 
+for pathname, overrides in MD5SUMS.iteritems():
+    for i in range(len(overrides)):
+        if '/' != overrides[i][0]:
+            continue
+        try:
+            overrides[i] = hashlib.md5(open(overrides[i]).read()).hexdigest()
+        except IOError:
+            pass
+
 
 def files(b):
     logging.info('searching for configuration files')
@@ -147,34 +156,21 @@ def files(b):
                 continue
 
             # Ignore files that are from the `base-files` package (which
-            # doesn't include MD5 sums for every file for some reason),
-            # are unchanged from their packaged version, or match in `MD5SUMS`.
+            # doesn't include MD5 sums for every file for some reason).
             apt_packages = _dpkg_query_S(pathname)
-            yum_packages = _rpm_qf(pathname)
-            packages = apt_packages + yum_packages
-            if 'base-files' in packages:
+            if 'base-files' in apt_packages:
                 continue
-            if 0 < len(packages):
-                md5sums = [_dpkg_md5sum(package, pathname)
-                           for package in packages]
-            elif pathname in MD5SUMS:
-                md5sums = MD5SUMS[pathname]
-                for i in range(len(md5sums)):
-                    if '/' != md5sums[i][0]:
-                        continue
-                    try:
-                        md5sums[i] = hashlib.md5(open(
-                            md5sums[i]).read()).hexdigest()
-                    except IOError:
-                        pass
-            else:
-                md5sums = []
-            if 0 < len(md5sums) \
-                and hashlib.md5(content).hexdigest() in md5sums \
-                and ignore.file(pathname, True):
-                continue
-            if any([not _rpm_V(package, pathname) for package in packages]) \
-                and ignore.file(pathname, True):
+
+            # Ignore files that are unchanged from their packaged version,
+            # or match in MD5SUMS.
+            md5sums = MD5SUMS.get(pathname, [])
+            md5sums.extend([_dpkg_md5sum(package, pathname)
+                            for package in apt_packages])
+            md5sum = _rpm_md5sum(pathname)
+            if md5sum is not None:
+                md5sums.append(md5sum)
+            if hashlib.md5(content).hexdigest() in md5sums \
+               and ignore.file(pathname, True):
                 continue
 
             # A symbolic link's content is the link target.
@@ -281,24 +277,6 @@ def _dpkg_md5sum(package, pathname):
     `pathname` does not come from a Debian package.
     """
 
-    # Cache the MD5 sums for files in this package.
-    if not hasattr(_dpkg_md5sum, '_cache'):
-        _dpkg_md5sum._cache = defaultdict(dict)
-    if package not in _dpkg_md5sum._cache:
-        cache_ref = _dpkg_md5sum._cache[package]
-        try:
-            for line in open('/var/lib/dpkg/info/{0}.md5sums'.format(package)):
-                md5sum, rel_pathname = line.split(None, 1)
-                cache_ref['/{0}'.format(rel_pathname.rstrip())] = md5sum
-        except IOError:
-            pass
-
-    # Return this file's MD5 sum, if it can be found.
-    try:
-        return _dpkg_md5sum._cache[package][pathname]
-    except KeyError:
-        pass
-
     # Cache any MD5 sums stored in the status file.  These are typically
     # conffiles and the like.
     if not hasattr(_dpkg_md5sum, '_status_cache'):
@@ -320,44 +298,44 @@ def _dpkg_md5sum(package, pathname):
     except KeyError:
         pass
 
+    # Cache the MD5 sums for files in this package.
+    if not hasattr(_dpkg_md5sum, '_cache'):
+        _dpkg_md5sum._cache = defaultdict(dict)
+    if package not in _dpkg_md5sum._cache:
+        cache_ref = _dpkg_md5sum._cache[package]
+        try:
+            for line in open('/var/lib/dpkg/info/{0}.md5sums'.format(package)):
+                md5sum, rel_pathname = line.split(None, 1)
+                cache_ref['/{0}'.format(rel_pathname.rstrip())] = md5sum
+        except IOError:
+            pass
+
+    # Return this file's MD5 sum, if it can be found.
+    try:
+        return _dpkg_md5sum._cache[package][pathname]
+    except KeyError:
+        pass
+
     return None
 
 
-def _rpm_qf(pathname):
+def _rpm_md5sum(pathname):
     """
-    Return a list of package names that contain `pathname` or `[]`.  RPM
-    might not actually support a single pathname being claimed by more
-    than one package but `dpkg` does so the interface is maintained.
+    Find the MD5 sum of the packaged version of pathname or `None` if the
+    `pathname` does not come from an RPM.
     """
-    try:
-        p = subprocess.Popen(['rpm', '--qf=%{NAME}\n', '-qf', pathname],
-                             close_fds=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-    except OSError:
-        return []
-    stdout, stderr = p.communicate()
-    if 0 != p.returncode:
-        return []
-    return [stdout.rstrip()]
-
-def _rpm_V(package, pathname):
-    """
-    Return `True` if the given file has not been modified from its
-    packaged state.
-    """
-    try:
-        p = subprocess.Popen(['rpm', '-V', package],
-                             close_fds=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-    except OSError:
-        return True
-    stdout, stderr = p.communicate()
-    if 0 == p.returncode:
-        return True
-    pattern = re.compile(r'^..5......  . {0}$'.format(pathname))
-    for line in stdout.splitlines():
-        if pattern.match(line) is not None:
-            return False
-    return True
+    if not hasattr(_rpm_md5sum, '_cache'):
+        _rpm_md5sum._cache = {}
+        try:
+            p = subprocess.Popen(['rpm', '-qa', '--dump'],
+                                 close_fds=True,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            pattern = re.compile(r'^(/etc/\S+) \d+ \d+ ([0-9a-f]{32}) ')
+            for line in p.stdout:
+                match = pattern.match(line)
+                if match is not None:
+                    _rpm_md5sum._cache[match.group(1)] = match.group(2)
+        except OSError:
+            pass
+    return _rpm_md5sum._cache.get(pathname, None)
