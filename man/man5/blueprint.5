@@ -1,55 +1,86 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINT\.CFG" "5" "August 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINT" "5" "August 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
-\fBblueprint\.cfg\fR \- centralized blueprint service configuration
+\fBblueprint\fR \- blueprint JSON format
 .
 .SH "SYNOPSIS"
 .
 .nf
 
-[io]
-server = https://devstructure\.com
-secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_\-
+{
+  "arch": "ARCHITECTURE",
+  "files": {
+    "PATHNAME": {
+      "owner": "OWNER",
+      "group": "GROUP",
+      "mode": "MODE",
+      "content": "CONTENT",
+      "encoding": "ENCODING"
+    }
+  },
+  "packages": {
+    "MANAGER": {
+      "PACKAGE": ["VERSION"],
+      "PACKAGE": ["VERSION", "VERSION"]
+    },
+    "MANAGER": {
+      "PACKAGE": ["VERSION"],
+      "PACKAGE": ["VERSION"]
+    }
+  },
+  "services": {
+    "MANAGER": {
+      "SERVICENAME": {
+        "files": ["PATHNAME"],
+        "packages": {
+          "MANAGER": ["PACKAGE"]
+        },
+        "sources": ["DIRNAME"]
+      }
+    }
+  },
+  "sources": {
+    "DIRNAME": "FILENAME"
+  }
+}
 .
 .fi
 .
+.P
+(Keys and values written in CAPITALS represent variable data\.)
+.
 .SH "DESCRIPTION"
-\fB/etc/blueprint\.cfg\fR or \fB~/\.blueprint\.cfg\fR allow customizing the configuration of Blueprint and Blueprint I/O\. Blueprint I/O will prompt you with snippets that can be used in these files when you perform pushes and pulls for the first time\.
+\fBblueprint\-create\fR(1) commits \fBblueprint\.json\fR to the appropriate branch in the local blueprint repository\. The format described here is used to generate Puppet modules, Chef cookbooks, and POSIX shell scripts in \fBblueprint\-show\fR(1) and \fBblueprint\-apply\fR(1)\. These sections must be followed in order\.
+.
+.SS "Sources"
+Each key in the optional \fBsources\fR object is the fully\-qualified path to a directory\. These directory names should be traversed in alphabetical order\. The associated value is the name of a tarball of the contents of that directory at the time the blueprint was created\. It must be extracted there when the blueprint is applied\. The tarball is stored in Git alongside \fBblueprint\.json\fR\.
 .
 .P
-The file is INI\-style and divided into sections, of which there is only one, currently\.
+If \fBsources\fR is present and non\-empty, \fBarch\fR will also be present indicating the architecture of the server that created the blueprint\. If present, this value will be \fIamd64\fR or \fIi386\fR on Debian\-based systems or \fIx86_64\fR or \fIx86\fR on RPM\-based systems\. It is legal to refuse to apply a blueprint with a mismatched architecture\. The architecture can be found by running \fBdpkg \-\-print\-architecture\fR or \fBrpm \-\-eval %_arch\fR as appropriate\.
 .
-.SS "[io]"
+.SS "Files"
+Each key in the optional \fBfiles\fR object is the fully\-qualified pathname to a file\. These pathnames should be traversed in alphabetical order\. The associated value contains the \fBowner\fR, owning \fBgroup\fR, \fBmode\fR (a string containing the full 6\-digit octal representation), \fBcontent\fR, and the \fBencoding\fR of content (one of \fIplain\fR or \fIbase64\fR)\. Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied\.
 .
-.TP
-\fBsecret\fR
-The 64\-byte secret key used for all \fBblueprint\-push\fR(1) calls and \fBblueprint\-pull\fR(1) calls that don\'t specify a full URL\.
+.SS "Packages"
+Each key within \fBpackages\fR names a package manager\. Each manager contains keys that name packages to be installed by that manager\. Each package name is associated with an array of versions that must be installed\. In most cases, for most managers, this array will have only one element\.
 .
-.TP
-\fBserver\fR
-The Blueprint I/O Server that receives push and pull calls\. \fBhttps://devstructure\.com\fR by default\.
+.P
+Each manager is itself the name of a package that appears elsewhere\. \fBpackages\fR must be processed by starting with the \fBapt\fR and \fByum\fR managers, installing their dependencies\. Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed\.
 .
-.SH "FILES"
+.SS "Services"
+Each key within \fBservices\fR names a service manager\. Each manager contains keys that name services on the system\. Each service name is associated with a set of dependencies which themselves take a form much like a blueprint: \fBfiles\fR may be present and point to a list of pathnames; \fBpackages\fR may be present and point to a set of package managers which each point to a list of packages; \fBsources\fR may be present and point to a list of directory names\.
 .
-.TP
-\fB/etc/blueprint\.cfg\fR, \fB~/\.blueprint\.cfg\fR
-Optional INI\-style configuration files\.
+.P
+If any of the resources on which the service depends are changed, upgraded, initailized, or otherwise acted upon, the service should be restarted\.
 .
 .SH "THEME SONG"
-Girl Talk \- "Let It Out"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
 .
 .SH "AUTHOR"
-.
-.IP "\(bu" 4
-Matt Tanase \fImatt@devstructure\.com\fR
-.
-.IP "\(bu" 4
 Richard Crowley \fIrichard@devstructure\.com\fR
 .
-.IP "" 0
-.
 .SH "SEE ALSO"
-Part of \fBblueprint\fR(1)\.
+\fBblueprint\fR(1)\.
