@@ -882,18 +882,47 @@ def _rpm_md5sum(pathname):
     Find the MD5 sum of the packaged version of pathname or `None` if the
     `pathname` does not come from an RPM.
     """
+
     if not hasattr(_rpm_md5sum, '_cache'):
         _rpm_md5sum._cache = {}
+        symlinks = []
         try:
             p = subprocess.Popen(['rpm', '-qa', '--dump'],
                                  close_fds=True,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
-            pattern = re.compile(r'^(/etc/\S+) \d+ \d+ ([0-9a-f]{32}) ')
+            pattern = re.compile(r'^(/etc/\S+) \d+ \d+ ([0-9a-f]+) ' # No ,
+                                  '(0\d+) \S+ \S+ \d \d \d (\S+)$')
             for line in p.stdout:
                 match = pattern.match(line)
-                if match is not None:
+                if match is None:
+                    continue
+                if '0120777' == match.group(3):
+                    symlinks.append((match.group(1), match.group(4)))
+                else:
                     _rpm_md5sum._cache[match.group(1)] = match.group(2)
+
+            # Find the MD5 sum of the targets of any symbolic links, even
+            # if the target is outside of /etc.
+            pattern = re.compile(r'^(/\S+) \d+ \d+ ([0-9a-f]+) ' # No ,
+                                  '(0\d+) \S+ \S+ \d \d \d (\S+)$')
+            for pathname, target in symlinks:
+                if '/' != target[0]:
+                    target = os.path.normpath(os.path.join(
+                        os.path.dirname(pathname), target))
+                if target in _rpm_md5sum._cache:
+                    _rpm_md5sum._cache[pathname] = _rpm_md5sum._cache[target]
+                else:
+                    p = subprocess.Popen(['rpm', '-qf', '--dump', target],
+                                         close_fds=True,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.PIPE)
+                    for line in p.stdout:
+                        match = pattern.match(line)
+                        if match is not None and target == match.group(1):
+                            _rpm_md5sum._cache[pathname] = match.group(2)
+
         except OSError:
             pass
+
     return _rpm_md5sum._cache.get(pathname, None)
