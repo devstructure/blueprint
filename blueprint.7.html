@@ -95,7 +95,7 @@ b.sh().dumpf(gzip=True)
 
 <h3 id="blueprint-Blueprint">blueprint.Blueprint</h3>
 
-<p>The <code>blueprint.Blueprint</code> class manages blueprints stored in the local blueprint repository using the <code>git</code>(1) tools.  New blueprints are created by passing the <code>create=True</code> keyword argument to <code>blueprint.Blueprint</code>.  Previously committed blueprints are referenced by passing the <code>name=</code><em>name</em> keyword argument and optionally <code>commit=</code><em>commit</em>.</p>
+<p>The <code>blueprint.Blueprint</code> class manages blueprints stored in the local blueprint repository using the <span class="man-ref"><code>git</code><span class="s">(1)</span></span> tools.  New blueprints are created by passing the <code>create=True</code> keyword argument to <code>blueprint.Blueprint</code>.  Previously committed blueprints are referenced by passing the <code>name=</code><em>name</em> keyword argument and optionally <code>commit=</code><em>commit</em>.</p>
 
 <p><code>blueprint.Blueprint</code> objects may be subtracted from one another.</p>
 
@@ -104,7 +104,7 @@ b.sh().dumpf(gzip=True)
 <dl>
 <dt class="flush"><code>arch</code></dt><dd>The architecture of the system that created the blueprint.  Only present if the blueprint contains source tarballs.</dd>
 <dt class="flush"><code>files</code></dt><dd>A dictionary that maps path names to file properties.  Each object contains <code>content</code>, <code>encoding</code>, <code>group</code>, <code>mode</code>, and <code>owner</code>.</dd>
-<dt><code>managers</code></dt><dd>A computed dictionary of each package manager mapped to its package manager.  Useful for reversing the algorithm described in <code>blueprint</code>(5).</dd>
+<dt><code>managers</code></dt><dd>A computed dictionary of each package manager mapped to its package manager.  Useful for reversing the algorithm described in <span class="man-ref"><code>blueprint</code><span class="s">(5)</span></span>.</dd>
 <dt class="flush"><code>name</code></dt><dd>This blueprint's name.</dd>
 <dt><code>packages</code></dt><dd>A dictionary of package managers that map to dictionaries of managed packages mapped to a list of version numbers to be installed.</dd>
 <dt><code>services</code></dt><dd>A dictionary of service managers that map to dictionaries of managed services mapped to resources on which the service depends.</dd>
@@ -118,7 +118,7 @@ b.sh().dumpf(gzip=True)
 
 <p><code>puppet()</code>, <code>chef()</code>, <code>sh()</code> return <code>Manifest</code>, <code>Cookbook</code>, and <code>Script</code> objects, respectively.  See the next section.</p>
 
-<p><code>walk()</code> is a generic implementation of the algorithm described in <code>blueprint</code>(5) which accepts callbacks as keyword arguments:</p>
+<p><code>walk()</code> is a generic implementation of the algorithm described in <span class="man-ref"><code>blueprint</code><span class="s">(5)</span></span> which accepts callbacks as keyword arguments:</p>
 
 <dl>
 <dt><code>before_sources():</code>
@@ -172,7 +172,7 @@ Executed after a service manager's dependencies are enumerated.</dt><dd></dd>
 
 <h3 id="blueprint-backend">blueprint.backend</h3>
 
-<p>The <code>blueprint.backend</code> module implements <code>blueprint-create</code>(1).  Each module within (for example, <code>blueprint.backend.apt</code>) must contain a function by the same name (in the example, <code>blueprint.backend.apt.apt</code>) which accepts a <code>blueprint.Blueprint</code> object as its only argument.  When <code>blueprint.backend</code> is imported, it finds all such functions, lists them in <code>blueprint.backend.__all__</code>, and imports the function.  Use the backend functions thus:</p>
+<p>The <code>blueprint.backend</code> module implements <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>.  Each module within (for example, <code>blueprint.backend.apt</code>) must contain a function by the same name (in the example, <code>blueprint.backend.apt.apt</code>) which accepts a <code>blueprint.Blueprint</code> object as its only argument.  When <code>blueprint.backend</code> is imported, it finds all such functions, lists them in <code>blueprint.backend.__all__</code>, and imports the function.  Use the backend functions thus:</p>
 
 <pre><code>import blueprint
 b = blueprint.Blueprint()
@@ -183,7 +183,7 @@ for funcname in blueprint.backend.__all__:
 
 <h3 id="blueprint-git">blueprint.git</h3>
 
-<p>The <code>blueprint.git</code> module exposes the <code>git</code>(1) tools to Python via the standard <code>subprocess</code> module.  <code>blueprint.git.git</code> is a direct proxy to running arbitrary Git commands.  Several commands have been wrapped specially to expose their results:</p>
+<p>The <code>blueprint.git</code> module exposes the <span class="man-ref"><code>git</code><span class="s">(1)</span></span> tools to Python via the standard <code>subprocess</code> module.  <code>blueprint.git.git</code> is a direct proxy to running arbitrary Git commands.  Several commands have been wrapped specially to expose their results:</p>
 
 <dl>
 <dt><code>blueprint.git.rev_parse(</code><em>refname</em><code>)</code></dt><dd>Return the commit associated with <em>refname</em>.</dd>
@@ -198,7 +198,7 @@ for funcname in blueprint.backend.__all__:
 
 <h3 id="blueprint-context_managers">blueprint.context_managers</h3>
 
-<p>The <code>blueprint.context_managers</code> module implements context managers used throughout <code>blueprint</code>(1).</p>
+<p>The <code>blueprint.context_managers</code> module implements context managers used throughout <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
 
 <dl>
 <dt><code>blueprint.context_managers.cd(</code><em>new_cwd</em><code>)</code></dt><dd>Execute in a different working directory.  The property <code>old_cwd</code> is available on the context object containing the previous working directory.</dd>
@@ -228,11 +228,11 @@ for funcname in blueprint.backend.__all__:
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#114;&#x69;&#99;&#x68;&#97;&#x72;&#x64;&#64;&#100;&#x65;&#118;&#x73;&#116;&#x72;&#117;&#x63;&#116;&#x75;&#x72;&#x65;&#x2e;&#x63;&#111;&#109;" data-bare-link="true">&#x72;&#x69;&#99;&#104;&#x61;&#x72;&#x64;&#64;&#100;&#x65;&#x76;&#115;&#116;&#114;&#117;&#x63;&#x74;&#x75;&#114;&#x65;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x72;&#x69;&#x63;&#x68;&#97;&#x72;&#100;&#x40;&#x64;&#101;&#118;&#115;&#x74;&#x72;&#117;&#x63;&#116;&#x75;&#114;&#x65;&#46;&#99;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#105;&#99;&#104;&#97;&#114;&#100;&#x40;&#x64;&#x65;&#x76;&#115;&#116;&#x72;&#x75;&#x63;&#x74;&#117;&#114;&#x65;&#x2e;&#99;&#111;&#109;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p>Part of <code>blueprint</code>(1).</p>
+<p>Part of <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
 
 
   <ol class='man-decor man-foot man foot'>
