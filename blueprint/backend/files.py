@@ -708,7 +708,9 @@ def files(b):
             md5sum = _rpm_md5sum(pathname)
             if md5sum is not None:
                 md5sums.append(md5sum)
-            if hashlib.md5(content).hexdigest() in md5sums \
+            if (hashlib.md5(content).hexdigest() in md5sums \
+                or 64 in [len(md5sum) for md5sum in md5sums] \
+                   and hashlib.sha256(content).hexdigest() in md5sums) \
                and ignore.file(pathname, True):
                 continue
 
