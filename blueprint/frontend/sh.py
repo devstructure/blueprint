@@ -127,6 +127,12 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
             s.add('/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
                   'which update_rubygems)', match.group(1))
 
+        if 'nodejs' == package:
+            s.add('which npm || {{ ' # No ,
+                  'curl http://npmjs.org/install.sh || ' # No ,
+                  'wget -O- http://npmjs.org/install.sh ' # No ,
+                  '}} | sh')
+
     def service(manager, service):
         s.add(manager(service))
 

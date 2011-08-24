@@ -115,6 +115,14 @@ def puppet(b, relaxed=False):
                     'which update_rubygems)"'.format(match.group(1)),
                     require=Package.ref(package)))
 
+            if 'nodejs' == package:
+                m['packages'][manager].add(Exec('/bin/sh -c " { ' # No ,
+                    'curl http://npmjs.org/install.sh || ' # No ,
+                    'wget -O- http://npmjs.org/install.sh ' # No ,
+                    '} | sh"',
+                    creates='/usr/bin/npm',
+                    require=Package.ref(package)))
+
         # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
         # built in provider.  This is called simply "rubygems" on
         # RPM-based distros.
