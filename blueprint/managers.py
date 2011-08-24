@@ -99,7 +99,7 @@ class PackageManager(unicode):
             arg = package if relaxed else '{0}-{1}'.format(package, version)
             return 'pecl install {0}'.format(arg)
 
-        if 'npm' == self:
+        if 'nodejs' == self:
             arg = package if relaxed else '{0}@{1}'.format(package, version)
             return 'npm install -g {0}'.format(arg)
 

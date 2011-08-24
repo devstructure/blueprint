@@ -1,5 +1,8 @@
 """
-Search for npm packages to include in the blueprint.
+Search for npm packages to include in the blueprint.  This assumes that
+Node itself is installed via Chris Lea's PPAs, either
+<https://launchpad.net/~chris-lea/+archive/node.js> or
+<https://launchpad.net/~chris-lea/+archive/node.js-devel>.
 """
 
 import logging
@@ -25,6 +28,6 @@ def npm(b):
             if match is None:
                 continue
             package, version = match.group(1), match.group(2)
-            b.add_package('npm', package, version)
+            b.add_package('nodejs', package, version)
     except OSError:
         pass
