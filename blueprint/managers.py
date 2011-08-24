@@ -99,6 +99,10 @@ class PackageManager(unicode):
             arg = package if relaxed else '{0}-{1}'.format(package, version)
             return 'pecl install {0}'.format(arg)
 
+        if 'npm' == self:
+            arg = package if relaxed else '{0}@{1}'.format(package, version)
+            return 'npm install -g {0}'.format(arg)
+
         if relaxed:
             return ': unknown manager {0} for {1}'.format(self, package)
         else:
