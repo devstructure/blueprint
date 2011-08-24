@@ -683,7 +683,8 @@ def files(b):
             # Ignore ignored files and files that share their ctime with other
             # files in the directory.  This is a very strong indication that
             # the file is original to the system and should be ignored.
-            if ignored or 1 < ctimes[s.st_ctime]:
+            if ignored or 1 < ctimes[s.st_ctime] and ignore.file(pathname,
+                                                                 True):
                 continue
 
             # The content is used even for symbolic links to determine whether
