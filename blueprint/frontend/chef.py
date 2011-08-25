@@ -97,6 +97,13 @@ def chef(b, relaxed=False):
                           '$(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
                           'which update_rubygems)"'.format(match.group(1)))
 
+            if 'nodejs' == package:
+                c.execute('{ ' # No ,
+                          'curl http://npmjs.org/install.sh || ' # No ,
+                          'wget -O- http://npmjs.org/install.sh ' # No ,
+                          '} | sh',
+                          creates='/usr/bin/npm')
+
         # All types of gems get to have package resources.
         elif 'rubygems' == manager:
             c.gem_package(package, version=version)
