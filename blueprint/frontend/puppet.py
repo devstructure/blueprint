@@ -184,7 +184,8 @@ def puppet(b, relaxed=False):
            before_packages=before_packages,
            package=package,
            service=service)
-    m['packages'].dep(*[Class.ref(dep) for dep in deps])
+    if 1 < len(deps):
+        m['packages'].dep(*[Class.ref(dep) for dep in deps])
 
     # Strict ordering of classes.  Don't bother with services since
     # they manage their own dependencies.
@@ -195,7 +196,8 @@ def puppet(b, relaxed=False):
         deps.append('files')
     if 0 < len(b.packages):
         deps.append('packages')
-    m.dep(*[Class.ref(dep) for dep in deps])
+    if 1 < len(deps):
+        m.dep(*[Class.ref(dep) for dep in deps])
 
     return m
 
