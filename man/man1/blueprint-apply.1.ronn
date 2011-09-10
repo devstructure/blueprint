@@ -9,7 +9,7 @@ blueprint-apply(1) -- run a blueprint's generated shell code
 
 `blueprint-apply` generated POSIX shell code for the blueprint _name_ and executes it.  It is equivalent to
 
-	blueprint show <name> --sh | sudo sh
+	blueprint show <name> --sh | sh
 
 and provided for convenience and completeness.
 

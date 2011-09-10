@@ -77,6 +77,28 @@ class Blueprint(dict):
         for line in stdout.splitlines():
             yield line.strip()
 
+    @classmethod
+    def load(cls, f, name=None):
+        """
+        Instantiate and return a Blueprint object from a file-like object
+        from which valid blueprint JSON may be read.
+        """
+        b = cls()
+        b.name = name
+        b.update(json.load(f))
+        return b
+
+    @classmethod
+    def loads(cls, s, name=None):
+        """
+        Instantiate and return a Blueprint object from a string containing
+        valid blueprint JSON.
+        """
+        b = cls()
+        b.name = name
+        b.update(json.loads(s))
+        return b
+
     def __init__(self, name=None, commit=None, create=False):
         """
         Construct a blueprint in the new format in a backwards-compatible
@@ -212,7 +234,7 @@ class Blueprint(dict):
         """
         Validate and set the blueprint name.
         """
-        if name is not None and re.search(r'[/ \t\r\n]', name):
+        if name is not None and re.search(r'^$|^-$|[/ \t\r\n]', name):
             raise NameError('invalid blueprint name')
         self._name = name
     name = property(get_name, set_name)

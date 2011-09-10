@@ -3,11 +3,14 @@
 import errno
 import logging
 import optparse
+import os
 import re
+import select
 import subprocess
 import sys
 
 import blueprint
+import blueprint.cli
 from blueprint import context_managers
 
 parser = optparse.OptionParser(
@@ -54,15 +57,8 @@ if options.quiet:
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
-name = args[0]
 
-with context_managers.mkdtemp():
-    try:
-        b = blueprint.Blueprint(name=name, create=True)
-    except blueprint.NameError:
-        logging.error('invalid blueprint name')
-        sys.exit(1)
-    b.commit(options.message or '')
+b = blueprint.cli.create(options, args)
 
 try:
     if options.generate is None:
@@ -75,7 +71,7 @@ try:
             filename = getattr(b, options.generate)(options.relaxed).dumpf()
         except OSError as e:
             if errno.EEXIST == e.errno:
-                logging.error('{0} already exists'.format(name))
+                logging.error('{0} already exists'.format(args[0]))
             sys.exit(1)
         if not options.quiet:
             print(filename)

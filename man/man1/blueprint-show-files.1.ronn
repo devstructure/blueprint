@@ -3,11 +3,13 @@ blueprint-show-files(1) -- show files in a blueprint
 
 ## SYNOPSIS
 
-`blueprint show-files` [`-q`] _name_  
+`blueprint show-files` [`-q`] [_name_]  
 
 ## DESCRIPTION
 
 `blueprint-show-files` prints the fully-qualified pathname of each configuration file (always in `/etc`) in the blueprint _name_.  They are printed one-per-line to make this command useful in pipelines.
+
+If _name_ is omitted or `-`, a blueprint is read from standard input and treated in the same manner.  See `blueprint`(5) for the details of the format.
 
 ## OPTIONS
 

@@ -21,12 +21,11 @@ if options.quiet:
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
-name = args[0]
 
 try:
-    blueprint.Blueprint.destroy(name)
+    blueprint.Blueprint.destroy(args[0])
 except blueprint.NotFoundError:
-    logging.error('blueprint {0} does not exist'.format(name))
+    logging.error('blueprint {0} does not exist'.format(args[0]))
     sys.exit(1)
 except blueprint.NameError:
     logging.error('invalid blueprint name')

@@ -3,11 +3,13 @@ blueprint-show-packages(1) -- show packages in a blueprint
 
 ## SYNOPSIS
 
-`blueprint show-packages` [`-q`] _name_  
+`blueprint show-packages` [`-q`] [_name_]  
 
 ## DESCRIPTION
 
 `blueprint-show-packages` prints the manager, name, and version (separated by spaces) of each package in the blueprint _name_.  They are printed one-per-line to make this command useful in pipelines.
+
+If _name_ is omitted or `-`, a blueprint is read from standard input and treated in the same manner.  See `blueprint`(5) for the details of the format.
 
 ## OPTIONS
 

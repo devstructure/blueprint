@@ -3,11 +3,13 @@ blueprint-show-sources(1) -- show source tarballs in a blueprint
 
 ## SYNOPSIS
 
-`blueprint show-services` [`-q`] _name_  
+`blueprint show-services` [`-q`] [_name_]  
 
 ## DESCRIPTION
 
 `blueprint-show-sources` prints details about each source tarball in the blueprint _name_.  The directory name and tarball filename (separated by spaces) are printed to standard error.  The verbose listing of the tarball's contents are listed by `tar`(1)'s `tv` options.
+
+If _name_ is omitted or `-`, a blueprint is read from standard input and treated in the same manner.  See `blueprint`(5) for the details of the format.
 
 ## OPTIONS
 
