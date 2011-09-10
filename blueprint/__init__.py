@@ -494,6 +494,13 @@ class Blueprint(dict):
 
         callable = kwargs.get('file', lambda *args: None)
         for pathname, f in sorted(self.files.iteritems()):
+
+            # AWS cfn-init templates may specify file content as JSON, which
+            # must be converted to a string here, lest each frontend have to
+            # do so.
+            if 'content' in f and not isinstance(f['content'], basestring):
+                f['content'] = util.json_dumps(f['content'])
+
             callable(pathname, f)
 
         kwargs.get('after_files', lambda *args: None)()
