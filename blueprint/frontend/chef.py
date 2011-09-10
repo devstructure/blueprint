@@ -169,7 +169,10 @@ class Cookbook(object):
     def __init__(self, name, comment=None):
         """
         """
-        self.name = str(name)
+        if name is None:
+            self.name = 'blueprint-generated-chef-cookbook'
+        else:
+            self.name = str(name)
         self.comment = comment
         self.resources = []
         self.files = {}

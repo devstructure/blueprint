@@ -153,7 +153,10 @@ class Script(object):
     """
 
     def __init__(self, name, comment=None):
-        self.name = name
+        if name is None:
+            self.name = 'blueprint-generated-shell-script'
+        else:
+            self.name = name
         self.comment = comment
         self.out = []
         self.sources = {}

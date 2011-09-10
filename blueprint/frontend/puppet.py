@@ -224,7 +224,10 @@ class Manifest(object):
         Each class must have a name and might have a parent.  If a manifest
         has a parent, this signals it to `include` itself in the parent.
         """
-        self.name, count = re.subn(r'\.', '--', unicode(name))
+        if name is None:
+            self.name = 'blueprint-generated-puppet-module'
+        else:
+            self.name, _ = re.subn(r'\.', '--', unicode(name))
         self.parent = parent
         self.comment = comment
         self.manifests = defaultdict(dict)
