@@ -158,7 +158,7 @@ class Blueprint(dict):
                 return
             if 0 == len(b.packages[package]):
                 del b.packages[package]
-                del b.packages[self.managers[package].name][package]
+                del b.packages[self.managers[package]][package]
         while 1:
             l = len(b.packages)
             other.walk(package=package)
