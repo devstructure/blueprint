@@ -398,7 +398,7 @@ class Blueprint(dict):
         for key in ['files', 'packages', 'sources']:
             if key in self and 0 == len(self[key]):
                 del self[key]
-        return util.JSONEncoder(indent=2, sort_keys=True).encode(self)
+        return util.json_dumps(self)
 
     def puppet(self, relaxed=False):
         """

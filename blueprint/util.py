@@ -150,3 +150,6 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, set):
             return list(o)
         return super(JSONEncoder, self).default(o)
+
+def json_dumps(o):
+    return JSONEncoder(indent=2, sort_keys=True).encode(o)
