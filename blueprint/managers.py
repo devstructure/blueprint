@@ -26,6 +26,8 @@ class PackageManager(unicode):
                 return ('[ "$(dpkg-query -f\'${{{{Version}}}}\\n\' -W {0})" '
                         '= "{1}" ]').format(package, version)
 
+        if 'rpm' == self:
+            return 'rpm -q {0} >/dev/null'.format(package)
         if 'yum' == self:
             if relaxed:
                 arg = package
@@ -63,6 +65,11 @@ class PackageManager(unicode):
             arg = package if relaxed else '{0}={1}'.format(package, version)
             return ('apt-get -y -q -o DPkg::Options::=--force-confold '
                     'install {0}').format(arg)
+
+        # AWS cfn-init templates may specify RPMs to be installed from URLs,
+        # which are specified as versions.
+        if 'rpm' == self:
+            return 'rpm -U {0}'.format(version)
 
         if 'yum' == self:
             arg = package if relaxed else '{0}-{1}'.format(package, version)

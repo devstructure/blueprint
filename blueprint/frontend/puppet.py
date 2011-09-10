@@ -124,6 +124,14 @@ def puppet(b, relaxed=False):
                     creates='/usr/bin/npm',
                     require=Package.ref(package)))
 
+        # AWS cfn-init templates may specify RPMs to be installed from URLs,
+        # which are specified as versions.
+        elif 'rpm' == manager:
+            m['packages']['rpm'].add(Package(package,
+                                             ensure='installed',
+                                             provider='rpm',
+                                             source=version))
+
         # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
         # built in provider.  This is called simply "rubygems" on
         # RPM-based distros.

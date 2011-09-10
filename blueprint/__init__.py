@@ -524,9 +524,11 @@ class Blueprint(dict):
           Executed after a package manager's dependencies are enumerated.
         """
 
-        # Walking begins with the system package managers, `apt` and `yum`.
+        # Walking begins with the system package managers, `apt`, `rpm`,
+        # and `yum`.
         if managername is None:
             self.walk_packages('apt', **kwargs)
+            self.walk_packages('rpm', **kwargs)
             self.walk_packages('yum', **kwargs)
             return
 

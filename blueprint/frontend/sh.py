@@ -116,7 +116,7 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
         else:
             s.add(manager(package, version, relaxed))
 
-        if manager not in ('apt', 'yum'):
+        if manager not in ('apt', 'rpm', 'yum'):
             return
 
         # See comments on this section in `blueprint.frontend.puppet`.

@@ -104,6 +104,11 @@ def chef(b, relaxed=False):
                           '} | sh',
                           creates='/usr/bin/npm')
 
+        # AWS cfn-init templates may specify RPMs to be installed from URLs,
+        # which are specified as versions.
+        elif 'rpm' == manager:
+            c.rpm_package(package, source=version)
+
         # All types of gems get to have package resources.
         elif 'rubygems' == manager:
             c.gem_package(package, version=version)
@@ -200,6 +205,12 @@ class Cookbook(object):
         Create a package resource provided by the default provider.
         """
         self.add(Resource('package', name, **kwargs))
+
+    def rpm_package(self, name, **kwargs):
+        """
+        Create a package resource provided by RPM.
+        """
+        self.add(Resource('rpm_package', name, **kwargs))
 
     def gem_package(self, name, **kwargs):
         """
