@@ -304,7 +304,11 @@ class Blueprint(dict):
         """
         Create a service resource which depends on given files and packages.
         """
-        self.services[manager][service]
+
+        # AWS cfn-init respects the enable and ensure parameters like Puppet
+        # does.  Blueprint provides these parameters for interoperability.
+        self.services[manager].setdefault(service, {'enable': True,
+                                                    'ensure': 'running'})
 
     def add_service_file(self, manager, service, *args):
         """
