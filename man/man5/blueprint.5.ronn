@@ -7,11 +7,18 @@ blueprint(5) -- blueprint JSON format
 	  "arch": "ARCHITECTURE",
 	  "files": {
 	    "PATHNAME": {
-	      "owner": "OWNER",
+	      "content": "CONTENT",
+	      "encoding": "ENCODING",
 	      "group": "GROUP",
 	      "mode": "MODE",
-	      "content": "CONTENT",
-	      "encoding": "ENCODING"
+	      "owner": "OWNER"
+	    },
+	    "PATHNAME": {
+	      "encoding": "ENCODING",
+	      "group": "GROUP",
+	      "mode": "MODE",
+	      "owner": "OWNER",
+	      "source": "SOURCE"
 	    }
 	  },
 	  "packages": {
@@ -22,11 +29,16 @@ blueprint(5) -- blueprint JSON format
 	    "MANAGER": {
 	      "PACKAGE": ["VERSION"],
 	      "PACKAGE": ["VERSION"]
+	    },
+	    "rpm": {
+	      "PACKAGE": ["URL"]
 	    }
 	  },
 	  "services": {
 	    "MANAGER": {
 	      "SERVICENAME": {
+	        "enable": true,
+	        "ensure": "running",
 	        "files": ["PATHNAME"],
 	        "packages": {
 	          "MANAGER": ["PACKAGE"]
@@ -36,7 +48,8 @@ blueprint(5) -- blueprint JSON format
 	    }
 	  },
 	  "sources": {
-	    "DIRNAME": "FILENAME"
+	    "DIRNAME": "FILENAME",
+	    "DIRNAME": "URL"
 	  }
 	}
 
@@ -52,21 +65,29 @@ Each key in the optional `sources` object is the fully-qualified path to a direc
 
 If `sources` is present and non-empty, `arch` will also be present indicating the architecture of the server that created the blueprint.  If present, this value will be _amd64_ or _i386_ on Debian-based systems or _x86_64_ or _x86_ on RPM-based systems.  It is legal to refuse to apply a blueprint with a mismatched architecture.  The architecture can be found by running `dpkg --print-architecture` or `rpm --eval %_arch` as appropriate.
 
+For compatibility with AWS `cfn-init`, a URL may appear in the value in place of a filename.  If such a value is encountered, the URL should be fetched and extracted.  Blueprint will never generate such objects.
+
 ### Files
 
 Each key in the optional `files` object is the fully-qualified pathname to a file.  These pathnames should be traversed in alphabetical order.  The associated value contains the `owner`, owning `group`, `mode` (a string containing the full 6-digit octal representation), `content`, and the `encoding` of content (one of _plain_ or _base64_).  Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied.
+
+For compatibility with AWS `cfn-init`, `source` takes precedence over the `content`.  If a file with a `source` is encountered, the `source` URL should be fetched as the file's content.  Blueprint will never generate such objects.
 
 ### Packages
 
 Each key within `packages` names a package manager.  Each manager contains keys that name packages to be installed by that manager.  Each package name is associated with an array of versions that must be installed.  In most cases, for most managers, this array will have only one element.
 
-Each manager is itself the name of a package that appears elsewhere.  `packages` must be processed by starting with the `apt` and `yum` managers, installing their dependencies.  Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.
+Each manager is itself the name of a package that appears elsewhere.  `packages` must be processed by starting with the `apt`, `rpm`, and `yum` managers, installing their dependencies.  Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.
+
+For compatibility with AWS `cfn-init`, the `rpm` manager is included.  Packages managed by `rpm` specify URLs in place of version numbers.  If such a package is encountered, the URL should be installed via `rpm`(1).  Blueprint will never generate such objects.
 
 ### Services
 
 Each key within `services` names a service manager.  Each manager contains keys that name services on the system.  Each service name is associated with a set of dependencies which themselves take a form much like a blueprint: `files` may be present and point to a list of pathnames; `packages` may be present and point to a set of package managers which each point to a list of packages; `sources` may be present and point to a list of directory names.
 
 If any of the resources on which the service depends are changed, upgraded, initailized, or otherwise acted upon, the service should be restarted.
+
+For compatibility with AWS `cfn-init`, `"enable": true` and `"ensure": "running"` are included with each service.  Blueprint ignores these when generating code.
 
 ## THEME SONG
 
