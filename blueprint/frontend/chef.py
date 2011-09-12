@@ -21,22 +21,26 @@ def chef(b, relaxed=False):
     """
     c = Cookbook(b.name, comment=b.DISCLAIMER)
 
-    def source(dirname, filename, gen_content):
+    def source(dirname, filename, gen_content, url):
         """
         Create a cookbook_file and execute resource to fetch and extract
         a source tarball.
         """
         pathname = os.path.join('/tmp', filename)
-        c.file(pathname,
-               gen_content(),
-               owner='root',
-               group='root',
-               mode='0644',
-               backup=False,
-               source=pathname[1:])
-        c.execute(filename,
-                  command='tar xf {0}'.format(pathname),
-                  cwd=dirname)
+        if url is not None:
+            c.execute('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"'.
+                          format(filename, url),
+                      creates=pathname,
+                      cwd='/tmp')
+        elif gen_content is not None:
+            c.file(pathname,
+                   gen_content(),
+                   owner='root',
+                   group='root',
+                   mode='0644',
+                   backup=False,
+                   source=pathname[1:])
+        c.execute('tar xf "{0}"'.format(pathname), cwd=dirname)
 
     def file(pathname, f):
         """

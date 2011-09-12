@@ -30,14 +30,17 @@ b = blueprint.cli.read(options, args)
 try:
     commit = git.rev_parse(args[0])
     tree = git.tree(commit)
-    def source(dirname, filename, gen_content):
+    def source(dirname, filename, gen_content, url):
         if args[1:] and dirname not in args[1:]:
             return
-        blob = git.blob(tree, filename)
-        sys.stderr.write('{0} {1}\n'.format(dirname, filename))
-        p = subprocess.Popen(['tar', 'tv'],
-                             close_fds=True,
-                             stdin=git.cat_file(blob))
+        if url is not None:
+            sys.stderr.write('{0} {1}\n'.format(dirname, url))
+        elif gen_content is not None:
+            sys.stderr.write('{0} {1}\n'.format(dirname, filename))
+            blob = git.blob(tree, filename)
+            p = subprocess.Popen(['tar', 'tv'],
+                                 close_fds=True,
+                                 stdin=git.cat_file(blob))
     b.walk_sources(source=source)
 except IOError:
     pass

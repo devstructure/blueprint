@@ -24,23 +24,31 @@ def puppet(b, relaxed=False):
     # Set the default `PATH` for exec resources.
     m.add(Exec.defaults(path=os.environ['PATH']))
 
-    def source(dirname, filename, gen_content):
+    def source(dirname, filename, gen_content, url):
         """
         Create file and exec resources to fetch and extract a source tarball.
         """
         pathname = os.path.join('/tmp', filename)
-        m['sources'].add(File(
-            pathname,
-            b.name,
-            gen_content(),
-            owner='root',
-            group='root',
-            mode='0644',
-            source='puppet:///modules/{0}/{1}'.format(b.name, pathname[1:])))
+        if url is not None:
+            m['sources'].add(Exec(
+                '/bin/sh -c \'curl -o "{0}" "{1}" || wget -O "{0}" "{1}"\''.
+                    format(filename, url),
+                before=Exec.ref(dirname),
+                creates=pathname,
+                cwd='/tmp'))
+        elif gen_content is not None:
+            m['sources'].add(File(
+                pathname,
+                b.name,
+                gen_content(),
+                before=Exec.ref(dirname),
+                owner='root',
+                group='root',
+                mode='0644',
+                source='puppet:///modules/{0}{1}'.format(b.name, pathname)))
         m['sources'].add(Exec('tar xf {0}'.format(pathname),
-                              alias=filename,
-                              cwd=dirname,
-                              require=File.ref(pathname)))
+                              alias=dirname,
+                              cwd=dirname))
 
     def file(pathname, f):
         """

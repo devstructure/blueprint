@@ -36,20 +36,28 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
                     service_package=service_package,
                     service_source=service_source)
 
-    def source(dirname, filename, gen_content):
+    def source(dirname, filename, gen_content, url):
         """
         Extract a source tarball.
         """
+        print(dirname, filename, gen_content, url)
         if dirname in lut['sources']:
             s.add('MD5SUM="$(find "{0}" -printf %T@\\\\n | md5sum)"', dirname)
-        if secret is None:
+        if url is not None:
+            s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"', filename, url)
+            s.add('tar xf "{0}" -C "{1}"', filename, dirname)
+        elif secret is not None:
+            s.add('curl -O "{0}/{1}/{2}/{3}" || wget "{0}/{1}/{2}/{3}"',
+                  server,
+                  secret,
+                  b.name,
+                  filename)
+            s.add('tar xf "{0}" -C "{1}"', filename, dirname)
+        elif gen_content is not None:
             s.add('tar xf "{0}" -C "{1}"',
                   filename,
                   dirname,
                   sources={filename: gen_content()})
-        else:
-            s.add('wget "{0}/{1}/{2}/{3}"', server, secret, b.name, filename)
-            s.add('tar xf "{0}" -C "{1}"', filename, dirname)
         for manager, service in lut['sources'][dirname]:
             s.add('[ "$MD5SUM" != "$(find "{0}" -printf %T@\\\\n ' # No ,
                   '| md5sum)" ] && {1}=1',

@@ -463,22 +463,31 @@ class Blueprint(dict):
 
         * `before_sources():`
           Executed before source tarballs are enumerated.
-        * `source(dirname, filename, gen_content):`
-          Executed when a source tarball is enumerated.  `gen_content`
-          is a callable that will return the file's contents.
+        * `source(dirname, filename, gen_content, url):`
+          Executed when a source tarball is enumerated.  Either `gen_content`
+          or `url` will be `None`.  `gen_content`, when not `None`, is a
+          callable that will return the file's contents.
         * `after_sources():`
           Executed after source tarballs are enumerated.
         """
 
         kwargs.get('before_sources', lambda *args: None)()
 
+        pattern = re.compile(r'^(?:file|ftp|https?)://', re.I)
         callable = kwargs.get('source', lambda *args: None)
         for dirname, filename in sorted(self.sources.iteritems()):
-            def gen_content():
-                tree = git.tree(self._commit)
-                blob = git.blob(tree, filename)
-                return git.content(blob)
-            callable(dirname, filename, gen_content)
+            if pattern.match(filename) is None:
+                def gen_content():
+                    tree = git.tree(self._commit)
+                    blob = git.blob(tree, filename)
+                    return git.content(blob)
+                callable(dirname, filename, gen_content, None)
+            else:
+                url = filename
+                filename = os.path.basename(url)
+                if '' == filename:
+                    filename = 'blueprint-downloaded-tarball.tar.gz'
+                callable(dirname, filename, None, url)
 
         kwargs.get('before_sources', lambda *args: None)()
 
