@@ -1,0 +1,5 @@
+{
+  "sources": {
+    "/foobar": "http://rcrowley.org/work/foobar.tar.gz"
+  }
+}

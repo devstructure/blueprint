@@ -1,0 +1,11 @@
+{
+  "files": {
+    "/etc/foobar": {
+      "content": {"foo": "bar"},
+      "encoding": "plain",
+      "group": "root",
+      "mode": "100644",
+      "owner": "root"
+    }
+  }
+}
