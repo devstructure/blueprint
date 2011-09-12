@@ -74,20 +74,34 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
         if '120000' == f['mode'] or '120777' == f['mode']:
             s.add('ln -s "{0}" "{1}"', f['content'], pathname)
         else:
-            command = 'base64 --decode' if 'base64' == f['encoding'] else 'cat'
-            eof = 'EOF'
-            while re.search(r'{0}'.format(eof), f['content']):
-                eof += 'EOF'
-            s.add('{0} >"{1}" <<{2}', command, pathname, eof)
-            s.add(raw=f['content'])
-            if 0 < len(f['content']) and '\n' != f['content'][-1]:
-                eof = '\n{0}'.format(eof)
-            s.add(eof)
+            if 'source' in f:
+                if 'base64' == f['encoding']:
+                    s.add('{{ curl "{1}" || wget -O- "{1}" }} | ' # No ,
+                          'base64 --decode >"{0}"',
+                          pathname,
+                          f['source'])
+                else:
+                    s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"',
+                          pathname,
+                          f['source'])
+            else:
+                eof = 'EOF'
+                while re.search(r'{0}'.format(eof), f['content']):
+                    eof += 'EOF'
+                s.add(
+                    '{0} >"{1}" <<{2}',
+                    'base64 --decode' if 'base64' == f['encoding'] else 'cat',
+                    pathname,
+                    eof)
+                s.add(raw=f['content'])
+                if 0 < len(f['content']) and '\n' != f['content'][-1]:
+                    eof = '\n{0}'.format(eof)
+                s.add(eof)
             if 'root' != f['owner']:
                 s.add('chown {0} "{1}"', f['owner'], pathname)
             if 'root' != f['group']:
                 s.add('chgrp {0} "{1}"', f['group'], pathname)
-            if '000644' != f['mode']:
+            if '100644' != f['mode']:
                 s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
         for manager, service in lut['files'][pathname]:
             s.add('[ "$MD5SUM" != "$(md5sum "{0}")" ] && {1}=1',
@@ -165,8 +179,9 @@ class Script(object):
             self.name = 'blueprint-generated-shell-script'
         else:
             self.name = name
-        self.comment = comment
-        self.out = []
+        self.out = [comment if comment is not None else '',
+                    'set -x\n',
+                    'cd "$(dirname "$0")"\n']
         self.sources = {}
 
     def add(self, s='', *args, **kwargs):
@@ -200,15 +215,13 @@ class Script(object):
         else:
             filename = '{0}.sh'.format(self.name)
             f = codecs.open(filename, 'w', encoding='utf-8')
-        f.write(self.comment)
-        f.write('cd "$(dirname "$0")"\n')
+        for out in self.out:
+            f.write(out)
+        f.close()
         for filename2, content in sorted(self.sources.iteritems()):
             f2 = open(os.path.join(self.name, filename2), 'w')
             f2.write(content)
             f2.close()
-        for out in self.out:
-            f.write(out)
-        f.close()
         if gzip and 0 != len(self.sources):
             filename = 'sh-{0}.tar.gz'.format(self.name)
             tarball = tarfile.open(filename, 'w:gz')

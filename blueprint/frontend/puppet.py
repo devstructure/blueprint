@@ -32,10 +32,9 @@ def puppet(b, relaxed=False):
         if url is not None:
             m['sources'].add(Exec(
                 '/bin/sh -c \'curl -o "{0}" "{1}" || wget -O "{0}" "{1}"\''.
-                    format(filename, url),
+                    format(pathname, url),
                 before=Exec.ref(dirname),
-                creates=pathname,
-                cwd='/tmp'))
+                creates=pathname))
         elif gen_content is not None:
             m['sources'].add(File(
                 pathname,
@@ -71,16 +70,37 @@ def puppet(b, relaxed=False):
                                 group=f['group'],
                                 ensure=f['content']))
             return
-        content = f['content']
-        if 'base64' == f['encoding']:
-            content = base64.b64decode(content)
-        m['files'].add(File(pathname,
-                            b.name,
-                            content,
-                            owner=f['owner'],
-                            group=f['group'],
-                            mode=f['mode'][-4:],
-                            ensure='file'))
+        if 'source' in f:
+            if 'base64' == f['encoding']:
+                m['files'].add(Exec(
+                    '/bin/sh -c \'{{ curl "{1}" || wget -O- "{1}" }} | ' # No ,
+                    'base64 --decode >"{0}"\''.format(pathname, f['source']),
+                    before=File.ref(pathname),
+                    creates=pathname,
+                    require=File.ref(os.path.dirname(pathname))))
+            else:
+                m['files'].add(Exec(
+                    'curl -o "{0}" "{1}" || wget -O "{0}" "{1}"'.
+                        format(pathname, f['source']),
+                    before=File.ref(pathname),
+                    creates=pathname,
+                    require=File.ref(os.path.dirname(pathname))))
+            m['files'].add(File(pathname,
+                                owner=f['owner'],
+                                group=f['group'],
+                                mode=f['mode'][-4:],
+                                ensure='file'))
+        else:
+            content = f['content']
+            if 'base64' == f['encoding']:
+                content = base64.b64decode(content)
+            m['files'].add(File(pathname,
+                                b.name,
+                                content,
+                                owner=f['owner'],
+                                group=f['group'],
+                                mode=f['mode'][-4:],
+                                ensure='file'))
 
     deps = []
     def before_packages(manager):

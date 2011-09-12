@@ -29,9 +29,8 @@ def chef(b, relaxed=False):
         pathname = os.path.join('/tmp', filename)
         if url is not None:
             c.execute('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"'.
-                          format(filename, url),
-                      creates=pathname,
-                      cwd='/tmp')
+                          format(pathname, url),
+                      creates=pathname)
         elif gen_content is not None:
             c.file(pathname,
                    gen_content(),
@@ -53,20 +52,41 @@ def chef(b, relaxed=False):
                     recursive=True)
         if '120000' == f['mode'] or '120777' == f['mode']:
             c.link(pathname,
-                   owner=f['owner'],
                    group=f['group'],
+                   owner=f['owner'],
                    to=f['content'])
             return
-        content = f['content']
-        if 'base64' == f['encoding']:
-            content = base64.b64decode(content)
-        c.file(pathname,
-               content,
-               owner=f['owner'],
-               group=f['group'],
-               mode=f['mode'][-4:],
-               backup=False,
-               source=pathname[1:])
+        if 'source' in f:
+            if 'base64' == f['encoding']:
+                pass
+                c.execute('{{ curl "{1}" || wget -O- "{1}" }} | ' # No ,
+                          'base64 --decode >"{0}"'.format(pathname,
+                                                          f['source']),
+                          creates=pathname)
+                c.file(pathname,
+                       None,
+                       backup=False,
+                       group=f['group'],
+                       mode=f['mode'][-4:],
+                       owner=f['owner'])
+            else:
+                c.remote_file(pathname,
+                              backup=False,
+                              group=f['group'],
+                              mode=f['mode'][-4:],
+                              owner=f['owner'],
+                              source=f['source'])
+        else:
+            content = f['content']
+            if 'base64' == f['encoding']:
+                content = base64.b64decode(content)
+            c.file(pathname,
+                   content,
+                   backup=False,
+                   group=f['group'],
+                   mode=f['mode'][-4:],
+                   owner=f['owner'],
+                   source=pathname[1:])
 
     def before_packages(manager):
         """
@@ -209,6 +229,12 @@ class Cookbook(object):
         cookbook is dumped to a string or to files.
         """
         self.add(File(name, content, **kwargs))
+
+    def remote_file(self, name, **kwargs):
+        """
+        Create a remote_file resource.
+        """
+        self.add(Resource('remote_file', name, **kwargs))
 
     def package(self, name, **kwargs):
         """
@@ -391,6 +417,6 @@ class File(Resource):
                 del self.content
             self.type = 'file'
             del self['source']
-        else:
+        elif self.content is not None and 'source' in self:
             self.type = 'cookbook_file'
         return super(File, self).dumps(inline)
