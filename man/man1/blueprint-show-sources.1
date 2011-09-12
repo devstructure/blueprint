@@ -1,16 +1,19 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINT\-SHOW\-SOURCES" "1" "August 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINT\-SHOW\-SOURCES" "1" "September 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
 \fBblueprint\-show\-sources\fR \- show source tarballs in a blueprint
 .
 .SH "SYNOPSIS"
-\fBblueprint show\-services\fR [\fB\-q\fR] \fIname\fR
+\fBblueprint show\-services\fR [\fB\-q\fR] [\fIname\fR]
 .
 .SH "DESCRIPTION"
 \fBblueprint\-show\-sources\fR prints details about each source tarball in the blueprint \fIname\fR\. The directory name and tarball filename (separated by spaces) are printed to standard error\. The verbose listing of the tarball\'s contents are listed by \fBtar\fR(1)\'s \fBtv\fR options\.
+.
+.P
+If \fIname\fR is omitted or \fB\-\fR, a blueprint is read from standard input and treated in the same manner\. See \fBblueprint\fR(5) for the details of the format\.
 .
 .SH "OPTIONS"
 .
