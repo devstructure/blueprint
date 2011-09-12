@@ -68,7 +68,10 @@ def chef(b, relaxed=False):
         """
         Create execute resources to configure the package managers.
         """
-        if 0 == len(manager):
+        packages = b.packages.get(manager, [])
+        if 0 == len(packages):
+            return
+        if 1 == len(packages) and manager in packages:
             return
         if 'apt' == manager:
             c.execute('apt-get -q update')
