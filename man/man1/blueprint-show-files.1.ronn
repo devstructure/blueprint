@@ -20,8 +20,8 @@ blueprint-show-files(1) -- show files in a blueprint
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
-* `~/.blueprintignore`:
-  A list of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
+* `/etc/blueprintignore`, `~/.blueprintignore`:
+  Lists of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
 
 ## THEME SONG
 

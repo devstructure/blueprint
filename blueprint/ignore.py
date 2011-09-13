@@ -210,11 +210,12 @@ def _mtime(pathname):
 
 # Check for a fresh cache of the complete blueprintignore(5) rules.
 cache = None
-if _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE) \
+if _mtime('/etc/blueprintignore') < _mtime(CACHE) \
+    and _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE) \
     and _mtime(__file__) < _mtime(CACHE):
     try:
         cache = defaultdict(list, json.load(open(CACHE)))
-        logging.info('using cached blueprintignore rules')
+        logging.info('using cached blueprintignore(5) rules')
     except (OSError, ValueError):
         pass
 
@@ -231,62 +232,67 @@ if cache is None:
                    ('/usr/local', True)],
     })
 
-    # Cache the patterns stored in the `~/.blueprintignore` file.
+    # Cache the patterns stored in the blueprintignore files.
+    logging.info('parsing blueprintignore(5) rules')
     try:
-        f = open(os.path.expanduser('~/.blueprintignore'))
-        logging.info('parsing ~/.blueprintignore')
-        for pattern in f:
-            pattern = pattern.rstrip()
+        for pathname in ('/etc/blueprintignore',
+                         os.path.expanduser('~/.blueprintignore')):
+            f = open(pathname)
+            for pattern in f:
+                pattern = pattern.rstrip()
 
-            # Comments and blank lines.
-            if '' == pattern or '#' == pattern[0]:
-                continue
-
-            # Negated lines.
-            if '!' == pattern[0]:
-                pattern = pattern[1:]
-                negate = True
-            else:
-                negate = False
-
-            # Normalize file resources, which don't need the : and type
-            # qualifier, into the same format as others, like packages.
-            if ':' == pattern[0]:
-                try:
-                    restype, pattern = pattern[1:].split(':', 2)
-                except ValueError:
+                # Comments and blank lines.
+                if '' == pattern or '#' == pattern[0]:
                     continue
-            else:
-                restype = 'file'
 
-            # Ignore a package and its dependencies or unignore a single
-            # package.  Empirically, the best balance of power and granularity
-            # comes from this arrangement.  Take build-esseantial's mutual
-            # dependence with dpkg-dev as an example of why.
-            if 'package' == restype:
-                try:
-                    manager, package = pattern.split('/')
-                except ValueError:
-                    logging.warning('invalid package ignore "{0}"'.
-                                    format(pattern))
-                    continue
-                cache['package'].append((manager, package, negate))
-                if not negate:
-                    for dep in getattr(deps, manager, lambda(s): [])(package):
-                        cache['package'].append((manager, dep, negate))
+                # Negated lines.
+                if '!' == pattern[0]:
+                    pattern = pattern[1:]
+                    negate = True
+                else:
+                    negate = False
 
-            elif 'service' == restype:
-                try:
-                    manager, service = pattern.split('/')
-                except ValueError:
-                    logging.warning('invalid service ignore "{0}"'.
-                                    format(pattern))
-                    continue
-                cache['service'].append((manager, service, negate))
+                # Normalize file resources, which don't need the : and type
+                # qualifier, into the same format as others, like packages.
+                if ':' == pattern[0]:
+                    try:
+                        restype, pattern = pattern[1:].split(':', 2)
+                    except ValueError:
+                        continue
+                else:
+                    restype = 'file'
 
-            # Ignore or unignore a file, glob, or directory tree.
-            else:
-                cache[restype].append((pattern, negate))
+                # Ignore a package and its dependencies or unignore a single
+                # package.  Empirically, the best balance of power and
+                # granularity comes from this arrangement.  Take
+                # build-esseantial's mutual dependence with dpkg-dev as an
+                # example of why.
+                if 'package' == restype:
+                    try:
+                        manager, package = pattern.split('/')
+                    except ValueError:
+                        logging.warning('invalid package ignore "{0}"'.
+                                        format(pattern))
+                        continue
+                    cache['package'].append((manager, package, negate))
+                    if not negate:
+                        for dep in getattr(deps,
+                                           manager,
+                                           lambda(s): [])(package):
+                            cache['package'].append((manager, dep, negate))
+
+                elif 'service' == restype:
+                    try:
+                        manager, service = pattern.split('/')
+                    except ValueError:
+                        logging.warning('invalid service ignore "{0}"'.
+                                        format(pattern))
+                        continue
+                    cache['service'].append((manager, service, negate))
+
+                # Ignore or unignore a file, glob, or directory tree.
+                else:
+                    cache[restype].append((pattern, negate))
 
     except IOError:
         pass

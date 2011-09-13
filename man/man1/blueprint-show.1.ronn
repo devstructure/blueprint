@@ -20,7 +20,7 @@ If none of `--puppet`, `--chef`, or `--sh` are given, the raw JSON data structur
 * `-S`, `--sh`:
   Generate POSIX shell code.
 * `-I`, `--ignore`:
-  Show the blueprint's ~/.blueprintignore.
+  Show the blueprint's `blueprintignore`(5) rules.
 * `-r`, `--relaxed`:
   Relax version constraints in generated code.
 * `-q`, `--quiet`:
@@ -32,6 +32,8 @@ If none of `--puppet`, `--chef`, or `--sh` are given, the raw JSON data structur
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
+* `/etc/blueprintignore`, `~/.blueprintignore`:
+  Lists of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
 
 ## THEME SONG
 

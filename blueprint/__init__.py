@@ -347,17 +347,18 @@ class Blueprint(dict):
         for filename in self.sources.itervalues():
             git.git('update-index', '--add', os.path.abspath(filename))
 
-        # Add the `.blueprintignore` file to the index.  Since adding extra
-        # syntax to this file, it no longer makes sense to store it as
-        # `.gitignore`.
-        try:
-            os.link(os.path.expanduser('~/.blueprintignore'),
-                    '.blueprintignore')
-            git.git('update-index',
-                    '--add',
-                    os.path.abspath('.blueprintignore'))
-        except OSError:
-            pass
+        # Add `/etc/blueprintignore` and `~/.blueprintignore` to the index.
+        # Since adding extra syntax to this file, it no longer makes sense
+        # to store it as `.gitignore`.
+        f = open('blueprintignore', 'w')
+        for pathname in ('/etc/blueprintignore',
+                         os.path.expanduser('~/.blueprintignore')):
+            try:
+                f.write(open(pathname).read())
+            except IOError:
+                pass
+        f.close()
+        git.git('update-index', '--add', os.path.abspath('blueprintignore'))
 
         # Write the index to Git's object store.
         tree = git.write_tree()
@@ -404,11 +405,14 @@ class Blueprint(dict):
 
     def blueprintignore(self):
         """
-        Return the blueprint's ~/.blueprintignore file.  Prior to v3.0.4
-        this file was stored as .gitignore in the repository.
+        Return the blueprint's blueprintignore file.  Prior to v3.0.9 this
+        file was stored as .blueprintignore in the repository.  Prior to
+        v3.0.4 this file was stored as .gitignore in the repository.
         """
         tree = git.tree(self._commit)
-        blob = git.blob(tree, '.blueprintignore')
+        blob = git.blob(tree, 'blueprintignore')
+        if blob is None:
+            blob = git.blob(tree, '.blueprintignore')
         if blob is None:
             blob = git.blob(tree, '.gitignore')
         import ignore

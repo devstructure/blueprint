@@ -12,7 +12,7 @@ blueprintignore(5) -- ignore specific resources when creating blueprints
 
 ## DESCRIPTION
 
-Lines in `~/.blueprintignore` are interpreted as in `gitignore`(5).  Blank lines and lines that begin with a `#` will be ignored.  Patterns that begin with a `!` are negated.  As resources are considered for inclusion in a blueprint, the last matching line in `~/.blueprintignore` wins.
+Lines in `/etc/blueprintignore` and `~/.blueprintignore` are interpreted as in `gitignore`(5).  Blank lines and lines that begin with a `#` will be ignored.  Patterns that begin with a `!` are negated.  As resources are considered for inclusion in a blueprint, the last matching line in `/etc/blueprintignore` or `~/.blueprintignore` (in that order) wins.
 
 The general form of each line is `:`_type_`:`_resource_, where _type_ is one of `file`, `package`, or `source`.  The `file` type is assumed and typically seen without the full `:`-prefixed form.
 
@@ -22,7 +22,7 @@ Package resources are of the form `:package:`_manager_`/`_package_.  Ignored pac
 
 Source resources must use the full `:source:`_resource_ format and must be fully-qualified (that is, begin with a `/`).  By default, all directories except `/usr/local` are ignored as source resources.  If it is necessary to build and install software from source in another directory, use a negated source resource such as _!:source:/opt_.
 
-As part of `blueprint-create`(1), the `~/.blueprintignore` file that was used to create the blueprint is stored in the local blueprint repository.
+As part of `blueprint-create`(1), the `/etc/blueprintignore` and `~/.blueprintignore` files that were used to create the blueprint are stored in the local blueprint repository.
 
 All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.
 
@@ -188,6 +188,8 @@ These defaults are not meant to be an exhuastive list of exceptions and edge cas
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
+* `/etc/blueprintignore`, `~/.blueprintignore`:
+  Lists of filename patterns to be ignored when creating blueprints.
 * `/tmp/blueprint-apt-exclusions`, `/tmp/blueprint-yum-exclusions`:
   The lists of APT- and Yum-managed packages considered essential.
 * `/tmp/blueprintignore`:

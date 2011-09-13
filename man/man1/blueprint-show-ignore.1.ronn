@@ -7,7 +7,7 @@ blueprint-show-ignore(1) -- show .blueprintignore rules from a blueprint
 
 ## DESCRIPTION
 
-`blueprint-show-ignore` prints the contents of the `~/.blueprintignore` file at the time the blueprint _name_ was created.
+`blueprint-show-ignore` prints the `blueprintignore`(5) rules from the time the blueprint _name_ was created.
 
 This command is preferred over `blueprint-show`(1)'s `-I` option.
 
@@ -22,8 +22,8 @@ This command is preferred over `blueprint-show`(1)'s `-I` option.
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
-* `~/.blueprintignore`:
-  A list of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
+* `/etc/blueprintignore`, `~/.blueprintignore`:
+  Lists of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
 
 ## THEME SONG
 

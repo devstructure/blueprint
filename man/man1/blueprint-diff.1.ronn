@@ -22,6 +22,8 @@ blueprint-diff(1) -- save the difference between two blueprints
 
 * `~/.blueprints.git`:
   The local repsitory where blueprints are stored, each on its own branch.
+* `/etc/blueprintignore`, `~/.blueprintignore`:
+  Lists of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
 
 ## THEME SONG
 
