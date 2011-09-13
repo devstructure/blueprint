@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINTIGNORE" "5" "August 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINTIGNORE" "5" "September 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
 \fBblueprintignore\fR \- ignore specific resources when creating blueprints
@@ -20,7 +20,7 @@ baz*
 .fi
 .
 .SH "DESCRIPTION"
-Lines in \fB~/\.blueprintignore\fR are interpreted as in \fBgitignore\fR(5)\. Blank lines and lines that begin with a \fB#\fR will be ignored\. Patterns that begin with a \fB!\fR are negated\. As resources are considered for inclusion in a blueprint, the last matching line in \fB~/\.blueprintignore\fR wins\.
+Lines in \fB/etc/blueprintignore\fR and \fB~/\.blueprintignore\fR are interpreted as in \fBgitignore\fR(5)\. Blank lines and lines that begin with a \fB#\fR will be ignored\. Patterns that begin with a \fB!\fR are negated\. As resources are considered for inclusion in a blueprint, the last matching line in \fB/etc/blueprintignore\fR or \fB~/\.blueprintignore\fR (in that order) wins\.
 .
 .P
 The general form of each line is \fB:\fR\fItype\fR\fB:\fR\fIresource\fR, where \fItype\fR is one of \fBfile\fR, \fBpackage\fR, or \fBsource\fR\. The \fBfile\fR type is assumed and typically seen without the full \fB:\fR\-prefixed form\.
@@ -35,7 +35,7 @@ Package resources are of the form \fB:package:\fR\fImanager\fR\fB/\fR\fIpackage\
 Source resources must use the full \fB:source:\fR\fIresource\fR format and must be fully\-qualified (that is, begin with a \fB/\fR)\. By default, all directories except \fB/usr/local\fR are ignored as source resources\. If it is necessary to build and install software from source in another directory, use a negated source resource such as \fI!:source:/opt\fR\.
 .
 .P
-As part of \fBblueprint\-create\fR(1), the \fB~/\.blueprintignore\fR file that was used to create the blueprint is stored in the local blueprint repository\.
+As part of \fBblueprint\-create\fR(1), the \fB/etc/blueprintignore\fR and \fB~/\.blueprintignore\fR files that were used to create the blueprint are stored in the local blueprint repository\.
 .
 .P
 All APT\- or Yum\-managed packages considered essential to the system are part of the default ignore list\.
@@ -508,6 +508,10 @@ These defaults are not meant to be an exhuastive list of exceptions and edge cas
 .TP
 \fB~/\.blueprints\.git\fR
 The local repsitory where blueprints are stored, each on its own branch\.
+.
+.TP
+\fB/etc/blueprintignore\fR, \fB~/\.blueprintignore\fR
+Lists of filename patterns to be ignored when creating blueprints\.
 .
 .TP
 \fB/tmp/blueprint\-apt\-exclusions\fR, \fB/tmp/blueprint\-yum\-exclusions\fR
