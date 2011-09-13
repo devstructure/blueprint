@@ -198,6 +198,14 @@ class Blueprint(dict):
                             b.packages[managername][package] = mine
         other.walk(after_packages=after_packages)
 
+        # Compare service metadata.  Keep services that differ.
+        for manager, services in self.services.iteritems():
+            for service, deps in services.iteritems():
+                if other.services.get(manager, {}).get(service, {}) == deps:
+                    del b.services[manager][service]
+            if 0 == len(b.services[manager]):
+                del b.services[manager]
+
         # Compare source tarball filenames, which indicate their content.
         # Keep source tarballs that differ.
         for dirname, filename in self.sources.iteritems():
