@@ -91,7 +91,7 @@ baz*
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p>Lines in <code>~/.blueprintignore</code> are interpreted as in <span class="man-ref"><code>gitignore</code><span class="s">(5)</span></span>.  Blank lines and lines that begin with a <code>#</code> will be ignored.  Patterns that begin with a <code>!</code> are negated.  As resources are considered for inclusion in a blueprint, the last matching line in <code>~/.blueprintignore</code> wins.</p>
+<p>Lines in <code>/etc/blueprintignore</code> and <code>~/.blueprintignore</code> are interpreted as in <span class="man-ref"><code>gitignore</code><span class="s">(5)</span></span>.  Blank lines and lines that begin with a <code>#</code> will be ignored.  Patterns that begin with a <code>!</code> are negated.  As resources are considered for inclusion in a blueprint, the last matching line in <code>/etc/blueprintignore</code> or <code>~/.blueprintignore</code> (in that order) wins.</p>
 
 <p>The general form of each line is <code>:</code><em>type</em><code>:</code><em>resource</em>, where <em>type</em> is one of <code>file</code>, <code>package</code>, or <code>source</code>.  The <code>file</code> type is assumed and typically seen without the full <code>:</code>-prefixed form.</p>
 
@@ -101,7 +101,7 @@ baz*
 
 <p>Source resources must use the full <code>:source:</code><em>resource</em> format and must be fully-qualified (that is, begin with a <code>/</code>).  By default, all directories except <code>/usr/local</code> are ignored as source resources.  If it is necessary to build and install software from source in another directory, use a negated source resource such as <em>!:source:/opt</em>.</p>
 
-<p>As part of <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>, the <code>~/.blueprintignore</code> file that was used to create the blueprint is stored in the local blueprint repository.</p>
+<p>As part of <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>, the <code>/etc/blueprintignore</code> and <code>~/.blueprintignore</code> files that were used to create the blueprint are stored in the local blueprint repository.</p>
 
 <p>All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.</p>
 
@@ -273,6 +273,7 @@ baz*
 
 <dl>
 <dt><code>~/.blueprints.git</code></dt><dd>The local repsitory where blueprints are stored, each on its own branch.</dd>
+<dt><code>/etc/blueprintignore</code>, <code>~/.blueprintignore</code></dt><dd>Lists of filename patterns to be ignored when creating blueprints.</dd>
 <dt><code>/tmp/blueprint-apt-exclusions</code>, <code>/tmp/blueprint-yum-exclusions</code></dt><dd>The lists of APT- and Yum-managed packages considered essential.</dd>
 <dt><code>/tmp/blueprintignore</code></dt><dd>A cached copy of the complete list of ignore rules.</dd>
 </dl>
@@ -284,7 +285,7 @@ baz*
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#109;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x72;&#105;&#99;&#104;&#97;&#x72;&#x64;&#x40;&#x64;&#101;&#118;&#115;&#x74;&#x72;&#x75;&#99;&#116;&#x75;&#114;&#101;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#x72;&#105;&#99;&#104;&#x61;&#x72;&#100;&#64;&#x64;&#101;&#118;&#x73;&#116;&#x72;&#x75;&#x63;&#x74;&#x75;&#x72;&#101;&#46;&#99;&#111;&#109;</a></p>
+<p>Richard Crowley <a href="&#109;&#97;&#105;&#108;&#116;&#x6f;&#58;&#114;&#105;&#x63;&#x68;&#x61;&#x72;&#100;&#x40;&#x64;&#101;&#x76;&#x73;&#x74;&#x72;&#x75;&#99;&#x74;&#117;&#114;&#x65;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#114;&#105;&#99;&#104;&#97;&#114;&#100;&#x40;&#100;&#x65;&#118;&#x73;&#x74;&#114;&#117;&#99;&#116;&#x75;&#x72;&#101;&#46;&#x63;&#111;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -293,7 +294,7 @@ baz*
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>August 2011</li>
+    <li class='tc'>September 2011</li>
     <li class='tr'>blueprintignore(5)</li>
   </ol>
 
