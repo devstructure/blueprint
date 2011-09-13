@@ -63,14 +63,6 @@ Prerequisites:
 
 * A Debian- or RPM-based Linux distribution
 * Python >= 2.6
-* [Blueprint](https://github.com/devstructure/blueprint)
-
-## Installation
-
-Prerequisites:
-
-* A Debian- or RPM-based Linux distribution
-* Python >= 2.6
 * Git >= 1.7
 
 ### From source on Debian, Ubuntu, and Fedora
