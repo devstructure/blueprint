@@ -134,12 +134,18 @@ class Blueprint(dict):
         def package(manager, package, version):
             if package in b.packages:
                 return
-            if manager in b.packages.get(manager, {}):
+            try:
+                b_packages = b.packages[manager]
+            except KeyError:
                 return
-            b_packages = b.packages[manager]
+            if manager in b_packages:
+                return
             if package not in b_packages:
                 return
-            b_versions = b_packages[package]
+            try:
+                b_versions = b_packages[package]
+            except KeyError:
+                return
             try:
                 del b_versions[b_versions.index(version)]
             except ValueError:
