@@ -45,9 +45,14 @@ def puppet(b, relaxed=False):
                 group='root',
                 mode='0644',
                 source='puppet:///modules/{0}{1}'.format(b.name, pathname)))
-        m['sources'].add(Exec('tar xf {0}'.format(pathname),
-                              alias=dirname,
-                              cwd=dirname))
+        if '.zip' == pathname[-4:]:
+            m['sources'].add(Exec('unzip {0}'.format(pathname),
+                                  alias=dirname,
+                                  cwd=dirname))
+        else:
+            m['sources'].add(Exec('tar xf {0}'.format(pathname),
+                                  alias=dirname,
+                                  cwd=dirname))
 
     def file(pathname, f):
         """

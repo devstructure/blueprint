@@ -44,7 +44,10 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
             s.add('MD5SUM="$(find "{0}" -printf %T@\\\\n | md5sum)"', dirname)
         if url is not None:
             s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"', filename, url)
-            s.add('tar xf "{0}" -C "{1}"', filename, dirname)
+            if '.zip' == pathname[-4:]:
+                s.add('unzip "{0}" -d "{1}"', filename, dirname)
+            else:
+                s.add('tar xf "{0}" -C "{1}"', filename, dirname)
         elif secret is not None:
             s.add('curl -O "{0}/{1}/{2}/{3}" || wget "{0}/{1}/{2}/{3}"',
                   server,
