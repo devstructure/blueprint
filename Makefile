@@ -1,4 +1,4 @@
-VERSION=3.0.8
+VERSION=3.1.0
 BUILD=1
 
 PYTHON=$(shell which python2.7 || which python27 || which python2.6 || which python26 || which python)
