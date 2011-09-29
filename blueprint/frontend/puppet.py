@@ -123,11 +123,11 @@ def puppet(b, relaxed=False):
         """
         Create a package resource.
         """
+        ensure = 'installed' if relaxed or version is None else version
 
         # `apt` and `yum` are easy since they're the default for their
         # respective platforms.
         if manager in ('apt', 'yum'):
-            ensure = 'installed' if relaxed else version
             m['packages'][manager].add(Package(package, ensure=ensure))
 
             # If APT is installing RubyGems, get complicated.  This would
@@ -165,7 +165,7 @@ def puppet(b, relaxed=False):
         # RPM-based distros.
         elif manager in ('rubygems', 'rubygems1.8'):
             m['packages'][manager].add(Package(package,
-                                               ensure=version,
+                                               ensure=ensure,
                                                provider='gem'))
 
         # Other versions of RubyGems are slightly more complicated.
@@ -173,7 +173,7 @@ def puppet(b, relaxed=False):
             match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
                              manager)
             m['packages'][manager].add(Exec(
-                manager(package, version),
+                manager(package, version, relaxed),
                 creates='{0}/{1}/gems/{2}-{3}'.format(util.rubygems_path(),
                                                       match.group(1),
                                                       package,
@@ -184,7 +184,9 @@ def puppet(b, relaxed=False):
         # directory is not known ahead of time.  This just so happens
         # to be the way everything else works, too.
         else:
-            m['packages'][manager].add(Exec(manager(package, version)))
+            m['packages'][manager].add(Exec(manager(package,
+                                                    version,
+                                                    relaxed)))
 
     restypes = {'files': File,
                 'packages': Package,

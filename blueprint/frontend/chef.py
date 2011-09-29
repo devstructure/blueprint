@@ -110,7 +110,7 @@ def chef(b, relaxed=False):
             return
 
         if manager in ('apt', 'yum'):
-            if relaxed:
+            if relaxed or version is None:
                 c.package(package)
             else:
                 c.package(package, version=version)
@@ -138,17 +138,24 @@ def chef(b, relaxed=False):
 
         # All types of gems get to have package resources.
         elif 'rubygems' == manager:
-            c.gem_package(package, version=version)
+            if relaxed or version is None:
+                c.gem_package(package)
+            else:
+                c.gem_package(package, version=version)
         elif re.search(r'ruby', manager) is not None:
             match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
                              manager)
-            c.gem_package(package,
-                gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
-                version=version)
+            if relaxed or version is None:
+                c.gem_package(package,
+                    gem_binary='/usr/bin/gem{0}'.format(match.group(1)))
+            else:
+                c.gem_package(package,
+                    gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
+                    version=version)
 
         # Everything else is an execute resource.
         else:
-            c.execute(manager(package, version))
+            c.execute(manager(package, version, relaxed))
 
     def service(manager, service):
         """

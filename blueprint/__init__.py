@@ -553,8 +553,13 @@ class Blueprint(dict):
         callable = kwargs.get('package', lambda *args: None)
         for package, versions in sorted(self.packages.get(manager,
                                                           {}).iteritems()):
-            for version in versions:
-                callable(manager, package, version)
+            if 0 == len(versions):
+                callable(manager, package, None)
+            elif isinstance(versions, basestring):
+                callable(manager, package, versions)
+            else:
+                for version in versions:
+                    callable(manager, package, version)
             if managername != package and package in self.packages:
                 next_managers.append(package)
 

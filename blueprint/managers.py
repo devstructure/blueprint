@@ -18,6 +18,8 @@ class PackageManager(unicode):
         given package via this package manager.  It should exit non-zero
         if the package is not in the desired state.
         """
+        if version is None:
+            relaxed = True
 
         if 'apt' == self:
             if relaxed:
@@ -60,6 +62,8 @@ class PackageManager(unicode):
         Return a shell command that installs the given version of the given
         package via this package manager.
         """
+        if version is None:
+            relaxed = True
 
         if 'apt' == self:
             arg = package if relaxed else '{0}={1}'.format(package, version)
