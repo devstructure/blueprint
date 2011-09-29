@@ -49,7 +49,7 @@ def read(options, args):
         if not os.isatty(sys.stdin.fileno()) or stdin:
             try:
 
-                # FIXME This implementation won't be able to find source
+                # TODO This implementation won't be able to find source
                 # tarballs that should be associated with the blueprint
                 # on standard input.
                 return blueprint.Blueprint.load(sys.stdin, name)

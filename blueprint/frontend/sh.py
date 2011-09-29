@@ -40,7 +40,6 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
         """
         Extract a source tarball.
         """
-        print(dirname, filename, gen_content, url)
         if dirname in lut['sources']:
             s.add('MD5SUM="$(find "{0}" -printf %T@\\\\n | md5sum)"', dirname)
         if url is not None:

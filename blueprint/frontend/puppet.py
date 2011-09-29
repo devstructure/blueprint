@@ -586,7 +586,7 @@ class File(Resource):
         """
         if inline:
 
-            # FIXME Leaky abstraction.  The source attribute is perfectly
+            # TODO Leaky abstraction.  The source attribute is perfectly
             # valid but the check here assumes it is only ever used for
             # placing source tarballs.
             if 'source' in self:

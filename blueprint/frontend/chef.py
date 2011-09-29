@@ -165,7 +165,7 @@ def chef(b, relaxed=False):
         # Transform dependency list into a subscribes attribute.
         subscribe = []
         def service_file(m, s, pathname):
-            subscribe.append('cookbook_file[{0}]'.format(pathname)) # FIXME Breaks inlining
+            subscribe.append('cookbook_file[{0}]'.format(pathname)) # TODO Breaks inlining.
         b.walk_service_files(manager, service, service_file=service_file)
         def service_package(m, s, pm, package):
             subscribe.append('package[{0}]'.format(package))
