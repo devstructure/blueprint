@@ -308,7 +308,7 @@ class Blueprint(dict):
         # AWS cfn-init respects the enable and ensure parameters like Puppet
         # does.  Blueprint provides these parameters for interoperability.
         self.services[manager].setdefault(service, {'enable': True,
-                                                    'ensure': 'running'})
+                                                    'ensureRunning': True})
 
     def add_service_file(self, manager, service, *args):
         """
