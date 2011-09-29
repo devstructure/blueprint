@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import blueprint
+import blueprint.cli
 from blueprint import git
 
 parser = optparse.OptionParser('Usage: %prog [-q] <name> [<dirname>][...]')
@@ -20,32 +21,26 @@ options, args = parser.parse_args()
 if options.quiet:
     logging.root.setLevel(logging.CRITICAL)
 
-if 0 == len(args):
+if 1 > len(args):
     parser.print_usage()
     sys.exit(1)
-name = args[0]
+
+b = blueprint.cli.read(options, args)
 
 try:
-    b = blueprint.Blueprint(name=name)
-except blueprint.NotFoundError:
-    logging.error('blueprint {0} does not exist'.format(name))
-    sys.exit(1)
-except blueprint.NameError:
-    logging.error('invalid blueprint name')
-    sys.exit(1)
-
-try:
-    commit = git.rev_parse(name)
+    commit = git.rev_parse(args[0])
     tree = git.tree(commit)
-    for dirname in args[1:] or b.sources.iterkeys():
-        if dirname not in b.sources:
-            logging.warning('source tarball for {0} not found'.format(dirname))
-            continue
-        filename = b.sources[dirname]
-        blob = git.blob(tree, filename)
-        sys.stderr.write('{0} {1}\n'.format(dirname, filename))
-        p = subprocess.Popen(['tar', 'tv'],
-                             close_fds=True,
-                             stdin=git.cat_file(blob))
+    def source(dirname, filename, gen_content, url):
+        if args[1:] and dirname not in args[1:]:
+            return
+        if url is not None:
+            sys.stderr.write('{0} {1}\n'.format(dirname, url))
+        elif gen_content is not None:
+            sys.stderr.write('{0} {1}\n'.format(dirname, filename))
+            blob = git.blob(tree, filename)
+            p = subprocess.Popen(['tar', 'tv'],
+                                 close_fds=True,
+                                 stdin=git.cat_file(blob))
+    b.walk_sources(source=source)
 except IOError:
     pass

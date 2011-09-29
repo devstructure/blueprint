@@ -1,0 +1,11 @@
+{
+  "files": {
+    "/etc/foobar": {
+      "encoding": "plain",
+      "group": "root",
+      "mode": "100644",
+      "owner": "root",
+      "source": "http://rcrowley.org/foobar"
+    }
+  }
+}

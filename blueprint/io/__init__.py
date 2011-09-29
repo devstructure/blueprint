@@ -16,9 +16,7 @@ def pull(server, secret, name):
     """
     r = http.get('/{0}/{1}'.format(secret, name), server=server)
     if 200 == r.status:
-        b = Blueprint()
-        b.name = name
-        b.update(json.loads(r.read()))
+        b = Blueprint.load(r, name)
 
         for filename in b.sources.itervalues():
             logging.info('fetching source tarballs - this may take a while')
@@ -75,32 +73,37 @@ def push(server, secret, b):
         logging.error('unexpected {0} storing blueprint'.format(r.status))
         return None
 
-    tree = git.tree(b._commit)
-    for dirname, filename in sorted(b.sources.iteritems()):
-        blob = git.blob(tree, filename)
-        content = git.content(blob)
-        logging.info('storing source tarballs - this may take a while')
-        r = http.put('/{0}/{1}/{2}'.format(secret, b.name, filename),
-                     content,
-                     {'Content-Type': 'application/x-tar'},
-                     server=server)
-        if 202 == r.status:
-            pass
-        elif 400 == r.status:
-            logging.error('tarball content or name not expected')
-            return None
-        elif 404 == r.status:
-            logging.error('blueprint not found')
-            return None
-        elif 413 == r.status:
-            logging.error('tarballs can\'t exceed 64MB')
-            return None
-        elif 502 == r.status:
-            logging.error('upstream storage service failed')
-            return None
-        else:
-            logging.error('unexpected {0} storing tarball'.format(r.status))
-            return None
+    if b._commit is None and 0 < len(b.sources):
+        logging.warning('blueprint came from standard input - '
+                        'source tarballs will not be pushed')
+    elif b._commit is not None:
+        tree = git.tree(b._commit)
+        for dirname, filename in sorted(b.sources.iteritems()):
+            blob = git.blob(tree, filename)
+            content = git.content(blob)
+            logging.info('storing source tarballs - this may take a while')
+            r = http.put('/{0}/{1}/{2}'.format(secret, b.name, filename),
+                         content,
+                         {'Content-Type': 'application/x-tar'},
+                         server=server)
+            if 202 == r.status:
+                pass
+            elif 400 == r.status:
+                logging.error('tarball content or name not expected')
+                return None
+            elif 404 == r.status:
+                logging.error('blueprint not found')
+                return None
+            elif 413 == r.status:
+                logging.error('tarballs can\'t exceed 64MB')
+                return None
+            elif 502 == r.status:
+                logging.error('upstream storage service failed')
+                return None
+            else:
+                logging.error('unexpected {0} storing tarball'.
+                              format(r.status))
+                return None
 
     return '{0}/{1}/{2}'.format(server, secret, b.name)
 

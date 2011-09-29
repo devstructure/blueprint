@@ -1,0 +1,18 @@
+{
+  "files": {
+    "/etc/apt/sources.list.d/devstructure.list": {
+      "content": "deb http://packages.devstructure.com natty main\n",
+      "encoding": "plain",
+      "group": "root",
+      "mode": "100644",
+      "owner": "root"
+    },
+    "/etc/apt/trusted.gpg.d/devstructure.gpg": {
+      "content": "mQENBExH+WABCADPVuh2idQvP4owKpXDCzqpEl2ePvo01tXhWTEX7Opsu3w8adwpG1BB0frYY5GQ61N9D6y9zwhpWivxL975SauPVHuZ6iVoZbOaNjL8JmlscGdIhqysV3cOeEkdDT3j7Zem1pmsvZrmqnBjj9ha1XkY1kEidp5yBNCZSFx/u7ZgvOZ3I/trMijnEU2GthjbiwTkLLFmRDV/6qw/DqDXh9F/PffbbKTCJ3Kc6jrdhKe7iIhR3euQ86xI+cBLtFxxBTuH6Ywr0hmdh6StKLWBn56185ErCXjVBt35XTVR/cKFPTYVZGvneXI5cA0cAlK83KiYuIay7WkTZ+P74zPkdxBRABEBAAG0KERldlN0cnVjdHVyZSA8cGFja2FnZXNAZGV2c3RydWN0dXJlLmNvbT6JATgEEwECACIFAkxH+WACGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJELPO0+qsl06CYG0IAIVaoGOkcJibTxWMbSQVunoJvK87eZBN79Zq/tJkL5/jU4HWdu+AALJmmcKMMVI7vyvSjVQDb3qU4jLbnUHLRw4ZkFqhrkaAOfOcHzvc/rvjTj9juRQaztiOtdcWCesyUGyENTf6rZAtO3jmwMdPn0t/suThAYl8B17/6OIyu0spEwx5lG/lWYdQyGhDTvj1F6lZcphFlOwSDFY0EUheXIeWli886XxnrnxyqlGC0nmm8h5mxHZDUqp3MgDlKRcdz6yo1WLkECGaEW1EWDt01Et0Qi6EBIlFLYozejU4C0MFVfR5wmB/95kTvXjfVqQIZLVb24sGLfaVwrsx/ZQtpZywAgADuQENBExH+WABCADK3tJMpC5Zm45HH1iEgI9mlk9CPwzLqdUR5CyYSQhJJhP3kkAkl31XrnugdxnOTXPuh7vO/EN3VUFthVYr9eXt+WEmX5I2zVPxA6bMP11tre5eJUAKrj2eOEskHs0aXusWhQlyM/9Bbt6X83YqbHZooNJ5m7zyARHp1nNo4go9Vesee9mIDTFBpqrHV3UvaxEl+DgRaKWIucMzevE9IF8tJKlKaolnJhKOxDd2vDepmMhLio1Ner3St8QJ+DghAhjZqlrQK/wjQ2eHEo0wFQX28UljaXWNFBV54+6kpCxQFg793k9Nb05er8Cj5oV/dQqLEbDOIXcGa3QDQ+Wl0XUlABEBAAGJAR8EGAECAAkFAkxH+WACGwwACgkQs87T6qyXToLchgf/XSSfyTxrZRnbxdb1g+KrU6D3xaMTQlD+Axj245vdzUaMkjsYnkHV/btUl8b/GE0MkErnAGuZAbMeXg1ci02PGTyX3W2HCVa06nU7AdOiCIjNktEg3BtjMT0t3DKnS/Q94Gy0EYF5yHURBzSG95+Vop2R+4eBzct/UsUg3CK885so59wERYtCQ8KarOqO/QQVRlLZPJ2K6SBinthTLTbG8Sou64OsJbeiSajLBW++/bETCXat9zRFbvvzh2RNBFZWWtGkWS9yf3wA0rC8kyztFAV344ZGLJAzPtRoEh66o524aMNJxJiCBg7ZCMzbviZHremDiajvPYZX9V06tzOjKbACAAM=",
+      "encoding": "base64",
+      "group": "root",
+      "mode": "100644",
+      "owner": "root"
+    }
+  }
+}

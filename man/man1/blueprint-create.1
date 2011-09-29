@@ -13,6 +13,9 @@
 \fBblueprint\-create\fR creates a list of all installed packages and modified configuration files and stores it in the branch \fIname\fR in the local blueprint repository with the commit \fImessage\fR (if given)\.
 .
 .P
+If standard input is not a TTY, a blueprint is read from standard input rather than created from the system\. See \fBblueprint\fR(5) for the details of the format\.
+.
+.P
 If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, or \fB\-\-sh\fR is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to \fBstdout\fR\. If \fB\-\-ignore\fR is given, the \fBblueprintignore\fR(5) rules used to create the blueprint will be printed to \fBstdout\fR\.
 .
 .P

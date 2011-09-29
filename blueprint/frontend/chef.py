@@ -21,22 +21,28 @@ def chef(b, relaxed=False):
     """
     c = Cookbook(b.name, comment=b.DISCLAIMER)
 
-    def source(dirname, filename, gen_content):
+    def source(dirname, filename, gen_content, url):
         """
         Create a cookbook_file and execute resource to fetch and extract
         a source tarball.
         """
         pathname = os.path.join('/tmp', filename)
-        c.file(pathname,
-               gen_content(),
-               owner='root',
-               group='root',
-               mode='0644',
-               backup=False,
-               source=pathname[1:])
-        c.execute(filename,
-                  command='tar xf {0}'.format(pathname),
-                  cwd=dirname)
+        if url is not None:
+            c.execute('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"'.
+                          format(pathname, url),
+                      creates=pathname)
+        elif gen_content is not None:
+            c.file(pathname,
+                   gen_content(),
+                   owner='root',
+                   group='root',
+                   mode='0644',
+                   backup=False,
+                   source=pathname[1:])
+        if '.zip' == pathname[-4:]:
+            c.execute('unzip "{0}"'.format(pathname), cwd=dirname)
+        else:
+            c.execute('tar xf "{0}"'.format(pathname), cwd=dirname)
 
     def file(pathname, f):
         """
@@ -49,26 +55,37 @@ def chef(b, relaxed=False):
                     recursive=True)
         if '120000' == f['mode'] or '120777' == f['mode']:
             c.link(pathname,
-                   owner=f['owner'],
                    group=f['group'],
+                   owner=f['owner'],
                    to=f['content'])
             return
-        content = f['content']
-        if 'base64' == f['encoding']:
-            content = base64.b64decode(content)
-        c.file(pathname,
-               content,
-               owner=f['owner'],
-               group=f['group'],
-               mode=f['mode'][-4:],
-               backup=False,
-               source=pathname[1:])
+        if 'source' in f:
+            c.remote_file(pathname,
+                          backup=False,
+                          group=f['group'],
+                          mode=f['mode'][-4:],
+                          owner=f['owner'],
+                          source=f['source'])
+        else:
+            content = f['content']
+            if 'base64' == f['encoding']:
+                content = base64.b64decode(content)
+            c.file(pathname,
+                   content,
+                   backup=False,
+                   group=f['group'],
+                   mode=f['mode'][-4:],
+                   owner=f['owner'],
+                   source=pathname[1:])
 
     def before_packages(manager):
         """
         Create execute resources to configure the package managers.
         """
-        if 0 == len(manager):
+        packages = b.packages.get(manager, [])
+        if 0 == len(packages):
+            return
+        if 1 == len(packages) and manager in packages:
             return
         if 'apt' == manager:
             c.execute('apt-get -q update')
@@ -83,7 +100,7 @@ def chef(b, relaxed=False):
             return
 
         if manager in ('apt', 'yum'):
-            if relaxed:
+            if relaxed or version is None:
                 c.package(package)
             else:
                 c.package(package, version=version)
@@ -104,19 +121,31 @@ def chef(b, relaxed=False):
                           '} | sh',
                           creates='/usr/bin/npm')
 
+        # AWS cfn-init templates may specify RPMs to be installed from URLs,
+        # which are specified as versions.
+        elif 'rpm' == manager:
+            c.rpm_package(package, source=version)
+
         # All types of gems get to have package resources.
         elif 'rubygems' == manager:
-            c.gem_package(package, version=version)
+            if relaxed or version is None:
+                c.gem_package(package)
+            else:
+                c.gem_package(package, version=version)
         elif re.search(r'ruby', manager) is not None:
             match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
                              manager)
-            c.gem_package(package,
-                gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
-                version=version)
+            if relaxed or version is None:
+                c.gem_package(package,
+                    gem_binary='/usr/bin/gem{0}'.format(match.group(1)))
+            else:
+                c.gem_package(package,
+                    gem_binary='/usr/bin/gem{0}'.format(match.group(1)),
+                    version=version)
 
         # Everything else is an execute resource.
         else:
-            c.execute(manager(package, version))
+            c.execute(manager(package, version, relaxed))
 
     def service(manager, service):
         """
@@ -126,7 +155,7 @@ def chef(b, relaxed=False):
         # Transform dependency list into a subscribes attribute.
         subscribe = []
         def service_file(m, s, pathname):
-            subscribe.append('cookbook_file[{0}]'.format(pathname)) # FIXME Breaks inlining
+            subscribe.append('cookbook_file[{0}]'.format(pathname)) # TODO Breaks inlining.
         b.walk_service_files(manager, service, service_file=service_file)
         def service_package(m, s, pm, package):
             subscribe.append('package[{0}]'.format(package))
@@ -164,7 +193,10 @@ class Cookbook(object):
     def __init__(self, name, comment=None):
         """
         """
-        self.name = str(name)
+        if name is None:
+            self.name = 'blueprint-generated-chef-cookbook'
+        else:
+            self.name = str(name)
         self.comment = comment
         self.resources = []
         self.files = {}
@@ -195,11 +227,23 @@ class Cookbook(object):
         """
         self.add(File(name, content, **kwargs))
 
+    def remote_file(self, name, **kwargs):
+        """
+        Create a remote_file resource.
+        """
+        self.add(Resource('remote_file', name, **kwargs))
+
     def package(self, name, **kwargs):
         """
         Create a package resource provided by the default provider.
         """
         self.add(Resource('package', name, **kwargs))
+
+    def rpm_package(self, name, **kwargs):
+        """
+        Create a package resource provided by RPM.
+        """
+        self.add(Resource('rpm_package', name, **kwargs))
 
     def gem_package(self, name, **kwargs):
         """
@@ -370,6 +414,6 @@ class File(Resource):
                 del self.content
             self.type = 'file'
             del self['source']
-        else:
+        elif self.content is not None and 'source' in self:
             self.type = 'cookbook_file'
         return super(File, self).dumps(inline)

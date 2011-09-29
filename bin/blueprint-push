@@ -8,6 +8,7 @@ import sys
 
 import blueprint
 from blueprint import cfg
+import blueprint.cli
 import blueprint.io
 
 parser = optparse.OptionParser('Usage: %prog [-q] <name>')
@@ -24,16 +25,8 @@ if options.quiet:
 if 1 != len(args):
     parser.print_usage()
     sys.exit(1)
-name = args[0]
 
-try:
-    b = blueprint.Blueprint(name=name)
-except KeyError:
-    logging.error('blueprint {0} does not exist'.format(name))
-    sys.exit(1)
-except ValueError:
-    logging.error('invalid blueprint name')
-    sys.exit(1)
+b = blueprint.cli.read(options, args)
 
 server = cfg.get('io', 'server')
 try:

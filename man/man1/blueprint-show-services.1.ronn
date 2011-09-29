@@ -3,11 +3,13 @@ blueprint-show-services(1) -- show services in a blueprint
 
 ## SYNOPSIS
 
-`blueprint show-services` [`-q`] _name_  
+`blueprint show-services` [`-q`] [_name_]  
 
 ## DESCRIPTION
 
 `blueprint-show-servies` prints the manager and name (separated by spaces) of each service in the blueprint _name_.  They are printed one-per-line to make this command useful in pipelines.
+
+If _name_ is omitted or `-`, a blueprint is read from standard input and treated in the same manner.  See `blueprint`(5) for the details of the format.
 
 ## OPTIONS
 

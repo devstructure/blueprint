@@ -14,11 +14,18 @@
   "arch": "ARCHITECTURE",
   "files": {
     "PATHNAME": {
-      "owner": "OWNER",
+      "content": "CONTENT",
+      "encoding": "ENCODING",
       "group": "GROUP",
       "mode": "MODE",
-      "content": "CONTENT",
-      "encoding": "ENCODING"
+      "owner": "OWNER"
+    },
+    "PATHNAME": {
+      "encoding": "ENCODING",
+      "group": "GROUP",
+      "mode": "MODE",
+      "owner": "OWNER",
+      "source": "SOURCE"
     }
   },
   "packages": {
@@ -29,11 +36,16 @@
     "MANAGER": {
       "PACKAGE": ["VERSION"],
       "PACKAGE": ["VERSION"]
+    },
+    "rpm": {
+      "PACKAGE": ["URL"]
     }
   },
   "services": {
     "MANAGER": {
       "SERVICENAME": {
+        "enable": true,
+        "ensure": "running",
         "files": ["PATHNAME"],
         "packages": {
           "MANAGER": ["PACKAGE"]
@@ -43,7 +55,8 @@
     }
   },
   "sources": {
-    "DIRNAME": "FILENAME"
+    "DIRNAME": "FILENAME",
+    "DIRNAME": "URL"
   }
 }
 .
@@ -61,20 +74,32 @@ Each key in the optional \fBsources\fR object is the fully\-qualified path to a 
 .P
 If \fBsources\fR is present and non\-empty, \fBarch\fR will also be present indicating the architecture of the server that created the blueprint\. If present, this value will be \fIamd64\fR or \fIi386\fR on Debian\-based systems or \fIx86_64\fR or \fIx86\fR on RPM\-based systems\. It is legal to refuse to apply a blueprint with a mismatched architecture\. The architecture can be found by running \fBdpkg \-\-print\-architecture\fR or \fBrpm \-\-eval %_arch\fR as appropriate\.
 .
+.P
+For compatibility with AWS \fBcfn\-init\fR, a URL may appear in the value in place of a filename\. If such a value is encountered, the URL should be fetched and extracted\. Blueprint will never generate such objects\.
+.
 .SS "Files"
 Each key in the optional \fBfiles\fR object is the fully\-qualified pathname to a file\. These pathnames should be traversed in alphabetical order\. The associated value contains the \fBowner\fR, owning \fBgroup\fR, \fBmode\fR (a string containing the full 6\-digit octal representation), \fBcontent\fR, and the \fBencoding\fR of content (one of \fIplain\fR or \fIbase64\fR)\. Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied\.
+.
+.P
+For compatibility with AWS \fBcfn\-init\fR, \fBsource\fR takes precedence over the \fBcontent\fR\. If a file with a \fBsource\fR is encountered, the \fBsource\fR URL should be fetched as the file\'s content\. Blueprint will never generate such objects\.
 .
 .SS "Packages"
 Each key within \fBpackages\fR names a package manager\. Each manager contains keys that name packages to be installed by that manager\. Each package name is associated with an array of versions that must be installed\. In most cases, for most managers, this array will have only one element\.
 .
 .P
-Each manager is itself the name of a package that appears elsewhere\. \fBpackages\fR must be processed by starting with the \fBapt\fR and \fByum\fR managers, installing their dependencies\. Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed\.
+Each manager is itself the name of a package that appears elsewhere\. \fBpackages\fR must be processed by starting with the \fBapt\fR, \fBrpm\fR, and \fByum\fR managers, installing their dependencies\. Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed\.
+.
+.P
+For compatibility with AWS \fBcfn\-init\fR, the \fBrpm\fR manager is included\. Packages managed by \fBrpm\fR specify URLs in place of version numbers\. If such a package is encountered, the URL should be installed via \fBrpm\fR(1)\. Blueprint will never generate such objects\.
 .
 .SS "Services"
 Each key within \fBservices\fR names a service manager\. Each manager contains keys that name services on the system\. Each service name is associated with a set of dependencies which themselves take a form much like a blueprint: \fBfiles\fR may be present and point to a list of pathnames; \fBpackages\fR may be present and point to a set of package managers which each point to a list of packages; \fBsources\fR may be present and point to a list of directory names\.
 .
 .P
 If any of the resources on which the service depends are changed, upgraded, initailized, or otherwise acted upon, the service should be restarted\.
+.
+.P
+For compatibility with AWS \fBcfn\-init\fR, \fB"enable": true\fR and \fB"ensure": "running"\fR are included with each service\. Blueprint ignores these when generating code\.
 .
 .SH "THEME SONG"
 The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"

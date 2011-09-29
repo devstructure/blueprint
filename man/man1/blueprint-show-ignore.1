@@ -7,10 +7,13 @@
 \fBblueprint\-show\-ignore\fR \- show \.blueprintignore rules from a blueprint
 .
 .SH "SYNOPSIS"
-\fBblueprint show\-ignore\fR [\fB\-q\fR] \fIname\fR
+\fBblueprint show\-ignore\fR [\fB\-q\fR] [\fIname\fR]
 .
 .SH "DESCRIPTION"
 \fBblueprint\-show\-ignore\fR prints the \fBblueprintignore\fR(5) rules from the time the blueprint \fIname\fR was created\.
+.
+.P
+If \fIname\fR is omitted or \fB\-\fR, a blueprint is read from standard input and treated in the same manner\. See \fBblueprint\fR(5) for the details of the format\.
 .
 .P
 This command is preferred over \fBblueprint\-show\fR(1)\'s \fB\-I\fR option\.

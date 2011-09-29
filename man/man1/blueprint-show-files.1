@@ -7,10 +7,13 @@
 \fBblueprint\-show\-files\fR \- show files in a blueprint
 .
 .SH "SYNOPSIS"
-\fBblueprint show\-files\fR [\fB\-q\fR] \fIname\fR
+\fBblueprint show\-files\fR [\fB\-q\fR] [\fIname\fR]
 .
 .SH "DESCRIPTION"
 \fBblueprint\-show\-files\fR prints the fully\-qualified pathname of each configuration file (always in \fB/etc\fR) in the blueprint \fIname\fR\. They are printed one\-per\-line to make this command useful in pipelines\.
+.
+.P
+If \fIname\fR is omitted or \fB\-\fR, a blueprint is read from standard input and treated in the same manner\. See \fBblueprint\fR(5) for the details of the format\.
 .
 .SH "OPTIONS"
 .

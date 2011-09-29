@@ -9,6 +9,7 @@ import subprocess
 import sys
 
 import blueprint
+import blueprint.cli
 from blueprint import context_managers
 
 parser = optparse.OptionParser('Usage: %prog [-r] [-q] [<name>]')
@@ -27,32 +28,11 @@ options, args = parser.parse_args()
 if options.quiet:
     logging.root.setLevel(logging.CRITICAL)
 
-try:
-
-    # Named blueprints are read from the local repository.
-    if 1 == len(args) and '-' != args[0]:
-        b = blueprint.Blueprint(name=args[0])
-
-    # Standard input is assumed to be blueprint JSON.
-    # FIXME This implementation won't be able to find source tarballs that
-    # should be associated with the blueprint on standard input.
-    elif 0 == len(args) or 1 == len(args) and '-' == args[0]:
-        b = blueprint.Blueprint()
-        try:
-            b.update(json.load(sys.stdin))
-        except ValueError:
-            logging.error('standard input contains invalid blueprint JSON')
-            sys.exit(1)
-
-    else:
-        parser.print_usage()
-        sys.exit(1)
-except blueprint.NotFoundError:
-    logging.error('blueprint {0} does not exist'.format(name))
+if 1 < len(args):
+    parser.print_usage()
     sys.exit(1)
-except blueprint.NameError:
-    logging.error('invalid blueprint name')
-    sys.exit(1)
+
+b = blueprint.cli.read(options, args)
 
 if 0 != os.geteuid():
     logging.warning('applying a blueprint may not work as a normal user')

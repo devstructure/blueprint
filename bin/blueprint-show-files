@@ -7,9 +7,9 @@ import subprocess
 import sys
 
 import blueprint
-from blueprint import git
+import blueprint.cli
 
-parser = optparse.OptionParser('Usage: %prog [-q] <name>')
+parser = optparse.OptionParser('Usage: %prog [-q] [<name>]')
 parser.add_option('-q', '--quiet',
                   dest='quiet',
                   default=False,
@@ -20,19 +20,11 @@ options, args = parser.parse_args()
 if options.quiet:
     logging.root.setLevel(logging.CRITICAL)
 
-if 1 != len(args):
+if 1 < len(args):
     parser.print_usage()
     sys.exit(1)
-name = args[0]
 
-try:
-    b = blueprint.Blueprint(name=name)
-except blueprint.NotFoundError:
-    logging.error('blueprint {0} does not exist'.format(name))
-    sys.exit(1)
-except blueprint.NameError:
-    logging.error('invalid blueprint name')
-    sys.exit(1)
+b = blueprint.cli.read(options, args)
 
 try:
     def file(pathname, f):

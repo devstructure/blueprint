@@ -3,11 +3,13 @@ blueprint-show-ignore(1) -- show .blueprintignore rules from a blueprint
 
 ## SYNOPSIS
 
-`blueprint show-ignore` [`-q`] _name_  
+`blueprint show-ignore` [`-q`] [_name_]  
 
 ## DESCRIPTION
 
 `blueprint-show-ignore` prints the `blueprintignore`(5) rules from the time the blueprint _name_ was created.
+
+If _name_ is omitted or `-`, a blueprint is read from standard input and treated in the same manner.  See `blueprint`(5) for the details of the format.
 
 This command is preferred over `blueprint-show`(1)'s `-I` option.
 

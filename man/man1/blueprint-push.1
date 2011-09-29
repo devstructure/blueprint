@@ -13,6 +13,9 @@
 \fBblueprint\-push\fR stores the blueprint \fIname\fR and all associated tarballs as \fIname\fR on the configured server (which is \fBhttps://devstructure\.com\fR by default) and prints the URL from which it may be fetched\.
 .
 .P
+If \fIname\fR does not exist and standard input is not a TTY, a blueprint is read from standard input\. See \fBblueprint\fR(5) for the details of the format\.
+.
+.P
 If no \fIsecret\fR is configured in \fB/etc/blueprint\.cfg\fR or \fB~/\.blueprint\.cfg\fR, one is created and a sample configuration is printed\.
 .
 .P

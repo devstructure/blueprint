@@ -79,7 +79,7 @@ def parse_service(pathname):
             raise ValueError('not a running service')
 
         return ('upstart', service)
-    elif '/etc/init.d' == dirname:
+    elif '/etc/init.d' == dirname or '/etc/rc.d/init.d' == dirname:
 
         # Let Upstart handle its services.
         if os.path.islink(pathname) \
@@ -91,7 +91,7 @@ def parse_service(pathname):
             content = open(pathname).read()
         except IOError:
             raise ValueError('not a readable SysV init script')
-        if not re.search(r'Default-Start:\s*[2345]', content):
+        if not re.search(r'Default-Start:\s*[2345]|chkconfig:', content):
             raise ValueError('not a running service')
 
         return ('sysvinit', basename)
@@ -150,3 +150,6 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, set):
             return list(o)
         return super(JSONEncoder, self).default(o)
+
+def json_dumps(o):
+    return JSONEncoder(indent=2, sort_keys=True).encode(o)

@@ -24,23 +24,35 @@ def puppet(b, relaxed=False):
     # Set the default `PATH` for exec resources.
     m.add(Exec.defaults(path=os.environ['PATH']))
 
-    def source(dirname, filename, gen_content):
+    def source(dirname, filename, gen_content, url):
         """
         Create file and exec resources to fetch and extract a source tarball.
         """
         pathname = os.path.join('/tmp', filename)
-        m['sources'].add(File(
-            pathname,
-            b.name,
-            gen_content(),
-            owner='root',
-            group='root',
-            mode='0644',
-            source='puppet:///modules/{0}/{1}'.format(b.name, pathname[1:])))
-        m['sources'].add(Exec('tar xf {0}'.format(pathname),
-                              alias=filename,
-                              cwd=dirname,
-                              require=File.ref(pathname)))
+        if url is not None:
+            m['sources'].add(Exec(
+                '/bin/sh -c \'curl -o "{0}" "{1}" || wget -O "{0}" "{1}"\''.
+                    format(pathname, url),
+                before=Exec.ref(dirname),
+                creates=pathname))
+        elif gen_content is not None:
+            m['sources'].add(File(
+                pathname,
+                b.name,
+                gen_content(),
+                before=Exec.ref(dirname),
+                owner='root',
+                group='root',
+                mode='0644',
+                source='puppet:///modules/{0}{1}'.format(b.name, pathname)))
+        if '.zip' == pathname[-4:]:
+            m['sources'].add(Exec('unzip {0}'.format(pathname),
+                                  alias=dirname,
+                                  cwd=dirname))
+        else:
+            m['sources'].add(Exec('tar xf {0}'.format(pathname),
+                                  alias=dirname,
+                                  cwd=dirname))
 
     def file(pathname, f):
         """
@@ -63,16 +75,29 @@ def puppet(b, relaxed=False):
                                 group=f['group'],
                                 ensure=f['content']))
             return
-        content = f['content']
-        if 'base64' == f['encoding']:
-            content = base64.b64decode(content)
-        m['files'].add(File(pathname,
-                            b.name,
-                            content,
-                            owner=f['owner'],
-                            group=f['group'],
-                            mode=f['mode'][-4:],
-                            ensure='file'))
+        if 'source' in f:
+            m['files'].add(Exec(
+                'curl -o "{0}" "{1}" || wget -O "{0}" "{1}"'.
+                    format(pathname, f['source']),
+                before=File.ref(pathname),
+                creates=pathname,
+                require=File.ref(os.path.dirname(pathname))))
+            m['files'].add(File(pathname,
+                                owner=f['owner'],
+                                group=f['group'],
+                                mode=f['mode'][-4:],
+                                ensure='file'))
+        else:
+            content = f['content']
+            if 'base64' == f['encoding']:
+                content = base64.b64decode(content)
+            m['files'].add(File(pathname,
+                                b.name,
+                                content,
+                                owner=f['owner'],
+                                group=f['group'],
+                                mode=f['mode'][-4:],
+                                ensure='file'))
 
     deps = []
     def before_packages(manager):
@@ -95,11 +120,11 @@ def puppet(b, relaxed=False):
         """
         Create a package resource.
         """
+        ensure = 'installed' if relaxed or version is None else version
 
         # `apt` and `yum` are easy since they're the default for their
         # respective platforms.
         if manager in ('apt', 'yum'):
-            ensure = 'installed' if relaxed else version
             m['packages'][manager].add(Package(package, ensure=ensure))
 
             # If APT is installing RubyGems, get complicated.  This would
@@ -124,12 +149,20 @@ def puppet(b, relaxed=False):
                     creates='/usr/bin/npm',
                     require=Package.ref(package)))
 
+        # AWS cfn-init templates may specify RPMs to be installed from URLs,
+        # which are specified as versions.
+        elif 'rpm' == manager:
+            m['packages']['rpm'].add(Package(package,
+                                             ensure='installed',
+                                             provider='rpm',
+                                             source=version))
+
         # RubyGems for Ruby 1.8 is easy, too, because Puppet has a
         # built in provider.  This is called simply "rubygems" on
         # RPM-based distros.
         elif manager in ('rubygems', 'rubygems1.8'):
             m['packages'][manager].add(Package(package,
-                                               ensure=version,
+                                               ensure=ensure,
                                                provider='gem'))
 
         # Other versions of RubyGems are slightly more complicated.
@@ -137,7 +170,7 @@ def puppet(b, relaxed=False):
             match = re.match(r'^ruby(?:gems)?(\d+\.\d+(?:\.\d+)?)',
                              manager)
             m['packages'][manager].add(Exec(
-                manager(package, version),
+                manager(package, version, relaxed),
                 creates='{0}/{1}/gems/{2}-{3}'.format(util.rubygems_path(),
                                                       match.group(1),
                                                       package,
@@ -148,7 +181,9 @@ def puppet(b, relaxed=False):
         # directory is not known ahead of time.  This just so happens
         # to be the way everything else works, too.
         else:
-            m['packages'][manager].add(Exec(manager(package, version)))
+            m['packages'][manager].add(Exec(manager(package,
+                                                    version,
+                                                    relaxed)))
 
     restypes = {'files': File,
                 'packages': Package,
@@ -216,7 +251,10 @@ class Manifest(object):
         Each class must have a name and might have a parent.  If a manifest
         has a parent, this signals it to `include` itself in the parent.
         """
-        self.name, count = re.subn(r'\.', '--', unicode(name))
+        if name is None:
+            self.name = 'blueprint-generated-puppet-module'
+        else:
+            self.name, _ = re.subn(r'\.', '--', unicode(name))
         self.parent = parent
         self.comment = comment
         self.manifests = defaultdict(dict)
@@ -545,7 +583,7 @@ class File(Resource):
         """
         if inline:
 
-            # FIXME Leaky abstraction.  The source attribute is perfectly
+            # TODO Leaky abstraction.  The source attribute is perfectly
             # valid but the check here assumes it is only ever used for
             # placing source tarballs.
             if 'source' in self:

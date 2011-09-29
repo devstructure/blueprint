@@ -77,7 +77,7 @@ A dictionary that maps directory names to the name of the tarball that contains 
 
 .
 .TP
-\fBsource(dirname, filename, gen_content):\fR Executed when a source tarball is enumerated\. \fBgen_content\fR is a callable that will return the file\'s contents\.
+\fBsource(dirname, filename, gen_content, url):\fR Executed when a source tarball is enumerated\. Either \fBgen_content\fR or \fBurl\fR will be \fBNone\fR\. \fBgen_content\fR, when not \fBNone\fR, is a callable that will return the file\'s contents\.
 
 .
 .TP
@@ -133,7 +133,7 @@ A dictionary that maps directory names to the name of the tarball that contains 
 
 .
 .P
-The \fBblueprint\.Blueprint\fR class (not individual instances) supports \fBdestroy(\fR\fIname\fR\fB)\fR to destroy a blueprint and \fBiter()\fR to iterate over the names of blueprints\.
+The \fBblueprint\.Blueprint\fR class (not individual instances) supports \fBdestroy(\fR\fIname\fR\fB)\fR to destroy a blueprint, \fBiter()\fR to iterate over the names of blueprints, \fBload(\fR\fIf\fR\fB)\fR to load blueprint JSON from a file\-like object, and \fBloads(\fR\fIs\fR\fB)\fR to load blueprint JSON from a string\.
 .
 .SS "blueprint\.frontend"
 \fBblueprint\.frontend\.puppet\.Manifest\fR, \fBblueprint\.frontend\.chef\.Cookbook\fR, and \fBblueprint\.frontend\.sh\.Script\fR all implement similar interfaces to code generation\.
@@ -148,7 +148,10 @@ The \fBblueprint\.Blueprint\fR class (not individual instances) supports \fBdest
 \fBdumpf(gzip=\fR\fIFalse\fR\fB)\fR returns the name of a file, possibly in a newly\-created directory, containing code in the language implemented by the class that received the call\. The file or directory is created in the current working directory\. If \fBgzip=\fR\fITrue\fR, the file or directory will compressed and the resulting tarball will be left in the current working directory\.
 .
 .SS "blueprint\.manager"
-The \fBblueprint\.manager\.Manager\fR class is a \fBdict\fR subclass that is used as the value associated with each package manager name\. It is a callable that can translate package names and versions into shell commands for installing the package\. For example: \fBblueprint\.manager\.Manager(\fR\fI\'apt\'\fR\fB)(\fR\fI\'python\'\fR\fB,\fR\fI\'2\.6\.6\-2ubuntu1\'\fR\fB)\fR\.
+The \fBblueprint\.managers\.PackageManager\fR class is a \fBunicode\fR subclass that is used as the key in the \fBpackages\fR dictionary\. It is a callable that can translate package names and versions into shell commands for installing the package\. For example: \fBblueprint\.managers\.PackageManager(\fR\fI\'apt\'\fR\fB)(\fR\fI\'python\'\fR\fB,\fR\fI\'2\.6\.6\-2ubuntu1\'\fR\fB)\fR\.
+.
+.P
+The \fBblueprint\.managers\.ServiceManager\fR class is like \fBblueprint\.managers\.PackageManager\fR but the callables to generate restart commands accept only one argument: the service name\. For example: \fBblueprint\.managers\.ServiceManager(\fR\fI\'sysvinit\'\fR\fB)(\fR\fI\'ssh\'\fR\fB)\fR\.
 .
 .SS "blueprint\.backend"
 The \fBblueprint\.backend\fR module implements \fBblueprint\-create\fR(1)\. Each module within (for example, \fBblueprint\.backend\.apt\fR) must contain a function by the same name (in the example, \fBblueprint\.backend\.apt\.apt\fR) which accepts a \fBblueprint\.Blueprint\fR object as its only argument\. When \fBblueprint\.backend\fR is imported, it finds all such functions, lists them in \fBblueprint\.backend\.__all__\fR, and imports the function\. Use the backend functions thus:

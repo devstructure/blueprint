@@ -77,6 +77,28 @@ class Blueprint(dict):
         for line in stdout.splitlines():
             yield line.strip()
 
+    @classmethod
+    def load(cls, f, name=None):
+        """
+        Instantiate and return a Blueprint object from a file-like object
+        from which valid blueprint JSON may be read.
+        """
+        b = cls()
+        b.name = name
+        b.update(json.load(f))
+        return b
+
+    @classmethod
+    def loads(cls, s, name=None):
+        """
+        Instantiate and return a Blueprint object from a string containing
+        valid blueprint JSON.
+        """
+        b = cls()
+        b.name = name
+        b.update(json.loads(s))
+        return b
+
     def __init__(self, name=None, commit=None, create=False):
         """
         Construct a blueprint in the new format in a backwards-compatible
@@ -226,7 +248,7 @@ class Blueprint(dict):
         """
         Validate and set the blueprint name.
         """
-        if name is not None and re.search(r'[/ \t\r\n]', name):
+        if name is not None and re.search(r'^$|^-$|[/ \t\r\n]', name):
             raise NameError('invalid blueprint name')
         self._name = name
     name = property(get_name, set_name)
@@ -296,7 +318,11 @@ class Blueprint(dict):
         """
         Create a service resource which depends on given files and packages.
         """
-        self.services[manager][service]
+
+        # AWS cfn-init respects the enable and ensure parameters like Puppet
+        # does.  Blueprint provides these parameters for interoperability.
+        self.services[manager].setdefault(service, {'enable': True,
+                                                    'ensureRunning': True})
 
     def add_service_file(self, manager, service, *args):
         """
@@ -391,7 +417,7 @@ class Blueprint(dict):
         for key in ['files', 'packages', 'sources']:
             if key in self and 0 == len(self[key]):
                 del self[key]
-        return util.JSONEncoder(indent=2, sort_keys=True).encode(self)
+        return util.json_dumps(self)
 
     def puppet(self, relaxed=False):
         """
@@ -455,22 +481,31 @@ class Blueprint(dict):
 
         * `before_sources():`
           Executed before source tarballs are enumerated.
-        * `source(dirname, filename, gen_content):`
-          Executed when a source tarball is enumerated.  `gen_content`
-          is a callable that will return the file's contents.
+        * `source(dirname, filename, gen_content, url):`
+          Executed when a source tarball is enumerated.  Either `gen_content`
+          or `url` will be `None`.  `gen_content`, when not `None`, is a
+          callable that will return the file's contents.
         * `after_sources():`
           Executed after source tarballs are enumerated.
         """
 
         kwargs.get('before_sources', lambda *args: None)()
 
+        pattern = re.compile(r'^(?:file|ftp|https?)://', re.I)
         callable = kwargs.get('source', lambda *args: None)
         for dirname, filename in sorted(self.sources.iteritems()):
-            def gen_content():
-                tree = git.tree(self._commit)
-                blob = git.blob(tree, filename)
-                return git.content(blob)
-            callable(dirname, filename, gen_content)
+            if pattern.match(filename) is None:
+                def gen_content():
+                    tree = git.tree(self._commit)
+                    blob = git.blob(tree, filename)
+                    return git.content(blob)
+                callable(dirname, filename, gen_content, None)
+            else:
+                url = filename
+                filename = os.path.basename(url)
+                if '' == filename:
+                    filename = 'blueprint-downloaded-tarball.tar.gz'
+                callable(dirname, filename, None, url)
 
         kwargs.get('before_sources', lambda *args: None)()
 
@@ -490,6 +525,13 @@ class Blueprint(dict):
 
         callable = kwargs.get('file', lambda *args: None)
         for pathname, f in sorted(self.files.iteritems()):
+
+            # AWS cfn-init templates may specify file content as JSON, which
+            # must be converted to a string here, lest each frontend have to
+            # do so.
+            if 'content' in f and not isinstance(f['content'], basestring):
+                f['content'] = util.json_dumps(f['content'])
+
             callable(pathname, f)
 
         kwargs.get('after_files', lambda *args: None)()
@@ -509,9 +551,11 @@ class Blueprint(dict):
           Executed after a package manager's dependencies are enumerated.
         """
 
-        # Walking begins with the system package managers, `apt` and `yum`.
+        # Walking begins with the system package managers, `apt`, `rpm`,
+        # and `yum`.
         if managername is None:
             self.walk_packages('apt', **kwargs)
+            self.walk_packages('rpm', **kwargs)
             self.walk_packages('yum', **kwargs)
             return
 
@@ -527,8 +571,13 @@ class Blueprint(dict):
         callable = kwargs.get('package', lambda *args: None)
         for package, versions in sorted(self.packages.get(manager,
                                                           {}).iteritems()):
-            for version in versions:
-                callable(manager, package, version)
+            if 0 == len(versions):
+                callable(manager, package, None)
+            elif isinstance(versions, basestring):
+                callable(manager, package, versions)
+            else:
+                for version in versions:
+                    callable(manager, package, version)
             if managername != package and package in self.packages:
                 next_managers.append(package)
 

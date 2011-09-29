@@ -9,6 +9,8 @@ blueprint-push(1) -- push a blueprint to the Internet
 
 `blueprint-push` stores the blueprint _name_ and all associated tarballs as _name_ on the configured server (which is `https://devstructure.com` by default) and prints the URL from which it may be fetched.
 
+If _name_ does not exist and standard input is not a TTY, a blueprint is read from standard input.  See `blueprint`(5) for the details of the format.
+
 If no _secret_ is configured in `/etc/blueprint.cfg` or `~/.blueprint.cfg`, one is created and a sample configuration is printed.
 
 DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3.  Alternatively, you can supply your own backend server.
