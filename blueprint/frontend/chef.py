@@ -57,25 +57,12 @@ def chef(b, relaxed=False):
                    to=f['content'])
             return
         if 'source' in f:
-            if 'base64' == f['encoding']:
-                pass
-                c.execute('{{ curl "{1}" || wget -O- "{1}" }} | ' # No ,
-                          'base64 --decode >"{0}"'.format(pathname,
-                                                          f['source']),
-                          creates=pathname)
-                c.file(pathname,
-                       None,
-                       backup=False,
-                       group=f['group'],
-                       mode=f['mode'][-4:],
-                       owner=f['owner'])
-            else:
-                c.remote_file(pathname,
-                              backup=False,
-                              group=f['group'],
-                              mode=f['mode'][-4:],
-                              owner=f['owner'],
-                              source=f['source'])
+            c.remote_file(pathname,
+                          backup=False,
+                          group=f['group'],
+                          mode=f['mode'][-4:],
+                          owner=f['owner'],
+                          source=f['source'])
         else:
             content = f['content']
             if 'base64' == f['encoding']:

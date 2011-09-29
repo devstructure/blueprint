@@ -71,20 +71,12 @@ def puppet(b, relaxed=False):
                                 ensure=f['content']))
             return
         if 'source' in f:
-            if 'base64' == f['encoding']:
-                m['files'].add(Exec(
-                    '/bin/sh -c \'{{ curl "{1}" || wget -O- "{1}" }} | ' # No ,
-                    'base64 --decode >"{0}"\''.format(pathname, f['source']),
-                    before=File.ref(pathname),
-                    creates=pathname,
-                    require=File.ref(os.path.dirname(pathname))))
-            else:
-                m['files'].add(Exec(
-                    'curl -o "{0}" "{1}" || wget -O "{0}" "{1}"'.
-                        format(pathname, f['source']),
-                    before=File.ref(pathname),
-                    creates=pathname,
-                    require=File.ref(os.path.dirname(pathname))))
+            m['files'].add(Exec(
+                'curl -o "{0}" "{1}" || wget -O "{0}" "{1}"'.
+                    format(pathname, f['source']),
+                before=File.ref(pathname),
+                creates=pathname,
+                require=File.ref(os.path.dirname(pathname))))
             m['files'].add(File(pathname,
                                 owner=f['owner'],
                                 group=f['group'],

@@ -74,15 +74,9 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
             s.add('ln -s "{0}" "{1}"', f['content'], pathname)
         else:
             if 'source' in f:
-                if 'base64' == f['encoding']:
-                    s.add('{{ curl "{1}" || wget -O- "{1}" }} | ' # No ,
-                          'base64 --decode >"{0}"',
-                          pathname,
-                          f['source'])
-                else:
-                    s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"',
-                          pathname,
-                          f['source'])
+                s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"',
+                      pathname,
+                      f['source'])
             else:
                 eof = 'EOF'
                 while re.search(r'{0}'.format(eof), f['content']):
