@@ -84,11 +84,18 @@
   "arch": "ARCHITECTURE",
   "files": {
     "PATHNAME": {
-      "owner": "OWNER",
+      "content": "CONTENT",
+      "encoding": "ENCODING",
       "group": "GROUP",
       "mode": "MODE",
-      "content": "CONTENT",
-      "encoding": "ENCODING"
+      "owner": "OWNER"
+    },
+    "PATHNAME": {
+      "encoding": "ENCODING",
+      "group": "GROUP",
+      "mode": "MODE",
+      "owner": "OWNER",
+      "source": "SOURCE"
     }
   },
   "packages": {
@@ -99,11 +106,16 @@
     "MANAGER": {
       "PACKAGE": ["VERSION"],
       "PACKAGE": ["VERSION"]
+    },
+    "rpm": {
+      "PACKAGE": ["URL"]
     }
   },
   "services": {
     "MANAGER": {
       "SERVICENAME": {
+        "enable": true,
+        "ensure": "running",
         "files": ["PATHNAME"],
         "packages": {
           "MANAGER": ["PACKAGE"]
@@ -113,7 +125,8 @@
     }
   },
   "sources": {
-    "DIRNAME": "FILENAME"
+    "DIRNAME": "FILENAME",
+    "DIRNAME": "URL"
   }
 }
 </code></pre>
@@ -130,15 +143,21 @@
 
 <p>If <code>sources</code> is present and non-empty, <code>arch</code> will also be present indicating the architecture of the server that created the blueprint.  If present, this value will be <em>amd64</em> or <em>i386</em> on Debian-based systems or <em>x86_64</em> or <em>x86</em> on RPM-based systems.  It is legal to refuse to apply a blueprint with a mismatched architecture.  The architecture can be found by running <code>dpkg --print-architecture</code> or <code>rpm --eval %_arch</code> as appropriate.</p>
 
+<p>For compatibility with AWS <code>cfn-init</code>, a URL may appear in the value in place of a filename.  If such a value is encountered, the URL should be fetched and extracted.  Blueprint will never generate such objects.</p>
+
 <h3 id="Files">Files</h3>
 
 <p>Each key in the optional <code>files</code> object is the fully-qualified pathname to a file.  These pathnames should be traversed in alphabetical order.  The associated value contains the <code>owner</code>, owning <code>group</code>, <code>mode</code> (a string containing the full 6-digit octal representation), <code>content</code>, and the <code>encoding</code> of content (one of <em>plain</em> or <em>base64</em>).  Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied.</p>
+
+<p>For compatibility with AWS <code>cfn-init</code>, <code>source</code> takes precedence over the <code>content</code>.  If a file with a <code>source</code> is encountered, the <code>source</code> URL should be fetched as the file's content.  Blueprint will never generate such objects.</p>
 
 <h3 id="Packages">Packages</h3>
 
 <p>Each key within <code>packages</code> names a package manager.  Each manager contains keys that name packages to be installed by that manager.  Each package name is associated with an array of versions that must be installed.  In most cases, for most managers, this array will have only one element.</p>
 
-<p>Each manager is itself the name of a package that appears elsewhere.  <code>packages</code> must be processed by starting with the <code>apt</code> and <code>yum</code> managers, installing their dependencies.  Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.</p>
+<p>Each manager is itself the name of a package that appears elsewhere.  <code>packages</code> must be processed by starting with the <code>apt</code>, <code>rpm</code>, and <code>yum</code> managers, installing their dependencies.  Any manager that was installed during this pass must next have its dependencies installed, continuing recursively until all managers and all dependencies have been installed.</p>
+
+<p>For compatibility with AWS <code>cfn-init</code>, the <code>rpm</code> manager is included.  Packages managed by <code>rpm</code> specify URLs in place of version numbers.  If such a package is encountered, the URL should be installed via <span class="man-ref"><code>rpm</code><span class="s">(1)</span></span>.  Blueprint will never generate such objects.</p>
 
 <h3 id="Services">Services</h3>
 
@@ -146,13 +165,15 @@
 
 <p>If any of the resources on which the service depends are changed, upgraded, initailized, or otherwise acted upon, the service should be restarted.</p>
 
+<p>For compatibility with AWS <code>cfn-init</code>, <code>"enable": true</code> and <code>"ensure": "running"</code> are included with each service.  Blueprint ignores these when generating code.</p>
+
 <h2 id="THEME-SONG">THEME SONG</h2>
 
 <p>The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"</p>
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#58;&#114;&#105;&#x63;&#104;&#x61;&#x72;&#100;&#x40;&#x64;&#101;&#x76;&#x73;&#116;&#x72;&#x75;&#x63;&#116;&#x75;&#114;&#101;&#x2e;&#99;&#x6f;&#x6d;" data-bare-link="true">&#114;&#105;&#x63;&#104;&#x61;&#x72;&#100;&#64;&#100;&#x65;&#118;&#x73;&#x74;&#114;&#x75;&#99;&#116;&#117;&#114;&#101;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#x72;&#105;&#99;&#104;&#97;&#114;&#100;&#x40;&#x64;&#101;&#118;&#x73;&#116;&#x72;&#117;&#99;&#x74;&#x75;&#x72;&#101;&#46;&#x63;&#x6f;&#109;" data-bare-link="true">&#114;&#105;&#x63;&#x68;&#x61;&#x72;&#100;&#64;&#100;&#101;&#x76;&#115;&#116;&#x72;&#x75;&#99;&#x74;&#117;&#x72;&#x65;&#x2e;&#99;&#111;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 

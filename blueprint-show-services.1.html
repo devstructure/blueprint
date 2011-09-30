@@ -82,11 +82,13 @@
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>blueprint show-services</code> [<code>-q</code>] <em>name</em></p>
+<p><code>blueprint show-services</code> [<code>-q</code>] [<em>name</em>]</p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
 <p><code>blueprint-show-servies</code> prints the manager and name (separated by spaces) of each service in the blueprint <em>name</em>.  They are printed one-per-line to make this command useful in pipelines.</p>
+
+<p>If <em>name</em> is omitted or <code>-</code>, a blueprint is read from standard input and treated in the same manner.  See <span class="man-ref"><code>blueprint</code><span class="s">(5)</span></span> for the details of the format.</p>
 
 <h2 id="OPTIONS">OPTIONS</h2>
 
@@ -110,7 +112,7 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#109;&#97;&#105;&#108;&#116;&#x6f;&#58;&#114;&#105;&#x63;&#x68;&#x61;&#x72;&#100;&#x40;&#x64;&#101;&#x76;&#x73;&#x74;&#x72;&#x75;&#99;&#x74;&#117;&#114;&#x65;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#114;&#105;&#99;&#104;&#97;&#114;&#100;&#x40;&#100;&#x65;&#118;&#x73;&#x74;&#114;&#117;&#99;&#116;&#x75;&#x72;&#101;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#x72;&#105;&#x63;&#x68;&#97;&#x72;&#100;&#x40;&#x64;&#x65;&#118;&#x73;&#116;&#x72;&#117;&#x63;&#x74;&#117;&#114;&#x65;&#x2e;&#x63;&#111;&#x6d;" data-bare-link="true">&#x72;&#105;&#99;&#104;&#97;&#x72;&#100;&#x40;&#100;&#x65;&#118;&#115;&#116;&#x72;&#x75;&#x63;&#116;&#x75;&#114;&#101;&#46;&#x63;&#x6f;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
