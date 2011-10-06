@@ -1,0 +1,115 @@
+#!/usr/bin/python
+
+import logging
+import optparse
+import readline
+import subprocess
+import sys
+
+import blueprint
+from blueprint import context_managers
+from blueprint import git
+from blueprint import walk
+
+parser = optparse.OptionParser(
+    'Usage: %prog [-m <message>] [-q] <src> <dest-a> <dest-b>')
+parser.add_option('-m', '--message',
+                  dest='message',
+                  default=None,
+                  help='commit message')
+parser.add_option('-q', '--quiet',
+                  dest='quiet',
+                  default=False,
+                  action='store_true',
+                  help='operate quietly')
+options, args = parser.parse_args()
+
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
+
+if 3 != len(args):
+    parser.print_usage()
+    sys.exit(1)
+src, dest_a, dest_b = args
+
+try:
+    b_s = blueprint.Blueprint.checkout(src)
+except blueprint.NotFoundError:
+    logging.error('blueprint {0} does not exist'.format(src))
+    sys.exit(1)
+except blueprint.NameError:
+    logging.error('invalid blueprint name {0}'.format(src))
+    sys.exit(1)
+try:
+    b_da = blueprint.Blueprint(dest_a)
+except blueprint.NameError:
+    logging.error('invalid blueprint name {0}'.format(dest_a))
+    sys.exit(1)
+try:
+    b_db = blueprint.Blueprint(dest_b)
+except blueprint.NameError:
+    logging.error('invalid blueprint name {0}'.format(dest_b))
+    sys.exit(1)
+
+# Return the blueprint object indicated by the user's input.
+
+def sortinghat():
+    prompt = '"{0}" or "{1}"? '.format(dest_a, dest_b)
+    prefix = raw_input(prompt)
+    while dest_a.startswith(prefix) == dest_b.startswith(prefix):
+        print('Ambiguous; please give a unique prefix of a blueprint name.')
+        prefix = raw_input(prompt)
+    return {(True, False): b_da,
+            (False, True): b_db}[(dest_a.startswith(prefix),
+                                  dest_b.startswith(prefix))]
+
+# Call the sorting hat and then add the resource being walked to the blueprint
+# indicated by the sorting hat.
+def file(pathname, f):
+    print(pathname)
+    sortinghat().add_file(pathname, **f)
+def package(manager, package, version):
+    print('{0} {1} {2}'.format(manager, package, version))
+    sortinghat().add_package(manager, package, version)
+def service(manager, service):
+    print('{0} {1}'.format(manager, service))
+    b = sortinghat()
+    b.add_service(manager, service)
+    def service_file(m, s, pathname):
+        b.add_service_file(m, s, pathname)
+    walk.walk_service_files(b, manager, service, service_file=service_file)
+    def service_package(m, s, pm, package):
+        b.add_service_package(m, s, pm, package)
+    walk.walk_service_packages(b,
+                               manager,
+                               service,
+                               service_package=service_package)
+    def service_source(m, s, dirname):
+        b.add_service_source(m, s, dirname)
+    walk.walk_service_sources(b,
+                              manager,
+                              service,
+                              service_source=service_source)
+commit = git.rev_parse(src)
+tree = git.tree(commit)
+def source(dirname, filename, gen_content, url):
+    if url is not None:
+        print('{0} {1}'.format(dirname, url))
+    elif gen_content is not None:
+        blob = git.blob(tree, filename)
+        p = subprocess.Popen(['cat'],
+                             close_fds=True,
+                             stdin=git.cat_file(blob),
+                             stdout=open(filename, 'w'))
+        print('{0} {1}'.format(dirname, filename))
+    sortinghat().add_source(dirname, filename)
+
+try:
+    with context_managers.mkdtemp():
+        b_s.walk(file=file, package=package, service=service, source=source)
+        b_da.commit(options.message or '')
+        b_db.commit(options.message or '')
+except IOError:
+    pass
+except KeyboardInterrupt:
+    print('')
