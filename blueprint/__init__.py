@@ -3,20 +3,14 @@ from collections import defaultdict
 import copy
 import json
 import logging
-import os
 import os.path
 import re
-import subprocess
-import time
-import urllib
 
 # This must be called early - before the rest of the blueprint library loads.
 logging.basicConfig(format='# [blueprint] %(message)s',
                     level=logging.INFO)
 
-import context_managers
 import git
-import managers
 import util
 
 

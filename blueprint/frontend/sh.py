@@ -10,8 +10,6 @@ import os.path
 import re
 import tarfile
 
-
-from blueprint import git
 from blueprint import util
 
 

@@ -5,13 +5,11 @@ Chef code generator.
 import base64
 import codecs
 import errno
-from collections import defaultdict
 import os
 import os.path
 import re
 import tarfile
 
-from blueprint import git
 from blueprint import util
 from blueprint import walk
 

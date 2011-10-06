@@ -6,7 +6,6 @@ import re
 import sys
 import urlparse
 
-import blueprint
 from blueprint import cfg
 from blueprint import context_managers
 import blueprint.io
