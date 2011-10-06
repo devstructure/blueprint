@@ -1,12 +1,9 @@
-import json
 import logging
 import sys
-import urlparse
 
 from blueprint import cfg
 from blueprint import git
 from blueprint import Blueprint
-from blueprint import context_managers
 import http
 
 

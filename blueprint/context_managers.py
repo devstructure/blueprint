@@ -1,6 +1,4 @@
-import getpass
 import os
-import os.path
 import shutil
 import tempfile
 

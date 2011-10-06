@@ -1,10 +1,7 @@
 #!/usr/bin/python
 
-import errno
 import logging
 import optparse
-import re
-import subprocess
 import sys
 
 import blueprint

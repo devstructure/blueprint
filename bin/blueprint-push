@@ -3,10 +3,8 @@
 from ConfigParser import NoOptionError
 import logging
 import optparse
-import re
 import sys
 
-import blueprint
 from blueprint import cfg
 import blueprint.cli
 import blueprint.io

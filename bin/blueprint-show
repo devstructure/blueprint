@@ -3,10 +3,8 @@
 import errno
 import logging
 import optparse
-import re
 import sys
 
-import blueprint
 import blueprint.cli
 
 parser = optparse.OptionParser('Usage: %prog [-P|-C|-S|-I] [-r] [-q] [<name>]')

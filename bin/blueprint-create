@@ -3,13 +3,8 @@
 import errno
 import logging
 import optparse
-import os
-import re
-import select
-import subprocess
 import sys
 
-import blueprint
 import blueprint.cli
 from blueprint import context_managers
 
