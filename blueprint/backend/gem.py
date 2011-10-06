@@ -50,4 +50,5 @@ def gem(b):
                     logging.warning('skipping questionably named gem {0}'.
                                     format(entry))
                     continue
-                b.add_package(manager, package, version)
+                if not ignore.package(manager, package):
+                    b.add_package(manager, package, version)

@@ -28,6 +28,7 @@ def npm(b):
             if match is None:
                 continue
             package, version = match.group(1), match.group(2)
-            b.add_package('nodejs', package, version)
+            if not ignore.package('nodejs', package):
+                b.add_package('nodejs', package, version)
     except OSError:
         pass
