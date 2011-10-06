@@ -94,7 +94,8 @@ def _dpkg_query(b, manager, package, version, entry, pathname):
         versions = b.packages['apt'][manager]
         if stdout not in versions:
             versions.add(stdout)
-        b.add_package(manager, package, version)
+        if not ignore.package(manager, package):
+            b.add_package(manager, package, version)
 
     # This package was installed via `pip`.  Figure out how
     # `pip` was installed and use that as this package's
@@ -107,9 +108,11 @@ def _dpkg_query(b, manager, package, version, entry, pathname):
                              stderr=subprocess.PIPE)
         p.communicate()
         if 0 != p.returncode:
-            b.add_package('pip', package, version)
+            if not ignore.package('pip', package):
+                b.add_package('pip', package, version)
         else:
-            b.add_package('python-pip', package, version)
+            if not ignore.package('python-pip', package):
+                b.add_package('python-pip', package, version)
 
 
 def _rpm(b, manager, package, version, entry, pathname):
@@ -143,7 +146,8 @@ def _rpm(b, manager, package, version, entry, pathname):
         versions = b.packages['yum']['python']
         if stdout not in versions:
             versions.add(stdout)
-        b.add_package('python', package, version)
+        if not ignore.package('python', package):
+            b.add_package('python', package, version)
 
     # This package was installed via `pip`.  Figure out how
     # `pip` was installed and use that as this package's
@@ -156,6 +160,8 @@ def _rpm(b, manager, package, version, entry, pathname):
                              stderr=subprocess.PIPE)
         p.communicate()
         if 0 != p.returncode:
-            b.add_package('pip', package, version)
+            if not ignore.package('pip', package):
+                b.add_package('pip', package, version)
         else:
-            b.add_package('python-pip', package, version)
+            if not ignore.package('python-pip', package):
+                b.add_package('python-pip', package, version)
