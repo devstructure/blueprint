@@ -5,18 +5,19 @@ blueprint(7) -- Blueprint Python library
 
 	import blueprint
 
-	b = blueprint.Blueprint(name='foo', create=True)
-	b.commit()
+	b1 = blueprint.Blueprint.create('foo')
+	b1.commit()
 
-	b.puppet().dumpf(gzip=True)
-	b.chef().dumpf(gzip=True)
-	b.sh().dumpf(gzip=True)
+	b2 = blueprint.Blueprint.checkout('foo')
+	b2.puppet().dumpf(gzip=True)
+	b2.chef().dumpf(gzip=True)
+	b2.sh().dumpf(gzip=True)
 
 ## DESCRIPTION
 
 ### blueprint.Blueprint
 
-The `blueprint.Blueprint` class manages blueprints stored in the local blueprint repository using the `git`(1) tools.  New blueprints are created by passing the `create=True` keyword argument to `blueprint.Blueprint`.  Previously committed blueprints are referenced by passing the `name=`_name_ keyword argument and optionally `commit=`_commit_.
+The `blueprint.Blueprint` class manages blueprints stored in the local blueprint repository using the `git`(1) tools.  New blueprints are created by calling the `blueprint.Blueprint.create` class method with a _name_.  Previously committed blueprints are recalled by calling the `blueprint.Blueprint.checkout` class method with a _name_ and optionally a _commit_.  Empty blueprints are created by calling the `blueprint.Blueprint` constructor.
 
 `blueprint.Blueprint` objects may be subtracted from one another.
 
@@ -88,7 +89,7 @@ The `blueprint.Blueprint` class (not individual instances) supports `destroy(`_n
 
 `dumpf(gzip=`_False_`)` returns the name of a file, possibly in a newly-created directory, containing code in the language implemented by the class that received the call.  The file or directory is created in the current working directory.  If `gzip=`_True_, the file or directory will compressed and the resulting tarball will be left in the current working directory.
 
-### blueprint.manager
+### blueprint.managers
 
 The `blueprint.managers.PackageManager` class is a `unicode` subclass that is used as the key in the `packages` dictionary.  It is a callable that can translate package names and versions into shell commands for installing the package.  For example: `blueprint.managers.PackageManager(`_'apt'_`)(`_'python'_`, `_'2.6.6-2ubuntu1'_`)`.
 

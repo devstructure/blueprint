@@ -27,7 +27,7 @@ def create(options, args):
                         'standard input contains invalid blueprint JSON')
                     sys.exit(1)
             else:
-                b = blueprint.Blueprint(args[0], create=True)
+                b = blueprint.Blueprint.create(args[0])
             b.commit(options.message or '')
             return b
     except blueprint.NameError:
@@ -58,7 +58,7 @@ def read(options, args):
                 logging.error('standard input contains invalid blueprint JSON')
                 sys.exit(1)
         if name is not None:
-            return blueprint.Blueprint(name)
+            return blueprint.Blueprint.checkout(name)
     except blueprint.NotFoundError:
         logging.error('blueprint {0} does not exist'.format(name))
         sys.exit(1)
