@@ -10,6 +10,8 @@ import os.path
 import re
 import subprocess
 
+import walk
+
 
 # Pattern for matching pathnames in init scripts and such.
 pattern = re.compile(r'(/[/0-9A-Za-z_.-]+)')
@@ -73,15 +75,16 @@ def services(b):
         Add extra file dependencies found in packages.  Then add extra file
         dependencies found by searching file content for pathnames.
         """
-        b.walk_service_packages(manager,
-                                service,
-                                service_package=service_package)
+        walk.walk_service_packages(b,
+                                   manager,
+                                   service,
+                                   service_package=service_package)
         if 'sysvinit' == manager:
             service_file(manager, service, '/etc/init.d/{0}'.format(service))
         elif 'upstart' == manager:
             service_file(manager,
                          service,
                          '/etc/init/{0}.conf'.format(service))
-        b.walk_service_files(manager, service, service_file=service_file)
+        walk.walk_service_files(b, manager, service, service_file=service_file)
 
-    b.walk_services(service=service)
+    b.walk(service=service)

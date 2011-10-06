@@ -32,9 +32,9 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
         lut['packages'][package_manager][package].add((manager, service))
     def service_source(manager, service, dirname):
         lut['sources'][dirname].add((manager, service))
-    b.walk_services(service_file=service_file,
-                    service_package=service_package,
-                    service_source=service_source)
+    b.walk(service_file=service_file,
+           service_package=service_package,
+           service_source=service_source)
 
     def source(dirname, filename, gen_content, url):
         """

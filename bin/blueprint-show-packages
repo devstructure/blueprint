@@ -29,6 +29,6 @@ b = blueprint.cli.read(options, args)
 try:
     def package(manager, package, version):
         print('{0} {1} {2}'.format(manager, package, version))
-    b.walk_packages(package=package)
+    b.walk(package=package)
 except IOError:
     pass

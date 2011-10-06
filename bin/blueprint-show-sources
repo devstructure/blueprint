@@ -41,6 +41,6 @@ try:
             p = subprocess.Popen(['tar', 'tv'],
                                  close_fds=True,
                                  stdin=git.cat_file(blob))
-    b.walk_sources(source=source)
+    b.walk(source=source)
 except IOError:
     pass

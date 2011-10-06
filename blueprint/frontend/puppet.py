@@ -13,6 +13,7 @@ import tarfile
 
 from blueprint import git
 from blueprint import util
+from blueprint import walk
 
 
 def puppet(b, relaxed=False):
@@ -197,15 +198,19 @@ def puppet(b, relaxed=False):
         subscribe = []
         def service_file(m, s, pathname):
             subscribe.append(File.ref(pathname))
-        b.walk_service_files(manager, service, service_file=service_file)
+        walk.walk_service_files(b, manager, service, service_file=service_file)
         def service_package(m, s, pm, package):
             subscribe.append(Package.ref(package))
-        b.walk_service_packages(manager,
-                                service,
-                                service_package=service_package)
+        walk.walk_service_packages(b,
+                                   manager,
+                                   service,
+                                   service_package=service_package)
         def service_source(m, s, dirname):
             subscribe.append(Exec.ref(b.sources[dirname]))
-        b.walk_service_sources(manager, service, service_source=service_source)
+        walk.walk_service_sources(b,
+                                  manager,
+                                  service,
+                                  service_source=service_source)
 
         kwargs = {'enable': True,
                   'ensure': 'running',

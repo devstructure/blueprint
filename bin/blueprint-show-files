@@ -29,6 +29,6 @@ b = blueprint.cli.read(options, args)
 try:
     def file(pathname, f):
         print(pathname)
-    b.walk_files(file=file)
+    b.walk(file=file)
 except IOError:
     pass
