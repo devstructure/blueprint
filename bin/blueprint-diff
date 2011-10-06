@@ -33,7 +33,7 @@ if 3 != len(args):
 minuend, subtrahend, difference = args
 
 try:
-    b_m = blueprint.Blueprint(name=minuend)
+    b_m = blueprint.Blueprint.checkout(minuend)
 except blueprint.NotFoundError:
     logging.error('blueprint {0} does not exist'.format(minuend))
     sys.exit(1)
@@ -41,7 +41,7 @@ except blueprint.NameError:
     logging.error('invalid blueprint name {0}'.format(minuend))
     sys.exit(1)
 try:
-    b_s = blueprint.Blueprint(name=subtrahend)
+    b_s = blueprint.Blueprint.checkout(subtrahend)
 except blueprint.NotFoundError:
     logging.error('blueprint {0} does not exist'.format(subtrahend))
     sys.exit(1)

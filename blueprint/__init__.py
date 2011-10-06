@@ -55,6 +55,28 @@ class Blueprint(dict):
 """
 
     @classmethod
+    def checkout(cls, name, commit=None):
+        git.init()
+        if commit is None:
+            commit = git.rev_parse('refs/heads/{0}'.format(name))
+            if commit is None:
+                raise NotFoundError(name)
+        tree = git.tree(commit)
+        blob = git.blob(tree, 'blueprint.json')
+        content = git.content(blob)
+        return cls(name, commit, **json.loads(content))
+
+    @classmethod
+    def create(cls, name):
+        b = cls(name)
+        import backend
+        for funcname in backend.__all__:
+            getattr(backend, funcname)(b)
+        import services
+        services.services(b)
+        return b
+
+    @classmethod
     def destroy(cls, name):
         """
         Destroy the named blueprint.
@@ -83,10 +105,7 @@ class Blueprint(dict):
         Instantiate and return a Blueprint object from a file-like object
         from which valid blueprint JSON may be read.
         """
-        b = cls()
-        b.name = name
-        b.update(json.load(f))
-        return b
+        return cls(name, **json.load(f))
 
     @classmethod
     def loads(cls, s, name=None):
@@ -94,43 +113,15 @@ class Blueprint(dict):
         Instantiate and return a Blueprint object from a string containing
         valid blueprint JSON.
         """
-        b = cls()
-        b.name = name
-        b.update(json.loads(s))
-        return b
+        return cls(name, **json.loads(s))
 
-    def __init__(self, name=None, commit=None, create=False):
+    def __init__(self, name=None, commit=None, *args, **kwargs):
         """
-        Construct a blueprint in the new format in a backwards-compatible
-        manner.
+        Construct a blueprint.  Extra arguments are handed off to `dict`.
         """
         self.name = name
         self._commit = commit
-
-        # Create a new blueprint object and populate it based on this server.
-        if create:
-            super(Blueprint, self).__init__()
-            import backend
-            for funcname in backend.__all__:
-                getattr(backend, funcname)(self)
-            import services
-            services.services(self)
-
-        # Create a blueprint from a Git repository.
-        elif name is not None:
-            git.init()
-            if self._commit is None:
-                self._commit = git.rev_parse('refs/heads/{0}'.format(name))
-                if self._commit is None:
-                    raise NotFoundError(name)
-            tree = git.tree(self._commit)
-            blob = git.blob(tree, 'blueprint.json')
-            content = git.content(blob)
-            super(Blueprint, self).__init__(**json.loads(content))
-
-        # Create an empty blueprint object to be filled in later.
-        else:
-            super(Blueprint, self).__init__()
+        super(Blueprint, self).__init__(*args, **kwargs)
 
     def __sub__(self, other):
         """
