@@ -1,5 +1,11 @@
 """
 Implementation of the blueprint walking algorithm from `blueprint`(5).
+
+It's critical that this implementation function over a naive
+`dict`-of-`dict`s-of-`list`s (as constructed by `json.load` and `json.loads`)
+as well as the true `defaultdict`- and `set`-based structure used by
+`Blueprint` objects.  This is because the walk algorithm is used to both walk
+actual `Blueprint` objects and to construct Blueprint objects.
 """
 
 import os.path
@@ -41,10 +47,16 @@ def walk_sources(b, **kwargs):
 
     pattern = re.compile(r'^(?:file|ftp|https?)://', re.I)
     callable = kwargs.get('source', lambda *args: None)
-    for dirname, filename in sorted(b.sources.iteritems()):
+    for dirname, filename in sorted(b.get('sources', {}).iteritems()):
         if pattern.match(filename) is None:
             def gen_content():
+
+                # It's a good thing `gen_content` is never called by the
+                # `Blueprint.__init__` callbacks, since this would always
+                # raise `AttributeError` on the fake blueprint structure
+                # used to initialize a real `Blueprint` object.
                 tree = git.tree(b._commit)
+
                 blob = git.blob(tree, filename)
                 return git.content(blob)
             callable(dirname, filename, gen_content, None)
@@ -73,7 +85,7 @@ def walk_files(b, **kwargs):
     kwargs.get('before_files', lambda *args: None)()
 
     callable = kwargs.get('file', lambda *args: None)
-    for pathname, f in sorted(b.files.iteritems()):
+    for pathname, f in sorted(b.get('files', {}).iteritems()):
 
         # AWS cfn-init templates may specify file content as JSON, which
         # must be converted to a string here, lest each frontend have to
@@ -119,8 +131,9 @@ def walk_packages(b, managername=None, **kwargs):
     # are themselves managers so they may be visited recursively later.
     next_managers = []
     callable = kwargs.get('package', lambda *args: None)
-    for package, versions in sorted(b.packages.get(manager,
-                                                      {}).iteritems()):
+    for package, versions in sorted(b.get('packages',
+                                          {}).get(manager,
+                                                  {}).iteritems()):
         if 0 == len(versions):
             callable(manager, package, None)
         elif isinstance(versions, basestring):
@@ -128,7 +141,7 @@ def walk_packages(b, managername=None, **kwargs):
         else:
             for version in versions:
                 callable(manager, package, version)
-        if managername != package and package in b.packages:
+        if managername != package and package in b.get('packages', {}):
             next_managers.append(package)
 
     # Give the manager a change to cleanup after itself.
@@ -156,7 +169,7 @@ def walk_services(b, managername=None, **kwargs):
 
     # Unless otherwise specified, walk all service managers.
     if managername is None:
-        for managername in sorted(b.services.iterkeys()):
+        for managername in sorted(b.get('services', {}).iterkeys()):
             walk_services(b, managername, **kwargs)
         return
 
@@ -165,7 +178,9 @@ def walk_services(b, managername=None, **kwargs):
     kwargs.get('before_services', lambda *args: None)(manager)
 
     callable = kwargs.get('service', lambda *args: None)
-    for service, deps in sorted(b.services.get(manager, {}).iteritems()):
+    for service, deps in sorted(b.get('services',
+                                      {}).get(manager,
+                                              {}).iteritems()):
         callable(manager, service)
         walk_service_files(b, manager, service, **kwargs)
         walk_service_packages(b, manager, service, **kwargs)
@@ -181,7 +196,7 @@ def walk_service_files(b, manager, servicename, **kwargs):
     * `service_file(manager, servicename, pathname):`
       Executed when a file service dependency is enumerated.
     """
-    deps = b.services[manager][servicename]
+    deps = b.get('services', {}).get(manager, {}).get(servicename, {})
     if 'files' not in deps:
         return
     callable = kwargs.get('service_file', lambda *args: None)
@@ -199,7 +214,7 @@ def walk_service_packages(b, manager, servicename, **kwargs):
                        package):`
       Executed when a file service dependency is enumerated.
     """
-    deps = b.services[manager][servicename]
+    deps = b.get('services', {}).get(manager, {}).get(servicename, {})
     if 'packages' not in deps:
         return
     callable = kwargs.get('service_package', lambda *args: None)
@@ -215,7 +230,7 @@ def walk_service_sources(b, manager, servicename, **kwargs):
     * `service_source(manager, servicename, dirname):`
       Executed when a source tarball service dependency is enumerated.
     """
-    deps = b.services[manager][servicename]
+    deps = b.get('services', {}).get(manager, {}).get(servicename, {})
     if 'sources' not in deps:
         return
     callable = kwargs.get('service_source', lambda *args: None)
