@@ -3,13 +3,15 @@ blueprint-create(1) -- create a blueprint
 
 ## SYNOPSIS
 
-`blueprint create` [`-P`|`-C`|`-S`|`-I`] [`-m` _message_] [`-r`] [`-q`] _name_  
+`blueprint create` [`-d` _subtrahend_] [`-P`|`-C`|`-S`|`-I`] [`-m` _message_] [`-r`] [`-q`] _name_  
 
 ## DESCRIPTION
 
 `blueprint-create` creates a list of all installed packages and modified configuration files and stores it in the branch _name_ in the local blueprint repository with the commit _message_ (if given).
 
 If standard input is not a TTY, a blueprint is read from standard input rather than created from the system.  See `blueprint`(5) for the details of the format.
+
+If a _subtrahend_ is given, it is subtracted from the generated or provided blueprint and the difference is committed as _name_.
 
 If one of `--puppet`, `--chef`, or `--sh` is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to `stdout`.  If `--ignore` is given, the `blueprintignore`(5) rules used to create the blueprint will be printed to `stdout`.
 
@@ -23,6 +25,8 @@ Anything installed in `/usr/local` will be archived and included in the blueprin
 
 ## OPTIONS
 
+* `-d` _subtrahend_, `--diff=`_subtrahend_:
+  Blueprint to subtract from the generated blueprint.
 * `-P`, `--puppet`:
   Generate a Puppet module.
 * `-C`, `--chef`:
