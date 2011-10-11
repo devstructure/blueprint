@@ -52,8 +52,7 @@ except blueprint.NameError:
     sys.exit(1)
 
 # Return the blueprint object indicated by the user's input.
-
-def sortinghat():
+def choose():
     prompt = '"{0}" or "{1}"? '.format(dest_a, dest_b)
     prefix = raw_input(prompt)
     while dest_a.startswith(prefix) == dest_b.startswith(prefix):
@@ -67,13 +66,13 @@ def sortinghat():
 # indicated by the sorting hat.
 def file(pathname, f):
     print(pathname)
-    sortinghat().add_file(pathname, **f)
+    choose().add_file(pathname, **f)
 def package(manager, package, version):
     print('{0} {1} {2}'.format(manager, package, version))
-    sortinghat().add_package(manager, package, version)
+    choose().add_package(manager, package, version)
 def service(manager, service):
     print('{0} {1}'.format(manager, service))
-    b = sortinghat()
+    b = choose()
     b.add_service(manager, service)
     def service_file(m, s, pathname):
         b.add_service_file(m, s, pathname)
@@ -102,7 +101,7 @@ def source(dirname, filename, gen_content, url):
                              stdin=git.cat_file(blob),
                              stdout=open(filename, 'w'))
         print('{0} {1}'.format(dirname, filename))
-    sortinghat().add_source(dirname, filename)
+    choose().add_source(dirname, filename)
 
 try:
     with context_managers.mkdtemp():
