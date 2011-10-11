@@ -390,7 +390,7 @@ class Resource(dict):
         else:
             out = [u'{0}({1}) do\n'.format(self.type, self._dumps(self.name))]
             for key, value in sorted(self.iteritems()):
-                out.append(u'\t{0} {1}\n'.format(key, self._dumps(value)))
+                out.append(u'  {0} {1}\n'.format(key, self._dumps(value)))
             out.append('end\n')
             return ''.join(out)
 
