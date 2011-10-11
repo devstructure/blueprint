@@ -1,16 +1,16 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINT\-DIFF" "1" "October 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINT\-SPLIT" "1" "October 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
-\fBblueprint\-diff\fR \- save the difference between two blueprints
+\fBblueprint\-split\fR \- split one blueprint into two others interactively
 .
 .SH "SYNOPSIS"
-\fBblueprint diff\fR [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIminuend\fR \fIsubtrahend\fR \fIdifference\fR
+\fBblueprint split\fR [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIsrc\fR \fIdest\-a\fR \fIdest\-b\fR
 .
 .SH "DESCRIPTION"
-\fBblueprint\-diff\fR saves the difference between the blueprints \fIminuend\fR and \fIsubtrahend\fR as \fIdifference\fR\. Files, package versions, and source tarballs in \fIminuend\fR that either differ from their counterparts in \fIsubtrahend\fR or do not appear at all will be included in \fIdifference\fR\.
+\fBblueprint\-split\fR interactively splits \fIsrc\fR into \fIdest\-a\fR and \fIdest\-b\fR\. Each resource is presented to the user and the user must indicate which destination blueprint will receive the resource by typing a unique prefix of the destination blueprint\'s name\. (The input provides full \fBreadline\fR(3) support\.)
 .
 .SH "OPTIONS"
 .
