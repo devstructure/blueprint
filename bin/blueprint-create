@@ -8,8 +8,12 @@ import sys
 import blueprint.cli
 from blueprint import context_managers
 
-parser = optparse.OptionParser(
-    'Usage: %prog [-P|-C|-S|-I] [-m <message>] [-r] [-q] <name>')
+parser = optparse.OptionParser('Usage: %prog [-d <subtrahend>] [-P|-C|-S|-I] '
+                               '[-m <message>] [-r] [-q] <name>')
+parser.add_option('-d', '--diff',
+                  dest='subtrahend',
+                  default=None,
+                  help='blueprint to subtract from the generated blueprint')
 parser.add_option('-P', '--puppet',
                   dest='generate',
                   action='store_const',
@@ -29,7 +33,7 @@ parser.add_option('-I', '--ignore',
                   dest='generate',
                   action='store_const',
                   const='ignore',
-                  help='show the blueprint\'s ~/.blueprintignore')
+                  help='show the blueprint\'s blueprintignore(5) rules')
 parser.add_option('-m', '--message',
                   dest='message',
                   default=None,

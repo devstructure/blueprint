@@ -7,13 +7,16 @@
 \fBblueprint\-create\fR \- create a blueprint
 .
 .SH "SYNOPSIS"
-\fBblueprint create\fR [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR|\fB\-I\fR] [\fB\-m\fR \fImessage\fR] [\fB\-r\fR] [\fB\-q\fR] \fIname\fR
+\fBblueprint create\fR [\fB\-d\fR \fIsubtrahend\fR] [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR|\fB\-I\fR] [\fB\-m\fR \fImessage\fR] [\fB\-r\fR] [\fB\-q\fR] \fIname\fR
 .
 .SH "DESCRIPTION"
 \fBblueprint\-create\fR creates a list of all installed packages and modified configuration files and stores it in the branch \fIname\fR in the local blueprint repository with the commit \fImessage\fR (if given)\.
 .
 .P
 If standard input is not a TTY, a blueprint is read from standard input rather than created from the system\. See \fBblueprint\fR(5) for the details of the format\.
+.
+.P
+If a \fIsubtrahend\fR is given, it is subtracted from the generated or provided blueprint and the difference is committed as \fIname\fR\.
 .
 .P
 If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, or \fB\-\-sh\fR is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to \fBstdout\fR\. If \fB\-\-ignore\fR is given, the \fBblueprintignore\fR(5) rules used to create the blueprint will be printed to \fBstdout\fR\.
@@ -31,6 +34,10 @@ Anything installed in \fB/usr/local\fR will be archived and included in the blue
 \fBblueprintignore\fR(5) provides means for ignoring specific files and packages plus treating arbitrary directories as \fB/usr/local\fR is treated\.
 .
 .SH "OPTIONS"
+.
+.TP
+\fB\-d\fR \fIsubtrahend\fR, \fB\-\-diff=\fR\fIsubtrahend\fR
+Blueprint to subtract from the generated blueprint\.
 .
 .TP
 \fB\-P\fR, \fB\-\-puppet\fR

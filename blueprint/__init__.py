@@ -12,6 +12,7 @@ logging.basicConfig(format='# [blueprint] %(message)s',
 
 import git
 import util
+import walk
 
 
 DEFAULTS = {'io': {'server': 'https://devstructure.com'}}
@@ -111,11 +112,41 @@ class Blueprint(dict):
 
     def __init__(self, name=None, commit=None, *args, **kwargs):
         """
-        Construct a blueprint.  Extra arguments are handed off to `dict`.
+        Construct a blueprint.  Extra arguments are used to create a `dict`
+        which is then sent through the `blueprint`(5) algorithm to be injested
+        into this `Blueprint` object with the proper types.  (The structure
+        makes heavy use of `defaultdict` and `set`).
         """
         self.name = name
         self._commit = commit
-        super(Blueprint, self).__init__(*args, **kwargs)
+        def file(pathname, f):
+            self.add_file(pathname, **f)
+        def package(manager, package, version):
+            self.add_package(manager, package, version)
+        def service(manager, service):
+            self.add_service(manager, service)
+        def service_file(manager, service, pathname):
+            self.add_service_file(manager, service, pathname)
+        def service_package(manager, service, package_manager, package):
+            self.add_service_package(manager,
+                                     service,
+                                     package_manager,
+                                     package)
+        def service_source(manager, service, dirname):
+            self.add_service_source(manager, service, dirname)
+        def source(dirname, filename, gen_content, url):
+            if url is not None:
+                self.add_source(dirname, url)
+            elif gen_content is not None:
+                self.add_source(dirname, filename)
+        walk.walk(dict(*args, **kwargs),
+                  file=file,
+                  package=package,
+                  service=service,
+                  service_file=service_file,
+                  service_package=service_package,
+                  service_source=service_source,
+                  source=source)
 
     def __sub__(self, other):
         """
@@ -153,10 +184,7 @@ class Blueprint(dict):
                 b_versions = b_packages[package]
             except KeyError:
                 return
-            try:
-                del b_versions[b_versions.index(version)]
-            except ValueError:
-                pass
+            b_versions.discard(version)
             if 0 == len(b_versions):
                 del b_packages[package]
             else:
@@ -449,5 +477,4 @@ class Blueprint(dict):
         return ignore.Rules(content)
 
     def walk(self, **kwargs):
-        import walk
         walk.walk(self, **kwargs)

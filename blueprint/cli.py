@@ -19,6 +19,7 @@ def create(options, args):
     """
     try:
         with context_managers.mkdtemp():
+
             if not os.isatty(sys.stdin.fileno()):
                 try:
                     b = blueprint.Blueprint.load(sys.stdin, args[0])
@@ -28,8 +29,15 @@ def create(options, args):
                     sys.exit(1)
             else:
                 b = blueprint.Blueprint.create(args[0])
+
+            if options.subtrahend:
+                logging.info('subtracting {0}'.format(options.subtrahend))
+                b_s = blueprint.Blueprint.checkout(options.subtrahend)
+                b = b - b_s
+
             b.commit(options.message or '')
             return b
+
     except blueprint.NameError:
         logging.error('invalid blueprint name')
         sys.exit(1)
