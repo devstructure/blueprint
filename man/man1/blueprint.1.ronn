@@ -19,6 +19,8 @@ blueprint(1) -- reverse engineer server configuration
   Save the difference between two blueprints.
 * `blueprint-split`(1):
   Split one blueprint into two others interactively.
+* `blueprint-prune`(1):
+  Select a subset of resources interactively.
 * `blueprint-apply`(1):
   Run a blueprint's generated shell code.
 * `blueprint-push`(1):

@@ -1,13 +1,13 @@
-blueprint-split(1) -- split one blueprint into two others interactively
-=======================================================================
+blueprint-prune(1) -- select a subset of resources interactively
+================================================================
 
 ## SYNOPSIS
 
-`blueprint split` [`-m` _message_] [`-q`] _src_ _dest-a_ _dest-b_  
+`blueprint prune` [`-m` _message_] [`-q`] _src_ _dest_  
 
 ## DESCRIPTION
 
-`blueprint-split` interactively splits _src_ into _dest-a_ and _dest-b_.  Each resource is presented to the user and the user must indicate which destination blueprint will receive the resource by typing a unique prefix of the destination blueprint's name.
+`blueprint-prune` interactively selects a subset of the resources in _src_ into _dest_.  Each resource is presented to the user and the user must indicate whether the resource should be included in _dest_.
 
 The input provides full `readline`(3) support but may not be piped from some other source.
 

@@ -11,8 +11,7 @@ from blueprint import cli
 from blueprint import context_managers
 from blueprint import interactive
 
-parser = optparse.OptionParser(
-    'Usage: %prog [-m <message>] [-q] <src> <dest-a> <dest-b>')
+parser = optparse.OptionParser('Usage: %prog [-m <message>] [-q] <src> <dest>')
 parser.add_option('-m', '--message',
                   dest='message',
                   default=None,
@@ -27,40 +26,31 @@ options, args = parser.parse_args()
 if options.quiet:
     logging.root.setLevel(logging.CRITICAL)
 
-if len(args) not in (2, 3):
+if len(args) not in (1, 2):
     parser.print_usage()
     sys.exit(1)
 
 b_s = blueprint.cli.read(options, args)
 try:
-    b_da = blueprint.Blueprint(args[-2])
-except blueprint.NameError:
-    logging.error('invalid blueprint name {0}'.format(args[-2]))
-    sys.exit(1)
-try:
-    b_db = blueprint.Blueprint(args[-1])
+    b_d = blueprint.Blueprint(args[-1])
 except blueprint.NameError:
     logging.error('invalid blueprint name {0}'.format(args[-1]))
     sys.exit(1)
 
 def choose():
     """
-    Return the blueprint object indicated by the user's input.
+    Return the destination blueprint object or `None`.
     """
-    prompt = '"{0}" or "{1}"? '.format(args[-2], args[-1])
-    prefix = raw_input(prompt)
-    while args[-2].startswith(prefix) == args[-1].startswith(prefix):
-        print('Ambiguous; please give a unique prefix of a blueprint name.')
-        prefix = raw_input(prompt)
-    return {(True, False): b_da,
-            (False, True): b_db}[(args[-2].startswith(prefix),
-                                  args[-1].startswith(prefix))]
+    prompt = 'Include in blueprint {0}? [y/n] '.format(args[-1])
+    yn = raw_input(prompt).lower()
+    while yn not in ('y', 'n', 'yes', 'no'):
+        yn = raw_input(prompt)
+    return b_d if 'y' == yn[0] else None
 
 try:
     with context_managers.mkdtemp():
         interactive.walk(b_s, choose)
-        b_da.commit(options.message or '')
-        b_db.commit(options.message or '')
+        b_d.commit(options.message or '')
 except IOError:
     pass
 except KeyboardInterrupt:

@@ -9,7 +9,7 @@ import os
 import sys
 
 import blueprint
-from blueprint import context_managers
+import context_managers
 
 
 def create(options, args):
@@ -63,7 +63,7 @@ def read(options, args):
         logging.error('blueprint {0} does not exist'.format(name))
         sys.exit(1)
     except blueprint.NameError:
-        logging.error('invalid blueprint name')
+        logging.error('invalid blueprint name {0}'.format(name))
         sys.exit(1)
     logging.error('no blueprint found on standard input')
     sys.exit(1)

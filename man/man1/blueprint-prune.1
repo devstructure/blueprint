@@ -1,16 +1,16 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINT\-SPLIT" "1" "October 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINT\-PRUNE" "1" "October 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
-\fBblueprint\-split\fR \- split one blueprint into two others interactively
+\fBblueprint\-prune\fR \- select a subset of resources interactively
 .
 .SH "SYNOPSIS"
-\fBblueprint split\fR [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIsrc\fR \fIdest\-a\fR \fIdest\-b\fR
+\fBblueprint prune\fR [\fB\-m\fR \fImessage\fR] [\fB\-q\fR] \fIsrc\fR \fIdest\fR
 .
 .SH "DESCRIPTION"
-\fBblueprint\-split\fR interactively splits \fIsrc\fR into \fIdest\-a\fR and \fIdest\-b\fR\. Each resource is presented to the user and the user must indicate which destination blueprint will receive the resource by typing a unique prefix of the destination blueprint\'s name\.
+\fBblueprint\-prune\fR interactively selects a subset of the resources in \fIsrc\fR into \fIdest\fR\. Each resource is presented to the user and the user must indicate whether the resource should be included in \fIdest\fR\.
 .
 .P
 The input provides full \fBreadline\fR(3) support but may not be piped from some other source\.
