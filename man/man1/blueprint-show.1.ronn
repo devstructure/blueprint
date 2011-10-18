@@ -3,13 +3,13 @@ blueprint-show(1) -- generate code from a blueprint
 
 ## SYNOPSIS
 
-`blueprint show` [`-P`|`-C`|`-S`|`-I`] [`-r`] [`-q`] [_name_]  
+`blueprint show` [`-P`|`-C`|`-S`|...] [`-r`] [`-q`] [_name_]  
 
 ## DESCRIPTION
 
-`blueprint-show` generates code from the blueprint _name_ as a Puppet module, a Chef cookbook, or POSIX shell code as indicated by the `--puppet`, `--chef`, or `--sh` option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to `stdout`.  If `--ignore` is given, the `blueprintignore`(5) rules used to create the blueprint will be printed to `stdout`.
+`blueprint-show` generates code from the blueprint _name_ as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the `--puppet`, `--chef`, `--sh`, or `--cfn` option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to `stdout`.
 
-If none of `--puppet`, `--chef`, or `--sh` are given, the raw JSON data structure that describes the blueprint is printed as described in `blueprint`(5).
+If none of `--puppet`, `--chef`, `--sh`, or `--cfn` are given, the raw JSON data structure that describes the blueprint is printed as described in `blueprint`(5).
 
 If _name_ is omitted or `-`, a blueprint is read from standard input and treated in the same manner.  See `blueprint`(5) for the details of the format.
 
@@ -21,8 +21,8 @@ If _name_ is omitted or `-`, a blueprint is read from standard input and treated
   Generate a Chef cookbook.
 * `-S`, `--sh`:
   Generate POSIX shell code.
-* `-I`, `--ignore`:
-  Show the blueprint's `blueprintignore`(5) rules.
+* `--cfn`:
+  Generate an AWS CloudFormation template.
 * `-r`, `--relaxed`:
   Relax version constraints in generated code.
 * `-q`, `--quiet`:

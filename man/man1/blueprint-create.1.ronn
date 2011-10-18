@@ -3,7 +3,7 @@ blueprint-create(1) -- create a blueprint
 
 ## SYNOPSIS
 
-`blueprint create` [`-d` _subtrahend_] [`-P`|`-C`|`-S`|`-I`] [`-m` _message_] [`-r`] [`-q`] _name_  
+`blueprint create` [`-d` _subtrahend_] [`-P`|`-C`|`-S`|...] [`-m` _message_] [`-r`] [`-q`] _name_  
 
 ## DESCRIPTION
 
@@ -13,7 +13,7 @@ If standard input is not a TTY, a blueprint is read from standard input rather t
 
 If a _subtrahend_ is given, it is subtracted from the generated or provided blueprint and the difference is committed as _name_.
 
-If one of `--puppet`, `--chef`, or `--sh` is given, a Puppet module, a Chef cookbook, or POSIX shell code will be generated, written to a file or directory in the current working directory, and its filename will be printed to `stdout`.  If `--ignore` is given, the `blueprintignore`(5) rules used to create the blueprint will be printed to `stdout`.
+If one of `--puppet`, `--chef`, `--sh`, or `--cfn` is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to `stdout`.
 
 Debian packages, Ruby gems, Python packages, and PHP PEAR/PECL packages are enumerated in the blueprint.  Debian packages that are listed as `essential`, `important`, `required`, or `standard` and those that are depended upon by `ubuntu-minimal`, `ubuntu-standard`, or `ubuntu-desktop` are ignored.
 
@@ -33,8 +33,8 @@ Anything installed in `/usr/local` will be archived and included in the blueprin
   Generate a Chef cookbook.
 * `-S`, `--sh`:
   Generate POSIX shell code.
-* `-I`, `--ignore`:
-  Show the blueprint's `blueprintignore`(5) rules.
+* `--cfn`:
+  Generate an AWS CloudFormation template.
 * `-m` _message_, `--message=`_message_:
   Commit message.
 * `-r`, `--relaxed`:
