@@ -420,16 +420,22 @@ class Blueprint(dict):
         self._commit = git.commit_tree(tree, message, parent)
         git.git('update-ref', refname, self._commit)
 
-    def dumps(self):
+    def normalize(self):
         """
-        Return a JSON serialization of this blueprint.  Make a best effort
-        to prevent variance from run-to-run.  Remove superfluous empty keys.
+        Remove superfluous empty keys to reduce variance in serialized JSON.
         """
         if 'arch' in self and self['arch'] is None:
             del self['arch']
         for key in ['files', 'packages', 'sources']:
             if key in self and 0 == len(self[key]):
                 del self[key]
+
+    def dumps(self):
+        """
+        Return a JSON serialization of this blueprint.  Make a best effort
+        to prevent variance from run-to-run.
+        """
+        self.normalize()
         return util.json_dumps(self)
 
     def puppet(self, relaxed=False):

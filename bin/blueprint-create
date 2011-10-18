@@ -8,7 +8,7 @@ import sys
 import blueprint.cli
 from blueprint import context_managers
 
-parser = optparse.OptionParser('Usage: %prog [-d <subtrahend>] [-P|-C|-S|-I] '
+parser = optparse.OptionParser('Usage: %prog [-d <subtrahend>] [-P|-C|-S|...] '
                                '[-m <message>] [-r] [-q] <name>')
 parser.add_option('-d', '--diff',
                   dest='subtrahend',
@@ -29,6 +29,11 @@ parser.add_option('-S', '--sh',
                   action='store_const',
                   const='sh',
                   help='generate POSIX shell code')
+parser.add_option('--cfn',
+                  dest='generate',
+                  action='store_const',
+                  const='cfn',
+                  help='generate an AWS CloudFormation template')
 parser.add_option('-I', '--ignore',
                   dest='generate',
                   action='store_const',
