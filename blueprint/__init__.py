@@ -462,6 +462,13 @@ class Blueprint(dict):
         import frontend.sh
         return frontend.sh.sh(self, relaxed, server, secret)
 
+    def cfn(self, relaxed=False):
+        """
+        Generate an AWS CloudFormation template.
+        """
+        import frontend.cfn
+        return frontend.cfn.cfn(self, relaxed)
+
     def blueprintignore(self):
         """
         Return the blueprint's blueprintignore file.  Prior to v3.0.9 this

@@ -2,9 +2,13 @@
 AWS CloudFormation template generator.
 """
 
+import codecs
 import copy
+import gzip as gziplib
 import json
+import logging
 import os.path
+import tarfile
 
 from blueprint import util
 
@@ -25,6 +29,7 @@ class Template(dict):
     """
 
     def __init__(self, b):
+        self.b = b
         if b.name is None:
             self.name = 'blueprint-generated-cfn-template'
         else:
@@ -36,7 +41,26 @@ class Template(dict):
             ['AWS::CloudFormation::Init']['config'] = b
 
     def dumps(self):
+        """
+        Serialize this AWS CloudFormation template to JSON in a string.
+        """
         return util.json_dumps(self)
 
     def dumpf(self, gzip=False):
-        pass
+        """
+        Serialize this AWS CloudFormation template to JSON in a file.
+        """
+        if 0 != len(self.b.sources):
+            logging.warning('this blueprint contains source tarballs - '
+                            'to use them with AWS CloudFormation, you must '
+                            'store them online and edit the template to '
+                            'reference their URLs')
+        if gzip:
+            filename = '{0}.json.gz'.format(self.name)
+            f = gziplib.open(filename, 'w')
+        else:
+            filename = '{0}.json'.format(self.name)
+            f = codecs.open(filename, 'w', encoding='utf-8')
+        f.write(self.dumps())
+        f.close()
+        return filename
