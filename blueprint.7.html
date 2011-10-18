@@ -83,19 +83,20 @@
 
 <pre><code>import blueprint
 
-b = blueprint.Blueprint(name='foo', create=True)
-b.commit()
+b1 = blueprint.Blueprint.create('foo')
+b1.commit()
 
-b.puppet().dumpf(gzip=True)
-b.chef().dumpf(gzip=True)
-b.sh().dumpf(gzip=True)
+b2 = blueprint.Blueprint.checkout('foo')
+b2.puppet().dumpf(gzip=True)
+b2.chef().dumpf(gzip=True)
+b2.sh().dumpf(gzip=True)
 </code></pre>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
 <h3 id="blueprint-Blueprint">blueprint.Blueprint</h3>
 
-<p>The <code>blueprint.Blueprint</code> class manages blueprints stored in the local blueprint repository using the <span class="man-ref"><code>git</code><span class="s">(1)</span></span> tools.  New blueprints are created by passing the <code>create=True</code> keyword argument to <code>blueprint.Blueprint</code>.  Previously committed blueprints are referenced by passing the <code>name=</code><em>name</em> keyword argument and optionally <code>commit=</code><em>commit</em>.</p>
+<p>The <code>blueprint.Blueprint</code> class manages blueprints stored in the local blueprint repository using the <span class="man-ref"><code>git</code><span class="s">(1)</span></span> tools.  New blueprints are created by calling the <code>blueprint.Blueprint.create</code> class method with a <em>name</em>.  Previously committed blueprints are recalled by calling the <code>blueprint.Blueprint.checkout</code> class method with a <em>name</em> and optionally a <em>commit</em>.  Empty blueprints are created by calling the <code>blueprint.Blueprint</code> constructor.</p>
 
 <p><code>blueprint.Blueprint</code> objects may be subtracted from one another.</p>
 
@@ -166,7 +167,7 @@ Executed after a service manager's dependencies are enumerated.</dt><dd></dd>
 
 <p><code>dumpf(gzip=</code><em>False</em><code>)</code> returns the name of a file, possibly in a newly-created directory, containing code in the language implemented by the class that received the call.  The file or directory is created in the current working directory.  If <code>gzip=</code><em>True</em>, the file or directory will compressed and the resulting tarball will be left in the current working directory.</p>
 
-<h3 id="blueprint-manager">blueprint.manager</h3>
+<h3 id="blueprint-managers">blueprint.managers</h3>
 
 <p>The <code>blueprint.managers.PackageManager</code> class is a <code>unicode</code> subclass that is used as the key in the <code>packages</code> dictionary.  It is a callable that can translate package names and versions into shell commands for installing the package.  For example: <code>blueprint.managers.PackageManager(</code><em>'apt'</em><code>)(</code><em>'python'</em><code>,</code><em>'2.6.6-2ubuntu1'</em><code>)</code>.</p>
 
@@ -230,7 +231,7 @@ for funcname in blueprint.backend.__all__:
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#x72;&#105;&#99;&#104;&#97;&#114;&#100;&#x40;&#x64;&#101;&#118;&#x73;&#116;&#x72;&#117;&#99;&#x74;&#x75;&#x72;&#101;&#46;&#x63;&#x6f;&#109;" data-bare-link="true">&#114;&#105;&#x63;&#x68;&#x61;&#x72;&#100;&#64;&#100;&#101;&#x76;&#115;&#116;&#x72;&#x75;&#99;&#x74;&#117;&#x72;&#x65;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#114;&#x69;&#x63;&#104;&#97;&#x72;&#100;&#x40;&#x64;&#101;&#118;&#x73;&#x74;&#x72;&#117;&#x63;&#x74;&#x75;&#114;&#101;&#46;&#99;&#111;&#x6d;" data-bare-link="true">&#x72;&#x69;&#x63;&#x68;&#x61;&#114;&#100;&#64;&#x64;&#101;&#118;&#115;&#x74;&#114;&#x75;&#99;&#x74;&#x75;&#114;&#101;&#46;&#99;&#111;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -239,7 +240,7 @@ for funcname in blueprint.backend.__all__:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>September 2011</li>
+    <li class='tc'>October 2011</li>
     <li class='tr'>blueprint(7)</li>
   </ol>
 
