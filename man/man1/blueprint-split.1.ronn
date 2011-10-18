@@ -1,0 +1,38 @@
+blueprint-split(1) -- split one blueprint into two others interactively
+=======================================================================
+
+## SYNOPSIS
+
+`blueprint split` [`-m` _message_] [`-q`] _src_ _dest-a_ _dest-b_  
+
+## DESCRIPTION
+
+`blueprint-split` interactively splits _src_ into _dest-a_ and _dest-b_.  Each resource is presented to the user and the user must indicate which destination blueprint will receive the resource by typing a unique prefix of the destination blueprint's name.
+
+The input provides full `readline`(3) support but may not be piped from some other source.
+
+## OPTIONS
+
+* `-m` _message_, `--message=`_message_:
+  Commit message.
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

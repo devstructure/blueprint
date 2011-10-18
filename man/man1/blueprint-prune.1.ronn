@@ -1,0 +1,38 @@
+blueprint-prune(1) -- select a subset of resources interactively
+================================================================
+
+## SYNOPSIS
+
+`blueprint prune` [`-m` _message_] [`-q`] _src_ _dest_  
+
+## DESCRIPTION
+
+`blueprint-prune` interactively selects a subset of the resources in _src_ into _dest_.  Each resource is presented to the user and the user must indicate whether the resource should be included in _dest_.
+
+The input provides full `readline`(3) support but may not be piped from some other source.
+
+## OPTIONS
+
+* `-m` _message_, `--message=`_message_:
+  Commit message.
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).
