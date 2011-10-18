@@ -1,5 +1,6 @@
 echo "Paste the contents of ~/production.pem here and press ^D:" >&2
 cat >"$HOME/production.pem"
+chmod 600 "$HOME/production.pem"
 
 apt-get -q update
 
