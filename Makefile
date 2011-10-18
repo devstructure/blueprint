@@ -100,8 +100,8 @@ deploy-deb-2.6:
 	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight cache apt/lenny apt/squeeze apt/lucid apt/maverick"
 
 deploy-deb-2.7:
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/natty"
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight cache apt/natty"
+	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/natty apt/oneiric"
+	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight cache apt/natty apt/oneiric"
 
 deploy-pypi:
 	$(PYTHON) setup.py sdist upload
