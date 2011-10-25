@@ -5,6 +5,7 @@ Chef code generator.
 import base64
 import codecs
 import errno
+import logging
 import os
 import os.path
 import re
@@ -47,6 +48,10 @@ def chef(b, relaxed=False):
         """
         Create a cookbook_file resource.
         """
+        if 'template' in f:
+            logging.warning('file template {0} won\'t appear in generated '
+                            'Chef cookbooks'.format(pathname))
+            return
         c.directory(os.path.dirname(pathname),
                     group='root',
                     mode='0755',

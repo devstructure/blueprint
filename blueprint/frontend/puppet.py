@@ -4,8 +4,9 @@ Puppet code generator.
 
 import base64
 import codecs
-import errno
 from collections import defaultdict
+import errno
+import logging
 import os
 import os.path
 import re
@@ -58,6 +59,10 @@ def puppet(b, relaxed=False):
         """
         Create a file resource.
         """
+        if 'template' in f:
+            logging.warning('file template {0} won\'t appear in generated '
+                            'Puppet modules'.format(pathname))
+            return
 
         # Create resources for parent directories and let the
         # autorequire mechanism work out dependencies.
