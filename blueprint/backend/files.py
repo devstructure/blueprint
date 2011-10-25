@@ -670,6 +670,14 @@ def files(b):
 
         for pathname, s, ignored in files:
 
+            # Always ignore block special files, character special files,
+            # pipes, and sockets.  They end up looking like deadlocks.
+            if stat.S_ISBLK(s.st_mode) \
+            or stat.S_ISCHR(s.st_mode) \
+            or stat.S_ISFIFO(s.st_mode) \
+            or stat.S_ISSOCK(s.st_mode):
+                continue
+
             # Make sure this pathname will actually be able to be included
             # in the blueprint.  This is a bit of a cop-out since the file
             # could be important but at least it's not a crashing bug.
