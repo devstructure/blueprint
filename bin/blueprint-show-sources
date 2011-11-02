@@ -39,6 +39,7 @@ try:
             p = subprocess.Popen(['tar', 'tv'],
                                  close_fds=True,
                                  stdin=git.cat_file(blob))
+            p.communicate()
     b.walk(source=source)
 except IOError:
     pass
