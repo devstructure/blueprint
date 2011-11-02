@@ -8,6 +8,7 @@ import gzip as gziplib
 import os
 import os.path
 import re
+import shutil
 import tarfile
 
 from blueprint import git
@@ -86,20 +87,30 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
                            operator='||')
             else:
                 if 'template' in f:
-                    s.add_mustache()
-                    # FIXME /etc/blueprint-tempate.d/* and {pathname}.blueprint-template.sh
+                    s.templates = True
                     if 'base64' == f['encoding']:
-                        commands = ['base64 --decode', 'mustache']
+                        commands = ('base64 --decode', 'mustache')
                     else:
-                        commands = ['mustache']
+                        commands = ('mustache',)
+                    s.add_list(('set +x',),
+                               ('. "./mustache.sh"',),
+                               ('for F in blueprint-template.d/*',),
+                               ('do',),
+                               ('\t. "$F"',),
+                               ('done',),
+                               (f['data'].rstrip(),),
+                               (command(*commands,
+                                        escape_stdin=True,
+                                        stdin=f['template'],
+                                        stdout=pathname),),
+                               operator='\n',
+                               wrapper='()')
                 else:
                     if 'base64' == f['encoding']:
-                        commands = ['base64 --decode']
+                        commands = ('base64 --decode',)
                     else:
-                        commands = ['cat']
-                s.add(*commands,
-                      stdin=f['template' if 'template' in f else 'content'],
-                      stdout=pathname)
+                        commands = ('cat',)
+                    s.add(*commands, stdin=f['content'], stdout=pathname)
             if 'root' != f['owner']:
                 s.add('chown {0} "{1}"', args=(f['owner'], pathname))
             if 'root' != f['group']:
@@ -185,6 +196,8 @@ def command(*commands, **kwargs):
         stdin = (kwargs['stdin'].replace(u'\\', u'\\\\').
                                  replace(u'$', u'\\$').
                                  replace(u'`', u'\\`'))
+        if kwargs.get('escape_stdin', False):
+            stdin = stdin.replace(u'{', u'{{').replace(u'}', u'}}')
         eof = 'EOF'
         while eof in stdin:
             eof += 'EOF'
@@ -198,13 +211,14 @@ def command(*commands, **kwargs):
 
 
 def command_list(*commands, **kwargs):
-    operator = {';': u'; ',
-                '&&': u' && ',
-                '||': u' || '}[kwargs.get('operator', ';')]
-    wrapper = {'': (u'', u''),
+    operator = {'&&': u' && ',
+                '||': u' || ',
+                '\n': u'\n',
+                ';': u'; '}[kwargs.get('operator', ';')]
+    wrapper = {'()': (u'(\n', u'\n)') if u'\n' == operator else (u'(', u')'),
                '{}': (u'{ ', u'; }'),
                '{{}}': (u'{{ ', u'; }}'), # Prevent double-escaping.
-               '()': (u'(', u')')}[kwargs.get('wrapper', '')]
+               '': (u'', u'')}[kwargs.get('wrapper', '')]
     return wrapper[0] \
          + operator.join([command(*c, **kwargs) for c in commands]) \
          + wrapper[-1]
@@ -223,9 +237,10 @@ class Script(object):
         else:
             self.name = name
         self.out = [comment if comment is not None else '',
-                    'set +e -x\n',
+                    'set -x\n',
                     'cd "$(dirname "$0")"\n']
         self.sources = {}
+        self.templates = False
 
     def add(self, s='', *args, **kwargs):
         self.out.append((unicode(s) + u'\n').format(*args))
@@ -256,12 +271,6 @@ class Script(object):
         """
         self.out.append(command_list(*args, **kwargs))
 
-    def add_mustache(self):
-        """
-        Make a note to add `mustache.sh` to the output when the time comes.
-        """
-        self._add_mustache = True
-
     def add_source(self, filename, blob):
         """
         Add a reference to a source tarball to the `Script`.  It will be
@@ -279,7 +288,7 @@ class Script(object):
         """
         Generate a file containing shell code and all file contents.
         """
-        if 0 != len(self.sources):
+        if 0 < len(self.sources) or self.templates:
             os.mkdir(self.name)
             filename = os.path.join(self.name, 'bootstrap.sh')
             f = codecs.open(filename, 'w', encoding='utf-8')
@@ -289,23 +298,25 @@ class Script(object):
         else:
             filename = '{0}.sh'.format(self.name)
             f = codecs.open(filename, 'w', encoding='utf-8')
-        if self._add_mustache:
-            f.write('#\n'
-                    '# mustache.sh\n'
-                    '# <https://github.com/rcrowley/mustache.sh>\n'
-                    '#\n'
-                    '\n')
-            for buf in open(os.path.join(os.path.dirname(__file__),
-                                         'mustache.sh')):
-                f.write(buf)
-            f.write('\n')
+        if self.templates:
+            shutil.copyfile(os.path.join(os.path.dirname(__file__),
+                            'mustache.sh'),
+                            os.path.join(self.name, 'mustache.sh'))
+            os.mkdir(os.path.join(self.name, 'blueprint-template.d'))
+            for filename2 in os.listdir('/etc/blueprint-template.d'):
+                if filename2.endswith('.sh'):
+                    shutil.copyfile(os.path.join('/etc/blueprint-template.d',
+                                                 filename2),
+                                    os.path.join(self.name,
+                                                 'blueprint-template.d',
+                                                 filename2))
         for out in self.out:
             f.write(out)
             f.write('\n')
         f.close()
         for filename2, blob in sorted(self.sources.iteritems()):
             git.cat_file(blob, os.path.join(self.name, filename2))
-        if gzip and 0 != len(self.sources):
+        if gzip and (0 < len(self.sources) or self.templates):
             filename = 'sh-{0}.tar.gz'.format(self.name)
             tarball = tarfile.open(filename, 'w:gz')
             tarball.add(self.name)

@@ -14,7 +14,7 @@ sysconfdir=${prefix}/etc
 all: blueprint/frontend/mustache.sh
 
 blueprint/frontend/mustache.sh: mustache.sh/lib/mustache.sh
-	egrep -v "^\\s*#" <$< | grep . >$@
+	install -m644 $< $@
 
 clean:
 	rm -f blueprint/frontend/mustache.sh
