@@ -66,10 +66,7 @@ def walk(b, choose):
             print('{0} {1}'.format(dirname, url))
         elif gen_content is not None:
             blob = git.blob(tree, filename)
-            p = subprocess.Popen(['cat'],
-                                 close_fds=True,
-                                 stdin=git.cat_file(blob),
-                                 stdout=open(filename, 'w'))
+            git.cat_file(blob, filename)
             print('{0} {1}'.format(dirname, filename))
         b_chosen = choose()
         if b_chosen is None:
