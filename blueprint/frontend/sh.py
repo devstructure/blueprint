@@ -80,8 +80,10 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
             s.add('ln -s "{0}" "{1}"', args=(f['content'], pathname))
         else:
             if 'source' in f:
-                s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"', # FIXME
-                      args=(pathname, f['source']))
+                s.add_list(('curl -o "{0}" "{1}"',),
+                           ('wget -O "{0}" "{1}"',),
+                           args=(pathname, f['source']),
+                           operator='||')
             else:
                 if 'template' in f:
                     s.add_mustache()
