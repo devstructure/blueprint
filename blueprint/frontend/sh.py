@@ -221,7 +221,7 @@ class Script(object):
         else:
             self.name = name
         self.out = [comment if comment is not None else '',
-                    'set -x\n',
+                    'set +e -x\n',
                     'cd "$(dirname "$0")"\n']
         self.sources = {}
 
@@ -287,7 +287,16 @@ class Script(object):
         else:
             filename = '{0}.sh'.format(self.name)
             f = codecs.open(filename, 'w', encoding='utf-8')
-        # FIXME if self._add_mustache: ...
+        if self._add_mustache:
+            f.write('#\n'
+                    '# mustache.sh\n'
+                    '# <https://github.com/rcrowley/mustache.sh>\n'
+                    '#\n'
+                    '\n')
+            for buf in open(os.path.join(os.path.dirname(__file__),
+                                         'mustache.sh')):
+                f.write(buf)
+            f.write('\n')
         for out in self.out:
             f.write(out)
             f.write('\n')

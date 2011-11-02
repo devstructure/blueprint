@@ -11,9 +11,13 @@ pydir=$(shell ${PYTHON} pydir.py ${libdir})
 mandir=${prefix}/share/man
 sysconfdir=${prefix}/etc
 
-all:
+all: blueprint/frontend/mustache.sh
+
+blueprint/frontend/mustache.sh: mustache.sh/lib/mustache.sh
+	egrep -v "^\\s*#" <$< | grep . >$@
 
 clean:
+	rm -f blueprint/frontend/mustache.sh
 	rm -rf \
 		*.deb \
 		setup.py build dist *.egg *.egg-info \
@@ -36,6 +40,7 @@ install-bin:
 install-lib:
 	find blueprint -type d -printf %P\\0 | xargs -0r -I__ install -d $(DESTDIR)$(pydir)/blueprint/__
 	find blueprint -type f -name \*.py -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/__ $(DESTDIR)$(pydir)/blueprint/__
+	install -m644 blueprint/frontend/mustache.sh $(DESTDIR)$(pydir)/blueprint/frontend/
 	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall $(DESTDIR)$(pydir)/blueprint
 
 install-man:
