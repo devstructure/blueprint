@@ -10,6 +10,7 @@ import os.path
 import re
 import tarfile
 
+from blueprint import git
 from blueprint import util
 
 
@@ -34,73 +35,78 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
            service_package=service_package,
            service_source=service_source)
 
+    commit = git.rev_parse(b.name)
+    tree = git.tree(commit)
     def source(dirname, filename, gen_content, url):
         """
         Extract a source tarball.
         """
         if dirname in lut['sources']:
-            s.add('MD5SUM="$(find "{0}" -printf %T@\\\\n | md5sum)"', dirname)
+            s.add('MD5SUM="$(find "{0}" -printf %T@\\\\n | md5sum)"',
+                  args=(dirname,))
         if url is not None:
-            s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"', filename, url)
+            s.add_list(('curl -o "{0}" "{1}"',),
+                       ('wget -O "{0}" "{1}"',),
+                       args=(filename, url),
+                       operator='||')
             if '.zip' == pathname[-4:]:
-                s.add('unzip "{0}" -d "{1}"', filename, dirname)
+                s.add('unzip "{0}" -d "{1}"', args=(filename, dirname))
             else:
-                s.add('tar xf "{0}" -C "{1}"', filename, dirname)
+                s.add('tar xf "{0}" -C "{1}"', args=(filename, dirname))
         elif secret is not None:
-            s.add('curl -O "{0}/{1}/{2}/{3}" || wget "{0}/{1}/{2}/{3}"',
-                  server,
-                  secret,
-                  b.name,
-                  filename)
-            s.add('tar xf "{0}" -C "{1}"', filename, dirname)
+            s.add_list(('curl -O "{0}/{1}/{2}/{3}"',)
+                       ('wget "{0}/{1}/{2}/{3}"',),
+                       args=(server, secret, b.name, filename),
+                       operator='||')
+            s.add('tar xf "{0}" -C "{1}"', args=(filename, dirname))
         elif gen_content is not None:
-            s.add('tar xf "{0}" -C "{1}"',
-                  filename,
-                  dirname,
-                  sources={filename: gen_content()})
+            s.add('tar xf "{0}" -C "{1}"', args=(filename, dirname))
+            s.add_source(filename, git.blob(tree, filename))
         for manager, service in lut['sources'][dirname]:
-            s.add('[ "$MD5SUM" != "$(find "{0}" -printf %T@\\\\n ' # No ,
-                  '| md5sum)" ] && {1}=1',
-                  dirname,
-                  manager.env_var(service))
+            s.add_list(('[ "$MD5SUM" != "$(find "{0}" -printf %T@\\\\n '
+                        '| md5sum)" ]',),
+                       ('{1}=1',),
+                       args=(dirname, manager.env_var(service)),
+                       operator='&&')
 
     def file(pathname, f):
         """
         Place a file.
         """
         if pathname in lut['files']:
-            s.add('MD5SUM="$(md5sum "{0}" 2>/dev/null)"', pathname)
-        s.add('mkdir -p "{0}"', os.path.dirname(pathname))
+            s.add('MD5SUM="$(md5sum "{0}" 2>/dev/null)"', args=(pathname,))
+        s.add('mkdir -p "{0}"', args=(os.path.dirname(pathname),))
         if '120000' == f['mode'] or '120777' == f['mode']:
-            s.add('ln -s "{0}" "{1}"', f['content'], pathname)
+            s.add('ln -s "{0}" "{1}"', args=(f['content'], pathname))
         else:
             if 'source' in f:
-                s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"',
-                      pathname,
-                      f['source'])
+                s.add('curl -o "{0}" "{1}" || wget -O "{0}" "{1}"', # FIXME
+                      args=(pathname, f['source']))
             else:
-                eof = 'EOF'
-                while re.search(r'{0}'.format(eof), f['content']):
-                    eof += 'EOF'
-                s.add(
-                    '{0} >"{1}" <<{2}',
-                    'base64 --decode' if 'base64' == f['encoding'] else 'cat',
-                    pathname,
-                    eof)
-                s.add(raw=f['content'])
-                if 0 < len(f['content']) and '\n' != f['content'][-1]:
-                    eof = '\n{0}'.format(eof)
-                s.add(eof)
+                if 'template' in f:
+                    s.add_mustache()
+                    # FIXME /etc/blueprint-tempate.d/* and {pathname}.blueprint-template.sh
+                    if 'base64' == f['encoding']:
+                        commands = ['base64 --decode', 'mustache']
+                    else:
+                        commands = ['mustache']
+                else:
+                    if 'base64' == f['encoding']:
+                        commands = ['base64 --decode']
+                    else:
+                        commands = ['cat']
+                s.add(*commands,
+                      stdin=f['template' if 'template' in f else 'content'],
+                      stdout=pathname)
             if 'root' != f['owner']:
-                s.add('chown {0} "{1}"', f['owner'], pathname)
+                s.add('chown {0} "{1}"', args=(f['owner'], pathname))
             if 'root' != f['group']:
-                s.add('chgrp {0} "{1}"', f['group'], pathname)
+                s.add('chgrp {0} "{1}"', args=(f['group'], pathname))
             if '100644' != f['mode']:
-                s.add('chmod {0} "{1}"', f['mode'][-4:], pathname)
+                s.add('chmod {0} "{1}"', args=(f['mode'][-4:], pathname))
         for manager, service in lut['files'][pathname]:
             s.add('[ "$MD5SUM" != "$(md5sum "{0}")" ] && {1}=1',
-                  pathname,
-                  manager.env_var(service))
+                  args=(pathname, manager.env_var(service)))
 
     def before_packages(manager):
         """
@@ -124,11 +130,15 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
             return
 
         if manager in lut['packages'] and package in lut['packages'][manager]:
-            env_vars = ['{0}=1'.format(m.env_var(service))
-                        for m, service in lut['packages'][manager][package]]
-            s.add(manager.gate(package, version, relaxed) + ' || {{ ' \
-                  + manager.install(package, version, relaxed) + '; ' \
-                  + '; '.join(env_vars) + '; }}')
+            s.add_list((manager.gate(package, version, relaxed),),
+                       (command_list((manager.install(package,
+                                                      version,
+                                                      relaxed),),
+                                     *[('{0}=1'.format(m.env_var(service)),)
+                                       for m, service in
+                                       lut['packages'][manager][package]],
+                                     wrapper='{{}}'),),
+                       operator='||')
         else:
             s.add(manager(package, version, relaxed))
 
@@ -138,16 +148,20 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
         # See comments on this section in `blueprint.frontend.puppet`.
         match = re.match(r'^rubygems(\d+\.\d+(?:\.\d+)?)$', package)
         if match is not None and util.rubygems_update():
-            s.add('/usr/bin/gem{0} install --no-rdoc --no-ri ' # No ,
-                  'rubygems-update', match.group(1))
-            s.add('/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin ' # No ,
-                  'which update_rubygems)', match.group(1))
+            s.add('/usr/bin/gem{0} install --no-rdoc --no-ri rubygems-update',
+                  args=(match.group(1),))
+            s.add('/usr/bin/ruby{0} $(PATH=$PATH:/var/lib/gems/{0}/bin '
+                  'which update_rubygems)',
+                  args=(match.group(1),))
 
         if 'nodejs' == package:
-            s.add('which npm || {{ ' # No ,
-                  'curl http://npmjs.org/install.sh || ' # No ,
-                  'wget -O- http://npmjs.org/install.sh ' # No ,
-                  '}} | sh')
+            s.add_list(('which npm',),
+                       (command_list(('curl http://npmjs.org/install.sh',),
+                                     ('wget -O- http://npmjs.org/install.sh',),
+                                     operator='||',
+                                     wrapper='{{}}'),
+                        'sh'),
+                operator='||')
 
     def service(manager, service):
         s.add(manager(service))
@@ -159,6 +173,39 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
            service=service)
 
     return s
+
+
+def command(*commands, **kwargs):
+    commands = list(commands)
+    if 'stdout' in kwargs:
+        commands[-1] += ' >"{0}"'.format(kwargs['stdout'])
+    if 'stdin' in kwargs:
+        stdin = (kwargs['stdin'].replace(u'\\', u'\\\\').
+                                 replace(u'$', u'\\$').
+                                 replace(u'`', u'\\`'))
+        eof = 'EOF'
+        while eof in stdin:
+            eof += 'EOF'
+        commands[0] += ' <<{0}'.format(eof)
+        return ''.join([' | '.join(commands).format(*kwargs.get('args', ())),
+                        '\n',
+                        stdin,
+                        '' if '\n' == stdin[-1] else '\n',
+                        eof])
+    return ' | '.join(commands).format(*kwargs.get('args', ()))
+
+
+def command_list(*commands, **kwargs):
+    operator = {';': u'; ',
+                '&&': u' && ',
+                '||': u' || '}[kwargs.get('operator', ';')]
+    wrapper = {'': (u'', u''),
+               '{}': (u'{ ', u'; }'),
+               '{{}}': (u'{{ ', u'; }}'), # Prevent double-escaping.
+               '()': (u'(', u')')}[kwargs.get('wrapper', '')]
+    return wrapper[0] \
+         + operator.join([command(*c, **kwargs) for c in commands]) \
+         + wrapper[-1]
 
 
 class Script(object):
@@ -179,15 +226,46 @@ class Script(object):
         self.sources = {}
 
     def add(self, s='', *args, **kwargs):
-        if 'raw' in kwargs:
-            self.out.append(kwargs['raw'].
-                replace(u'\\', u'\\\\').
-                replace(u'$', u'\\$').
-                replace(u'`', u'\\`'))
-        else:
-            self.out.append((unicode(s) + u'\n').format(*args))
+        self.out.append((unicode(s) + u'\n').format(*args))
         for filename, content in kwargs.get('sources', {}).iteritems():
             self.sources[filename] = content
+
+    def add(self, *args, **kwargs):
+        """
+        Add a command or pipeline to the `Script`.  Each positional `str`
+        is an element in the pipeline.  The keyword argument `args`, if
+        present, should contain an iterable of arguments to be substituted
+        into the final pipeline by the new-style string formatting library.
+        """
+        self.out.append(command(*args, **kwargs))
+
+    def add_list(self, *args, **kwargs):
+        """
+        Add a command or pipeline, or list of commands or pipelines, to
+        the `Script`.  Each positional `str` or `tuple` argument is a
+        pipeline.  The keyword argument `operator`, if present, must be
+        `';'`, `'&&'`, or `'||'` to control how the pipelines are joined.
+        The keyword argument `stdin`, if present, should contain a string
+        that will be given heredoc-style.  The keyword argument `stdout`,
+        if present, should contain a string pathname that will receive
+        standard output.  The keyword argument `args`, if present, should
+        contain an iterable of arguments to be substituted into the final
+        pipeline by the new-style string formatting library.
+        """
+        self.out.append(command_list(*args, **kwargs))
+
+    def add_mustache(self):
+        """
+        Make a note to add `mustache.sh` to the output when the time comes.
+        """
+        self._add_mustache = True
+
+    def add_source(self, filename, blob):
+        """
+        Add a reference to a source tarball to the `Script`.  It will be
+        placed in the output directory/tarball later via `git-cat-file`(1).
+        """
+        self.sources[filename] = blob
 
     def dumps(self):
         """
@@ -209,13 +287,13 @@ class Script(object):
         else:
             filename = '{0}.sh'.format(self.name)
             f = codecs.open(filename, 'w', encoding='utf-8')
+        # FIXME if self._add_mustache: ...
         for out in self.out:
             f.write(out)
+            f.write('\n')
         f.close()
-        for filename2, content in sorted(self.sources.iteritems()):
-            f2 = open(os.path.join(self.name, filename2), 'w')
-            f2.write(content)
-            f2.close()
+        for filename2, blob in sorted(self.sources.iteritems()):
+            git.cat_file(blob, os.path.join(self.name, filename2))
         if gzip and 0 != len(self.sources):
             filename = 'sh-{0}.tar.gz'.format(self.name)
             tarball = tarfile.open(filename, 'w:gz')
