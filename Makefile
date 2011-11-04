@@ -11,13 +11,16 @@ pydir=$(shell ${PYTHON} pydir.py ${libdir})
 mandir=${prefix}/share/man
 sysconfdir=${prefix}/etc
 
-all: blueprint/frontend/mustache.sh
+all: bin/blueprint-template blueprint/frontend/mustache.sh
+
+bin/blueprint-template: bin/blueprint-template.mustache
+	mustache.sh/bin/mustache.sh <$< >$@
 
 blueprint/frontend/mustache.sh: mustache.sh/lib/mustache.sh
 	install -m644 $< $@
 
 clean:
-	rm -f blueprint/frontend/mustache.sh
+	rm -f bin/blueprint-template blueprint/frontend/mustache.sh
 	rm -rf \
 		*.deb \
 		setup.py build dist *.egg *.egg-info \
@@ -90,7 +93,7 @@ build-deb:
 	make uninstall prefix=/usr sysconfdir=/etc DESTDIR=debian
 
 build-pypi:
-	m4 -D__VERSION__=$(VERSION) setup.py.m4 >setup.py
+	VERSION=$(VERSION) mustache.sh/bin/mustache.sh <setup.py.mustache >setup.py
 	$(PYTHON) setup.py bdist_egg
 
 deploy: deploy-deb deploy-pypi

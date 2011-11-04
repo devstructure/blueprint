@@ -8,6 +8,7 @@
 *.tar
 *.tar.gz
 .coverage
+bin/blueprint-template
 blueprint/frontend/mustache.sh
 build
 control
