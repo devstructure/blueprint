@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BLUEPRINT" "5" "October 2011" "DevStructure" "Blueprint"
+.TH "BLUEPRINT" "5" "November 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
 \fBblueprint\fR \- blueprint JSON format
@@ -19,6 +19,21 @@
       "group": "GROUP",
       "mode": "MODE",
       "owner": "OWNER"
+    },
+    "PATHNAME": {
+      "encoding": "ENCODING",
+      "group": "GROUP",
+      "mode": "MODE",
+      "owner": "OWNER",
+      "template": "TEMPLATE"
+    },
+    "PATHNAME": {
+      "dat": "DATA"
+      "encoding": "ENCODING",
+      "group": "GROUP",
+      "mode": "MODE",
+      "owner": "OWNER",
+      "template": "TEMPLATE"
     },
     "PATHNAME": {
       "encoding": "ENCODING",
@@ -81,7 +96,10 @@ For compatibility with AWS \fBcfn\-init\fR, a URL may appear in the value in pla
 Each key in the optional \fBfiles\fR object is the fully\-qualified pathname to a file\. These pathnames should be traversed in alphabetical order\. The associated value contains the \fBowner\fR, owning \fBgroup\fR, \fBmode\fR (a string containing the full 6\-digit octal representation), \fBcontent\fR, and the \fBencoding\fR of content (one of \fIplain\fR or \fIbase64\fR)\. Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied\.
 .
 .P
-For compatibility with AWS \fBcfn\-init\fR, \fBsource\fR takes precedence over the \fBcontent\fR\. If a file with a \fBsource\fR is encountered, the \fBsource\fR URL should be fetched as the file\'s content\. Blueprint will never generate such objects\.
+The file\'s content may alternately be specified as \fBtemplate\fR and (optionally) \fBdata\fR which contain a \fBmustache\.sh\fR template in the \fBmustache\fR(5) format and POSIX shell code, respectively\. When a blueprint is applied, the template should be given as standard input to \fBmustache\.sh\fR with this data and other default data available in the environment\. The resulting standard output should be taken as the file\'s content\. A copy of \fBmustache\.sh\fR is distributed with Blueprint\.
+.
+.P
+For compatibility with AWS \fBcfn\-init\fR, \fBsource\fR takes precedence over \fBcontent\fR\. If a file with a \fBsource\fR is encountered, the \fBsource\fR URL should be fetched as the file\'s content\. Blueprint will never generate such objects\.
 .
 .SS "Packages"
 Each key within \fBpackages\fR names a package manager\. Each manager contains keys that name packages to be installed by that manager\. Each package name is associated with an array of versions that must be installed\. In most cases, for most managers, this array will have only one element\.
@@ -109,3 +127,6 @@ Richard Crowley \fIrichard@devstructure\.com\fR
 .
 .SH "SEE ALSO"
 \fBblueprint\fR(1)\.
+.
+.P
+\fBmustache\fR(5) at \fIhttp://mustache\.github\.com/mustache\.5\.html\fR and \fBmustache\.sh\fR at \fIhttps://github\.com/rcrowley/mustache\.sh\fR\.
