@@ -11,6 +11,8 @@ blueprint-show(1) -- generate code from a blueprint
 
 If none of `--puppet`, `--chef`, `--sh`, or `--cfn` are given, the raw JSON data structure that describes the blueprint is printed as described in `blueprint`(5).
 
+The POSIX shell code generator is the only one prepared to handle files to be rendered from a template.  All other code generators will print a warning and ignore such files.
+
 If _name_ is omitted or `-`, a blueprint is read from standard input and treated in the same manner.  See `blueprint`(5) for the details of the format.
 
 ## OPTIONS
