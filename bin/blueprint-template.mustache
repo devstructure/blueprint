@@ -2,7 +2,7 @@
 
 set -e
 
-exec 3>&2
+exec 6>&2
 
 #/ Usage: blueprint template [-q] <pathname>
 usage() {
@@ -13,7 +13,7 @@ while [ "$#" -gt 0 ]
 do
 	case "$1" in
 		-h|--help) usage;;
-		-q|--quiet) exec 3>/dev/null;;
+		-q|--quiet) exec 6>/dev/null;;
 		*) break;;
 	esac
 done
@@ -24,13 +24,13 @@ done
 
 for PATHNAME in $(find "/etc/blueprint-template.d" -type f -name "*.sh")
 do
-	echo "# [blueprint-template] sourcing $PATHNAME" >&3
+	echo "# [blueprint-template] sourcing $PATHNAME" >&6
 	. "$PATHNAME"
 done
 
 if [ -f "$1.blueprint-template.sh" ]
 then
-	echo "# [blueprint-template] sourcing $1.blueprint-template.sh" >&3
+	echo "# [blueprint-template] sourcing $1.blueprint-template.sh" >&6
 	. "$1.blueprint-template.sh"
 fi
 
