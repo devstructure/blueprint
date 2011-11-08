@@ -22,7 +22,7 @@ done
 {{`cat mustache.sh/lib/mustache.sh`}}
 # END mustache.sh
 
-for PATHNAME in $(find "/etc/blueprint-template.d" -type f -name "*.sh")
+for PATHNAME in $(find "/etc/blueprint-template.d" "{{pydir}}/blueprint/frontend/blueprint-template.d" "-name" "*.sh" 2>/dev/null)
 do
 	echo "# [blueprint-template] sourcing $PATHNAME" >&6
 	. "$PATHNAME"

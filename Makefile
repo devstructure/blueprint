@@ -45,6 +45,7 @@ install-lib:
 	find blueprint -type d -printf %P\\0 | xargs -0r -I__ install -d $(DESTDIR)$(pydir)/blueprint/__
 	find blueprint -type f -name \*.py -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/__ $(DESTDIR)$(pydir)/blueprint/__
 	install -m644 blueprint/frontend/mustache.sh $(DESTDIR)$(pydir)/blueprint/frontend/
+	find blueprint/frontend/blueprint-template.d -type f -name \*.sh -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/frontend/blueprint-template.d/__ $(DESTDIR)$(pydir)/blueprint/frontend/blueprint-template.d/__
 	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall $(DESTDIR)$(pydir)/blueprint
 
 install-man:
@@ -64,6 +65,8 @@ uninstall-bin:
 
 uninstall-lib:
 	find blueprint -type f -name \*.py -printf %P\\0 | xargs -0r -I__ rm -f $(DESTDIR)$(pydir)/blueprint/__ $(DESTDIR)$(pydir)/blueprint/__c
+	rm -f $(DESTDIR)$(pydir)/blueprint/frontend/mustache.sh
+	find blueprint/frontend/blueprint-template.d -type f -name \*.sh -printf %P\\0 | xargs -0r -I__ rm -f $(DESTDIR)$(pydir)/blueprint/frontend/blueprint-template.d/__
 	find blueprint -depth -mindepth 1 -type d -printf %P\\0 | xargs -0r -I__ rmdir $(DESTDIR)$(pydir)/blueprint/__ || true
 	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(pydir)/blueprint || true
 

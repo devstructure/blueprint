@@ -8,7 +8,7 @@ import gzip as gziplib
 import os
 import os.path
 import re
-import shutil
+from shutil import copyfile
 import tarfile
 
 from blueprint import git
@@ -93,8 +93,8 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
                     else:
                         commands = ('mustache',)
                     s.add_list(('set +x',),
-                               ('. "./mustache.sh"',),
-                               ('for F in blueprint-template.d/*',),
+                               ('. "lib/mustache.sh"',),
+                               ('for F in */blueprint-template.d/*.sh',),
                                ('do',),
                                ('\t. "$F"',),
                                ('done',),
@@ -288,6 +288,8 @@ class Script(object):
         """
         Generate a file containing shell code and all file contents.
         """
+
+        # Open a file by the correct name, possibly with inline gzipping.
         if 0 < len(self.sources) or self.templates:
             os.mkdir(self.name)
             filename = os.path.join(self.name, 'bootstrap.sh')
@@ -298,28 +300,47 @@ class Script(object):
         else:
             filename = '{0}.sh'.format(self.name)
             f = codecs.open(filename, 'w', encoding='utf-8')
+
+        # Bring along `mustache.sh`, the default template data files, and
+        # any user-provided template data files.
         if self.templates:
-            shutil.copyfile(os.path.join(os.path.dirname(__file__),
-                            'mustache.sh'),
-                            os.path.join(self.name, 'mustache.sh'))
-            os.mkdir(os.path.join(self.name, 'blueprint-template.d'))
-            for filename2 in os.listdir('/etc/blueprint-template.d'):
-                if filename2.endswith('.sh'):
-                    shutil.copyfile(os.path.join('/etc/blueprint-template.d',
-                                                 filename2),
-                                    os.path.join(self.name,
-                                                 'blueprint-template.d',
-                                                 filename2))
+            os.mkdir(os.path.join(self.name, 'etc'))
+            os.mkdir(os.path.join(self.name, 'etc', 'blueprint-template.d'))
+            os.mkdir(os.path.join(self.name, 'lib'))
+            os.mkdir(os.path.join(self.name, 'lib', 'blueprint-template.d'))
+            copyfile(os.path.join(os.path.dirname(__file__), 'mustache.sh'),
+                     os.path.join(self.name, 'lib', 'mustache.sh'))
+            for src, dest in [('/etc/blueprint-template.d', 'etc'),
+                              (os.path.join(os.path.dirname(__file__),
+                                            'blueprint-template.d'),
+                               'lib')]:
+                try:
+                    for filename2 in os.listdir(src):
+                        if filename2.endswith('.sh'):
+                            copyfile(os.path.join(src, filename2),
+                                     os.path.join(self.name,
+                                                  dest,
+                                                  'blueprint-template.d',
+                                                  filename2))
+                except OSError:
+                    pass
+
+        # Write the actual shell code.
         for out in self.out:
             f.write(out)
             f.write('\n')
         f.close()
+
+        # Bring source tarballs along.
         for filename2, blob in sorted(self.sources.iteritems()):
             git.cat_file(blob, os.path.join(self.name, filename2))
+
+        # Possibly gzip the result.
         if gzip and (0 < len(self.sources) or self.templates):
             filename = 'sh-{0}.tar.gz'.format(self.name)
             tarball = tarfile.open(filename, 'w:gz')
             tarball.add(self.name)
             tarball.close()
             return filename
+
         return filename
