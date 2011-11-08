@@ -14,7 +14,8 @@ sysconfdir=${prefix}/etc
 all: bin/blueprint-template blueprint/frontend/mustache.sh
 
 bin/blueprint-template: bin/blueprint-template.mustache
-	mustache.sh/bin/mustache.sh <$< >$@
+	pydir=$(pydir) mustache.sh/bin/mustache.sh <$< >$@
+	chmod 755 $@
 
 blueprint/frontend/mustache.sh: mustache.sh/lib/mustache.sh
 	install -m644 $< $@
