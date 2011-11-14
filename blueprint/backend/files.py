@@ -695,6 +695,19 @@ def files(b):
                                                                  True):
                 continue
 
+            # Check for a Mustache template and an optional shell script
+            # that templatize this file.
+            try:
+                template = open(
+                    '{0}.blueprint-template.mustache'.format(pathname)).read()
+            except IOError:
+                template = None
+            try:
+                data = open(
+                    '{0}.blueprint-template.sh'.format(pathname)).read()
+            except IOError:
+                data = None
+
             # The content is used even for symbolic links to determine whether
             # it has changed from the packaged version.
             try:
@@ -703,25 +716,23 @@ def files(b):
                 #logging.warning('{0} not readable'.format(pathname))
                 continue
 
-            # Ignore files that are from the `base-files` package (which
-            # doesn't include MD5 sums for every file for some reason).
-            apt_packages = _dpkg_query_S(pathname)
-            if 'base-files' in apt_packages:
+            # Ignore files that are unchanged from their packaged version.
+            if _unchanged(pathname, content):
                 continue
 
-            # Ignore files that are unchanged from their packaged version,
-            # or match in MD5SUMS.
-            md5sums = MD5SUMS.get(pathname, [])
-            md5sums.extend([_dpkg_md5sum(package, pathname)
-                            for package in apt_packages])
-            md5sum = _rpm_md5sum(pathname)
-            if md5sum is not None:
-                md5sums.append(md5sum)
-            if (hashlib.md5(content).hexdigest() in md5sums \
-                or 64 in [len(md5sum or '') for md5sum in md5sums] \
-                   and hashlib.sha256(content).hexdigest() in md5sums) \
-               and ignore.file(pathname, True):
-                continue
+            # Resolve the rest of the file's metadata from the
+            # `/etc/passwd` and `/etc/group` databases.
+            try:
+                pw = pwd.getpwuid(s.st_uid)
+                owner = pw.pw_name
+            except KeyError:
+                owner = s.st_uid
+            try:
+                gr = grp.getgrgid(s.st_gid)
+                group = gr.gr_name
+            except KeyError:
+                group = s.st_gid
+            mode = '{0:o}'.format(s.st_mode)
 
             # A symbolic link's content is the link target.
             if stat.S_ISLNK(s.st_mode):
@@ -737,41 +748,36 @@ def files(b):
                 if content.startswith('/etc/alternatives/'):
                     continue
 
-                encoding = 'plain'
+                b.add_file(pathname,
+                           content=content,
+                           encoding='plain',
+                           group=group,
+                           mode=mode,
+                           owner=owner)
 
             # A regular file is stored as plain text only if it is valid
             # UTF-8, which is required for JSON serialization.
-            elif stat.S_ISREG(s.st_mode):
-                try:
-                    content = content.decode('utf_8')
-                    encoding = 'plain'
-                except UnicodeDecodeError:
-                    content = base64.b64encode(content)
-                    encoding = 'base64'
-
-            # Other types, like FIFOs and sockets are not supported within
-            # a blueprint and really shouldn't appear in `/etc` at all.
             else:
-                logging.warning('{0} is not a regular file or symbolic link'.
-                                format(pathname))
-                continue
-
-            try:
-                pw = pwd.getpwuid(s.st_uid)
-                owner = pw.pw_name
-            except KeyError:
-                owner = s.st_uid
-            try:
-                gr = grp.getgrgid(s.st_gid)
-                group = gr.gr_name
-            except KeyError:
-                group = s.st_gid
-            b.add_file(pathname,
-                       content=content,
-                       encoding=encoding,
-                       group=group,
-                       mode='{0:o}'.format(s.st_mode),
-                       owner=owner)
+                kwargs = dict(group=group,
+                              mode=mode,
+                              owner=owner)
+                try:
+                    if template:
+                        if data:
+                            kwargs['data'] = data.decode('utf_8')
+                        kwargs['template'] = template.decode('utf_8')
+                    else:
+                        kwargs['content'] = content.decode('utf_8')
+                    kwargs['encoding'] = 'plain'
+                except UnicodeDecodeError:
+                    if template:
+                        if data:
+                            kwargs['data'] = base64.b64encode(data)
+                        kwargs['template'] = base64.b64encode(template)
+                    else:
+                        kwargs['content'] = base64.b64encode(content)
+                    kwargs['encoding'] = 'base64'
+                b.add_file(pathname, **kwargs)
 
             # If this file is a service init script or config , create a
             # service resource.
@@ -782,7 +788,7 @@ def files(b):
                     b.add_service_package(manager,
                                           service,
                                           'apt',
-                                          *apt_packages)
+                                          *_dpkg_query_S(pathname))
                     b.add_service_package(manager,
                                           service,
                                           'yum',
@@ -937,3 +943,30 @@ def _rpm_md5sum(pathname):
             pass
 
     return _rpm_md5sum._cache.get(pathname, None)
+
+def _unchanged(pathname, content):
+    """
+    Return `True` if a file is unchanged from its packaged version.
+    """
+
+    # Ignore files that are from the `base-files` package (which
+    # doesn't include MD5 sums for every file for some reason).
+    apt_packages = _dpkg_query_S(pathname)
+    if 'base-files' in apt_packages:
+        return True
+
+    # Ignore files that are unchanged from their packaged version,
+    # or match in MD5SUMS.
+    md5sums = MD5SUMS.get(pathname, [])
+    md5sums.extend([_dpkg_md5sum(package, pathname)
+                    for package in apt_packages])
+    md5sum = _rpm_md5sum(pathname)
+    if md5sum is not None:
+        md5sums.append(md5sum)
+    if (hashlib.md5(content).hexdigest() in md5sums \
+        or 64 in [len(md5sum or '') for md5sum in md5sums] \
+           and hashlib.sha256(content).hexdigest() in md5sums) \
+       and ignore.file(pathname, True):
+        return True
+
+    return False

@@ -66,7 +66,7 @@ try:
             filename = getattr(b, options.generate)(options.relaxed).dumpf()
         except OSError as e:
             if errno.EEXIST == e.errno:
-                logging.error('{0} already exists'.format(name))
+                logging.error('{0} already exists'.format(b.name))
             sys.exit(1)
         if not options.quiet:
             print(filename)

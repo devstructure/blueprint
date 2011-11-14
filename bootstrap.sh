@@ -7,7 +7,6 @@ apt-get -q update
 apt-get -q -y install \
 	build-essential \
 	git-core \
-	m4 \
 	python python-setuptools \
 	ruby ruby-dev rubygems \
 
@@ -16,4 +15,5 @@ gem install fpm
 mkdir "$HOME/work"
 cd "$HOME/work"
 git clone git://github.com/devstructure/blueprint.git
+(cd "blueprint" && git submodule update --init)
 git clone git://github.com/rcrowley/ronn.git -b dots

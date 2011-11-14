@@ -146,15 +146,23 @@ def content(blob):
     return stdout
 
 
-def cat_file(blob):
+def cat_file(blob, pathname=None):
     """
-    Return an open file handle to a blob in Git's object store, via the
-    git-cat-file(1) command.
+    If `pathname` is `None`, return an open file handle to the blob in
+    Git's object store, otherwise stream the blob to `pathname`, all via
+    the git-cat-file(1) command.
     """
-    return subprocess.Popen(git_args() + ['cat-file', 'blob', blob],
-                            close_fds=True,
-                            preexec_fn=unroot,
-                            stdout=subprocess.PIPE).stdout
+    args = git_args() + ['cat-file', 'blob', blob]
+    if pathname is None:
+        return subprocess.Popen(args,
+                                close_fds=True,
+                                preexec_fn=unroot,
+                                stdout=subprocess.PIPE).stdout
+    else:
+        subprocess.Popen(args,
+                         close_fds=True,
+                         preexec_fn=unroot,
+                         stdout=open(pathname, 'w')).communicate()
 
 
 def write_tree():

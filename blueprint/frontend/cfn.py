@@ -14,13 +14,19 @@ from blueprint import util
 
 
 def cfn(b, relaxed=False):
+    b2 = copy.deepcopy(b)
+    def file(pathname, f):
+        if 'template' in f:
+            logging.warning('file template {0} won\'t appear in generated '
+                            'CloudFormation templates'.format(pathname))
+            del b2.files[pathname]
     if relaxed:
-        b_relaxed = copy.deepcopy(b)
         def package(manager, package, version):
-            b_relaxed.packages[manager][package] = []
-        b.walk(package=package)
-        return Template(b_relaxed)
-    return Template(b)
+            b2.packages[manager][package] = []
+        b.walk(file=file, package=package)
+    else:
+        b.walk(file=file)
+    return Template(b2)
 
 
 class Template(dict):

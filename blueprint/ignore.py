@@ -18,6 +18,7 @@ from blueprint import util
 #
 # XXX Update `blueprintignore`(5) if you make changes here.
 IGNORE = {'*~': False,
+          '*.blueprint-template.*': False,
           '*.dpkg-*': False,
           '/etc/.git': False,
           '/etc/.pwd.lock': False,

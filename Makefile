@@ -11,9 +11,17 @@ pydir=$(shell ${PYTHON} pydir.py ${libdir})
 mandir=${prefix}/share/man
 sysconfdir=${prefix}/etc
 
-all:
+all: bin/blueprint-template blueprint/frontend/mustache.sh
+
+bin/blueprint-template: bin/blueprint-template.mustache
+	pydir=$(pydir) mustache.sh/bin/mustache.sh <$< >$@
+	chmod 755 $@
+
+blueprint/frontend/mustache.sh: mustache.sh/lib/mustache.sh
+	install -m644 $< $@
 
 clean:
+	rm -f bin/blueprint-template blueprint/frontend/mustache.sh
 	rm -rf \
 		*.deb \
 		setup.py build dist *.egg *.egg-info \
@@ -36,12 +44,14 @@ install-bin:
 install-lib:
 	find blueprint -type d -printf %P\\0 | xargs -0r -I__ install -d $(DESTDIR)$(pydir)/blueprint/__
 	find blueprint -type f -name \*.py -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/__ $(DESTDIR)$(pydir)/blueprint/__
+	install -m644 blueprint/frontend/mustache.sh $(DESTDIR)$(pydir)/blueprint/frontend/
+	find blueprint/frontend/blueprint-template.d -type f -name \*.sh -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/frontend/blueprint-template.d/__ $(DESTDIR)$(pydir)/blueprint/frontend/blueprint-template.d/__
 	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall $(DESTDIR)$(pydir)/blueprint
 
 install-man:
 	find man -type d -printf %P\\0 | xargs -0r -I__ install -d $(DESTDIR)$(mandir)/__
 	find man -type f -name \*.[12345678] -printf %P\\0 | xargs -0r -I__ install -m644 man/__ $(DESTDIR)$(mandir)/__
-	find man -type f -name \*.[12345678] -printf %P\\0 | xargs -0r -I__ gzip $(DESTDIR)$(mandir)/__
+	find man -type f -name \*.[12345678] -printf %P\\0 | xargs -0r -I__ gzip -f $(DESTDIR)$(mandir)/__
 
 install-sysconf:
 	find etc -type d -printf %P\\0 | xargs -0r -I__ install -d $(DESTDIR)$(sysconfdir)/__
@@ -55,6 +65,8 @@ uninstall-bin:
 
 uninstall-lib:
 	find blueprint -type f -name \*.py -printf %P\\0 | xargs -0r -I__ rm -f $(DESTDIR)$(pydir)/blueprint/__ $(DESTDIR)$(pydir)/blueprint/__c
+	rm -f $(DESTDIR)$(pydir)/blueprint/frontend/mustache.sh
+	find blueprint/frontend/blueprint-template.d -type f -name \*.sh -printf %P\\0 | xargs -0r -I__ rm -f $(DESTDIR)$(pydir)/blueprint/frontend/blueprint-template.d/__
 	find blueprint -depth -mindepth 1 -type d -printf %P\\0 | xargs -0r -I__ rmdir $(DESTDIR)$(pydir)/blueprint/__ || true
 	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(pydir)/blueprint || true
 
@@ -85,7 +97,7 @@ build-deb:
 	make uninstall prefix=/usr sysconfdir=/etc DESTDIR=debian
 
 build-pypi:
-	m4 -D__VERSION__=$(VERSION) setup.py.m4 >setup.py
+	VERSION=$(VERSION) mustache.sh/bin/mustache.sh <setup.py.mustache >setup.py
 	$(PYTHON) setup.py bdist_egg
 
 deploy: deploy-deb deploy-pypi

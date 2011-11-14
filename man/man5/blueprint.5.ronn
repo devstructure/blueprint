@@ -18,6 +18,21 @@ blueprint(5) -- blueprint JSON format
 	      "group": "GROUP",
 	      "mode": "MODE",
 	      "owner": "OWNER",
+	      "template": "TEMPLATE"
+	    },
+	    "PATHNAME": {
+	      "dat": "DATA"
+	      "encoding": "ENCODING",
+	      "group": "GROUP",
+	      "mode": "MODE",
+	      "owner": "OWNER",
+	      "template": "TEMPLATE"
+	    },
+	    "PATHNAME": {
+	      "encoding": "ENCODING",
+	      "group": "GROUP",
+	      "mode": "MODE",
+	      "owner": "OWNER",
 	      "source": "SOURCE"
 	    }
 	  },
@@ -71,7 +86,9 @@ For compatibility with AWS `cfn-init`, a URL may appear in the value in place of
 
 Each key in the optional `files` object is the fully-qualified pathname to a file.  These pathnames should be traversed in alphabetical order.  The associated value contains the `owner`, owning `group`, `mode` (a string containing the full 6-digit octal representation), `content`, and the `encoding` of content (one of _plain_ or _base64_).  Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied.
 
-For compatibility with AWS `cfn-init`, `source` takes precedence over the `content`.  If a file with a `source` is encountered, the `source` URL should be fetched as the file's content.  Blueprint will never generate such objects.
+The file's content may alternately be specified as `template` and (optionally) `data` which contain a `mustache.sh` template in the `mustache`(5) format and POSIX shell code, respectively.  When a blueprint is applied, the template should be given as standard input to `mustache.sh` with this data and other default data available in the environment.  The resulting standard output should be taken as the file's content.  A copy of `mustache.sh` is distributed with Blueprint.
+
+For compatibility with AWS `cfn-init`, `source` takes precedence over `content`.  If a file with a `source` is encountered, the `source` URL should be fetched as the file's content.  Blueprint will never generate such objects.
 
 ### Packages
 
@@ -100,3 +117,5 @@ Richard Crowley <richard@devstructure.com>
 ## SEE ALSO
 
 `blueprint`(1).
+
+`mustache`(5) at <http://mustache.github.com/mustache.5.html> and `mustache.sh` at <https://github.com/rcrowley/mustache.sh>.

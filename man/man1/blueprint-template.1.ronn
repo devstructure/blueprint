@@ -1,0 +1,34 @@
+blueprint-template(1) -- 
+============================================================
+
+## SYNOPSIS
+
+`blueprint template` [`-q`] [_pathname_]  
+
+## DESCRIPTION
+
+FIXME
+
+## OPTIONS
+
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `/etc/blueprint-template.d`:
+  FIXME
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

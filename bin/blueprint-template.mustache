@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+
+exec 6>&2
+
+#/ Usage: blueprint template [-q] <pathname>
+usage() {
+	grep "^#/" "$0" | cut -c4- 1>&2
+	exit 1
+}
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		-h|--help) usage;;
+		-q|--quiet) exec 6>/dev/null;;
+		*) break;;
+	esac
+done
+
+# BEGIN mustache.sh
+{{`cat mustache.sh/lib/mustache.sh`}}
+# END mustache.sh
+
+for PATHNAME in $(find "/etc/blueprint-template.d" "{{pydir}}/blueprint/frontend/blueprint-template.d" "-name" "*.sh" 2>/dev/null)
+do
+	echo "# [blueprint-template] sourcing $PATHNAME" >&6
+	. "$PATHNAME"
+done
+
+if [ -f "$1.blueprint-template.sh" ]
+then
+	echo "# [blueprint-template] sourcing $1.blueprint-template.sh" >&6
+	. "$1.blueprint-template.sh"
+fi
+
+mustache <"$1.blueprint-template.mustache" >"$1"
