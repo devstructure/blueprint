@@ -2,8 +2,6 @@
 Interactively walk blueprints.
 """
 
-import subprocess
-
 import git
 import walk as walklib
 
