@@ -205,7 +205,7 @@ def command(*commands, **kwargs):
         return ''.join([' | '.join(commands).format(*kwargs.get('args', ())),
                         '\n',
                         stdin,
-                        '' if '\n' == stdin[-1] else '\n',
+                        '' if '' == stdin or '\n' == stdin[-1] else '\n',
                         eof])
     return ' | '.join(commands).format(*kwargs.get('args', ()))
 
