@@ -68,7 +68,9 @@ Prerequisites:
 ### From source on Debian, Ubuntu, and Fedora
 
 	git clone git://github.com/devstructure/blueprint.git
-	cd blueprint && make && sudo make install
+	cd blueprint
+	git submodule update --init
+	make && sudo make install
 
 ### From source on CentOS and RHEL 5
 
