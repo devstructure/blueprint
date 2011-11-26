@@ -15,7 +15,6 @@ import re
 import stat
 import subprocess
 
-from blueprint import ignore
 from blueprint import util
 
 
@@ -632,14 +631,14 @@ for pathname, overrides in MD5SUMS.iteritems():
             pass
 
 
-def files(b):
+def files(b, r):
     logging.info('searching for configuration files')
 
     # Visit every file in `/etc` except those on the exclusion list above.
     for dirpath, dirnames, filenames in os.walk('/etc'):
 
         # Determine if this entire directory should be ignored by default.
-        ignored = ignore.file(dirpath)
+        ignored = r.ignore_file(dirpath)
 
         # Collect up the full pathname to each file, `lstat` them all, and
         # note which ones will probably be ignored.
@@ -649,7 +648,7 @@ def files(b):
             try:
                 files.append((pathname,
                               os.lstat(pathname),
-                              ignore.file(pathname, ignored)))
+                              r.ignore_file(pathname, ignored)))
             except OSError as e:
                 logging.warning('{0} caused {1} - try running as root'.
                                 format(pathname, errno.errorcode[e.errno]))
@@ -691,8 +690,8 @@ def files(b):
             # Ignore ignored files and files that share their ctime with other
             # files in the directory.  This is a very strong indication that
             # the file is original to the system and should be ignored.
-            if ignored or 1 < ctimes[s.st_ctime] and ignore.file(pathname,
-                                                                 True):
+            if ignored \
+            or 1 < ctimes[s.st_ctime] and r.ignore_file(pathname, True):
                 continue
 
             # Check for a Mustache template and an optional shell script
@@ -717,7 +716,7 @@ def files(b):
                 continue
 
             # Ignore files that are unchanged from their packaged version.
-            if _unchanged(pathname, content):
+            if _unchanged(pathname, content, r):
                 continue
 
             # Resolve the rest of the file's metadata from the
@@ -783,7 +782,7 @@ def files(b):
             # service resource.
             try:
                 manager, service = util.parse_service(pathname)
-                if not ignore.service(manager, service):
+                if not r.ignore_service(manager, service):
                     b.add_service(manager, service)
                     b.add_service_package(manager,
                                           service,
@@ -944,7 +943,7 @@ def _rpm_md5sum(pathname):
 
     return _rpm_md5sum._cache.get(pathname, None)
 
-def _unchanged(pathname, content):
+def _unchanged(pathname, content, r):
     """
     Return `True` if a file is unchanged from its packaged version.
     """
@@ -966,7 +965,7 @@ def _unchanged(pathname, content):
     if (hashlib.md5(content).hexdigest() in md5sums \
         or 64 in [len(md5sum or '') for md5sum in md5sums] \
            and hashlib.sha256(content).hexdigest() in md5sums) \
-       and ignore.file(pathname, True):
+       and r.ignore_file(pathname, True):
         return True
 
     return False

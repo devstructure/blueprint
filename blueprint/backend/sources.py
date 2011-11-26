@@ -15,11 +15,10 @@ import subprocess
 import tarfile
 
 from blueprint import context_managers
-from blueprint import ignore
 from blueprint import util
 
 
-def _source(b, dirname, old_cwd):
+def _source(b, r, dirname, old_cwd):
     tmpname = os.path.join(os.getcwd(), dirname[1:].replace('/', '-'))
 
     exclude = []
@@ -39,7 +38,7 @@ def _source(b, dirname, old_cwd):
             continue
 
         # Determine if this entire directory should be ignored by default.
-        ignored = ignore.file(dirpath)
+        ignored = r.ignore_file(dirpath)
 
         dirpath2 = os.path.normpath(
             os.path.join(tmpname, os.path.relpath(dirpath, dirname)))
@@ -68,7 +67,7 @@ def _source(b, dirname, old_cwd):
         for filename in filenames:
             pathname = os.path.join(dirpath, filename)
 
-            if ignore.source(pathname, ignored):
+            if r.ignore_source(pathname, ignored):
                 continue
 
             pathname2 = os.path.join(dirpath2, filename)
@@ -167,10 +166,11 @@ def _source(b, dirname, old_cwd):
     b.add_source(dirname, tarname)
 
 
-def sources(b):
+def sources(b, r):
     logging.info('searching for software built from source')
-    for pathname, negate in ignore.cache['source']:
-        if negate and os.path.isdir(pathname) and not ignore.source(pathname):
+    for pathname, negate in r['source']:
+        if negate and os.path.isdir(pathname) \
+        and not r.ignore_source(pathname):
 
             # Note before creating a working directory within pathname what
             # it's atime and mtime should be.
@@ -188,7 +188,7 @@ def sources(b):
 
                     # Create the shallow copy and possibly tarball of the
                     # relevant parts of pathname.
-                    _source(b, pathname, c.cwd)
+                    _source(b, r, pathname, c.cwd)
 
                 # Once more restore the atime and mtime after the working
                 # directory is destroyed.

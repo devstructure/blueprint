@@ -79,6 +79,27 @@ The `blueprint.Blueprint` class manages blueprints stored in the local blueprint
 
 The `blueprint.Blueprint` class (not individual instances) supports `destroy(`_name_`)` to destroy a blueprint, `iter()` to iterate over the names of blueprints, `load(`_f_`)` to load blueprint JSON from a file-like object, and `loads(`_s_`)` to load blueprint JSON from a string.
 
+### blueprint.backend
+
+The `blueprint.backend` module implements `blueprint-create`(1).  Each module within (for example, `blueprint.backend.apt`) must contain a function by the same name (in the example, `blueprint.backend.apt.apt`) which accepts a `blueprint.Blueprint` object and a `blueprint.rules.Rules` object.  When `blueprint.backend` is imported, it finds all such functions, lists them in `blueprint.backend.__all__`, and imports the function.  Use the backend functions thus:
+
+	import blueprint
+	b = blueprint.Blueprint()
+	import blueprint.rules
+	r = blueprint.rules.Rules.defaults()
+	import blueprint.backend
+	for funcname in blueprint.backend.__all__:
+	    getattr(blueprint.backend, funcname)(b, r)
+
+### blueprint.context_managers
+
+The `blueprint.context_managers` module implements context managers used throughout `blueprint`(1).
+
+* `blueprint.context_managers.cd(`_new\_cwd_`)`:
+  Execute in a different working directory.  The property `old_cwd` is available on the context object containing the previous working directory.
+* `blueprint.context_managers.mkdtemp(dir=`_None_`)`:
+  Create a temporary directory and execute with it as the working directory.  The property `cwd` is available on the context object containing the previous working directory.  When the context closes, the temporary directory and all its contents are removed recursively.
+
 ### blueprint.frontend
 
 `blueprint.frontend.puppet.Manifest`, `blueprint.frontend.chef.Cookbook`, and `blueprint.frontend.sh.Script` all implement similar interfaces to code generation.
@@ -88,22 +109,6 @@ The `blueprint.Blueprint` class (not individual instances) supports `destroy(`_n
 `dumps()` returns a string containing code in the language implemented by the class that received the call.  If the blueprint contains source tarballs, `dumps()` may raise `ValueError`.
 
 `dumpf(gzip=`_False_`)` returns the name of a file, possibly in a newly-created directory, containing code in the language implemented by the class that received the call.  The file or directory is created in the current working directory.  If `gzip=`_True_, the file or directory will compressed and the resulting tarball will be left in the current working directory.
-
-### blueprint.managers
-
-The `blueprint.managers.PackageManager` class is a `unicode` subclass that is used as the key in the `packages` dictionary.  It is a callable that can translate package names and versions into shell commands for installing the package.  For example: `blueprint.managers.PackageManager(`_'apt'_`)(`_'python'_`, `_'2.6.6-2ubuntu1'_`)`.
-
-The `blueprint.managers.ServiceManager` class is like `blueprint.managers.PackageManager` but the callables to generate restart commands accept only one argument: the service name.  For example: `blueprint.managers.ServiceManager(`_'sysvinit'_`)(`_'ssh'_`)`.
-
-### blueprint.backend
-
-The `blueprint.backend` module implements `blueprint-create`(1).  Each module within (for example, `blueprint.backend.apt`) must contain a function by the same name (in the example, `blueprint.backend.apt.apt`) which accepts a `blueprint.Blueprint` object as its only argument.  When `blueprint.backend` is imported, it finds all such functions, lists them in `blueprint.backend.__all__`, and imports the function.  Use the backend functions thus:
-
-	import blueprint
-	b = blueprint.Blueprint()
-	import blueprint.backend
-	for funcname in blueprint.backend.__all__:
-	    getattr(blueprint.backend, funcname)(b)
 
 ### blueprint.git
 
@@ -124,15 +129,6 @@ The `blueprint.git` module exposes the `git`(1) tools to Python via the standard
 * `blueprint.git.commit_tree(`_tree_`, `_message_`, `_parent_`)`:
   Return the commit for _tree_ and _parent_ with _message_.
 
-### blueprint.context_managers
-
-The `blueprint.context_managers` module implements context managers used throughout `blueprint`(1).
-
-* `blueprint.context_managers.cd(`_new\_cwd_`)`:
-  Execute in a different working directory.  The property `old_cwd` is available on the context object containing the previous working directory.
-* `blueprint.context_managers.mkdtemp(dir=`_None_`)`:
-  Create a temporary directory and execute with it as the working directory.  The property `cwd` is available on the context object containing the previous working directory.  When the context closes, the temporary directory and all its contents are removed recursively.
-
 ### blueprint.io
 
 * `blueprint.io.pull(`_server_`, `_secret_`, `_name_`)`:
@@ -141,6 +137,16 @@ The `blueprint.context_managers` module implements context managers used through
   Push a blueprint to _secret_ and _b.name_ on _server_.
 * `blueprint.io.secret(`_server_`)`:
   Fetch a new secret from _server_.
+
+### blueprint.managers
+
+The `blueprint.managers.PackageManager` class is a `unicode` subclass that is used as the key in the `packages` dictionary.  It is a callable that can translate package names and versions into shell commands for installing the package.  For example: `blueprint.managers.PackageManager(`_'apt'_`)(`_'python'_`, `_'2.6.6-2ubuntu1'_`)`.
+
+The `blueprint.managers.ServiceManager` class is like `blueprint.managers.PackageManager` but the callables to generate restart commands accept only one argument: the service name.  For example: `blueprint.managers.ServiceManager(`_'sysvinit'_`)(`_'ssh'_`)`.
+
+### blueprint.rules
+
+The `blueprint.rules.Rules` class is a `defaultdict(list)` subclass that responds to `ignore_file`, `ignore_package`, `ignore_service`, and `ignore_source`.  It is instantiated by `blueprint.rules.Rules.defaults()` to access `/etc/blueprintignore` and `~/.blueprintignore` or by `blueprint.rules.Rules.parse(f)` to parse `blueprintignore`(5) rules from a file-like object.
 
 ## FILES
 

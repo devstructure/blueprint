@@ -5,11 +5,10 @@ Search for `yum` packages to include in the blueprint.
 import logging
 import subprocess
 
-from blueprint import ignore
 from blueprint import util
 
 
-def yum(b):
+def yum(b, r):
     logging.info('searching for Yum packages')
 
     # Try for the full list of packages.  If this fails, don't even
@@ -26,7 +25,7 @@ def yum(b):
 
     for line in p.stdout:
         package, group, epoch, version, arch = line.strip().split('\x1E')
-        if ignore.package('yum', package):
+        if r.ignore_package('yum', package):
             continue
 
         if '(none)' != epoch:
@@ -42,7 +41,7 @@ def yum(b):
         for line in p.stdout:
             try:
                 manager, service = util.parse_service(line.rstrip())
-                if not ignore.service(manager, service):
+                if not r.ignore_service(manager, service):
                     b.add_service(manager, service)
                     b.add_service_package(manager, service, 'yum', package)
             except ValueError:

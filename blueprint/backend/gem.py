@@ -8,10 +8,9 @@ import os
 import re
 
 from blueprint import util
-from blueprint import ignore
 
 
-def gem(b):
+def gem(b, r):
     logging.info('searching for Ruby gems')
 
     # Precompile a pattern for extracting the version of Ruby that was used
@@ -49,5 +48,5 @@ def gem(b):
                     logging.warning('skipping questionably named gem {0}'.
                                     format(entry))
                     continue
-                if not ignore.package(manager, package):
+                if not r.ignore_package(manager, package):
                     b.add_package(manager, package, version)

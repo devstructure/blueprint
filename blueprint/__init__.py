@@ -11,6 +11,7 @@ logging.basicConfig(format='# [blueprint] %(message)s',
                     level=logging.INFO)
 
 import git
+import rules
 import util
 import walk
 
@@ -64,9 +65,10 @@ class Blueprint(dict):
     @classmethod
     def create(cls, name):
         b = cls(name)
+        r = rules.Rules.defaults()
         import backend
         for funcname in backend.__all__:
-            getattr(backend, funcname)(b)
+            getattr(backend, funcname)(b, r)
         import services
         services.services(b)
         return b

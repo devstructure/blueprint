@@ -7,10 +7,9 @@ import re
 import subprocess
 
 from blueprint import util
-from blueprint import ignore
 
 
-def php(b):
+def php(b, r):
     logging.info('searching for PEAR/PECL packages')
 
     # Precompile a pattern for parsing the output of `{pear,pecl} list`.
@@ -36,5 +35,5 @@ def php(b):
             if match is None:
                 continue
             package, version = match.group(1), match.group(2)
-            if not ignore.package(manager, package):
+            if not r.ignore_package(manager, package):
                 b.add_package(manager, package, version)
