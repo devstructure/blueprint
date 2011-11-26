@@ -1,0 +1,67 @@
+#!/usr/bin/python
+
+import errno
+import logging
+import optparse
+import sys
+
+import blueprint.cli
+from blueprint import context_managers
+
+parser = optparse.OptionParser('Usage: %prog [-P|-C|-S|...] [-r] [-q] '
+                               '[<pathname>]')
+parser.add_option('-P', '--puppet',
+                  dest='generate',
+                  action='store_const',
+                  const='puppet',
+                  help='generate a Puppet module')
+parser.add_option('-C', '--chef',
+                  dest='generate',
+                  action='store_const',
+                  const='chef',
+                  help='generate a Chef cookbook')
+parser.add_option('-S', '--sh',
+                  dest='generate',
+                  action='store_const',
+                  const='sh',
+                  help='generate POSIX shell code')
+parser.add_option('--cfn',
+                  dest='generate',
+                  action='store_const',
+                  const='cfn',
+                  help='generate an AWS CloudFormation template')
+parser.add_option('-r', '--relaxed',
+                  dest='relaxed',
+                  default=False,
+                  action='store_true',
+                  help='relax version constraints in generated code')
+parser.add_option('-q', '--quiet',
+                  dest='quiet',
+                  default=False,
+                  action='store_true',
+                  help='operate quietly')
+options, args = parser.parse_args()
+
+if options.quiet:
+    logging.root.setLevel(logging.CRITICAL)
+
+if 1 < len(args):
+    parser.print_usage()
+    sys.exit(1)
+
+b = blueprint.cli.read_rules(options, args)
+
+try:
+    if options.generate is None:
+        print(b.dumps())
+    else:
+        try:
+            filename = getattr(b, options.generate)(options.relaxed).dumpf()
+        except OSError as e:
+            if errno.EEXIST == e.errno:
+                logging.error('{0} already exists'.format(b.name))
+            sys.exit(1)
+        if not options.quiet:
+            print(filename)
+except IOError:
+    pass

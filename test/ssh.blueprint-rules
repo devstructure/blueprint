@@ -1,0 +1,12 @@
+# Blueprint rules
+
+# These are the exact opposite of blueprintignore(5) files, so they only
+# list resource names - the data for those resources should be extracted
+# from the system on which the blueprint is rendered.
+
+/etc/blueprintignore
+
+:package:apt/build-essential
+:package:apt/openssh-server
+
+:service:sysvinit/ssh

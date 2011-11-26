@@ -86,6 +86,62 @@ IGNORE = {'*~': False,
 CACHE = '/tmp/blueprintignore'
 
 
+def defaults():
+    """
+    Parse `/etc/blueprintignore` and `~/.blueprintignore` to build the
+    default `Rules` object.
+    """
+    r = None
+
+    # Check for a fresh cache of the complete blueprintignore(5) rules.
+    if _mtime('/etc/blueprintignore') < _mtime(CACHE) \
+    and _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE) \
+    and _mtime(__file__) < _mtime(CACHE):
+        try:
+            r = Rules(json.load(open(CACHE)))
+            logging.info('using cached blueprintignore(5) rules')
+            return r
+        except (OSError, ValueError):
+            pass
+
+    # Cache things that are ignored by default first.
+    r = Rules({
+        'file': IGNORE.items(),
+        'package': [('apt', package, False) for package in _apt()] +
+                   [('yum', package, False) for package in _yum()],
+        'service': [('sysvinit', 'skeleton', False)],
+        'source': [('/', False),
+                   ('/usr/local', True)],
+    })
+
+    # Cache the patterns stored in the blueprintignore files.
+    logging.info('parsing blueprintignore(5) rules')
+    try:
+        for pathname in ['/etc/blueprintignore',
+                         os.path.expanduser('~/.blueprintignore')]:
+            r.parse(open(pathname), negate=True)
+
+    except IOError:
+        pass
+
+    # Store the cache to disk.
+    f = _cache_open(CACHE, 'w')
+    json.dump(r, f, indent=2, sort_keys=True)
+    f.close()
+
+    return r
+
+
+def none():
+    """
+    Build a `Rules` object that ignores every resource.
+    """
+    return Rules({'file': [('*', False)],
+                  'package': [('*', '*', False)],
+                  'service': [('*', '*', False)],
+                  'source': [('/', False)]})
+
+
 def _apt():
     """
     Return the set of packages that should never appear in a blueprint because
@@ -211,57 +267,9 @@ def _mtime(pathname):
 
 class Rules(defaultdict):
     """
+    Ordered lists of rules for ignoring/unignoring particular resources.
+    This is used for both `blueprintignore`(5) and `blueprint-render`(1).
     """
-
-    @classmethod
-    def defaults(cls):
-        """
-        """
-        self = None
-
-        # Check for a fresh cache of the complete blueprintignore(5) rules.
-        if _mtime('/etc/blueprintignore') < _mtime(CACHE) \
-        and _mtime(os.path.expanduser('~/.blueprintignore')) < _mtime(CACHE) \
-        and _mtime(__file__) < _mtime(CACHE):
-            try:
-                self = cls(json.load(open(CACHE)))
-                logging.info('using cached blueprintignore(5) rules')
-                return self
-            except (OSError, ValueError):
-                pass
-
-        # Cache things that are ignored by default first.
-        self = cls({
-            'file': IGNORE.items(),
-            'package': [('apt', package, False) for package in _apt()] +
-                       [('yum', package, False) for package in _yum()],
-            'service': [('sysvinit', 'skeleton', False)],
-            'source': [('/', False),
-                       ('/usr/local', True)],
-        })
-
-        # Cache the patterns stored in the blueprintignore files.
-        logging.info('parsing blueprintignore(5) rules')
-        try:
-            for pathname in ['/etc/blueprintignore',
-                             os.path.expanduser('~/.blueprintignore')]:
-                self.parse(open(pathname), negate=True)
-
-        except IOError:
-            pass
-
-        # Store the cache to disk.
-        f = _cache_open(CACHE, 'w')
-        json.dump(self, f, indent=2, sort_keys=True)
-        f.close()
-
-        return self
-
-    @classmethod
-    def parse(cls, f, negate=False):
-        self = cls()
-        self.parse(f, negate)
-        return self
 
     def __init__(self, *args, **kwargs):
         super(Rules, self).__init__(list, *args, **kwargs)
@@ -312,7 +320,9 @@ class Rules(defaultdict):
         `True` to indicate the package should be ignored.
         """
         for m, p, negate in self['package']:
-            if ignored != negate or manager != m or package != p and '*' != p:
+            if ignored != negate \
+            or manager != m and '*' != m \
+            or package != p and '*' != p:
                 continue
             ignored = not ignored
         return ignored
@@ -322,7 +332,9 @@ class Rules(defaultdict):
         Return `True` if a given service should be ignored.
         """
         for m, s, negate in self['service']:
-            if ignored != negate or manager != m or service != s:
+            if ignored != negate \
+            or manager != m and '*' != m \
+            or service != s and '*' != s:
                 continue
             ignored = not ignored
         return ignored

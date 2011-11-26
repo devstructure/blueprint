@@ -65,7 +65,7 @@ class Blueprint(dict):
     @classmethod
     def create(cls, name):
         b = cls(name)
-        r = rules.Rules.defaults()
+        r = rules.defaults()
         import backend
         for funcname in backend.__all__:
             getattr(backend, funcname)(b, r)
@@ -111,6 +111,16 @@ class Blueprint(dict):
         valid blueprint JSON.
         """
         return cls(name, **json.loads(s))
+
+    @classmethod
+    def render(cls, r, name=None):
+        b = cls(name)
+        import backend
+        for funcname in backend.__all__:
+            getattr(backend, funcname)(b, r)
+        import services
+        services.services(b)
+        return b
 
     def __init__(self, name=None, commit=None, *args, **kwargs):
         """
