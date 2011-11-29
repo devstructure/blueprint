@@ -12,61 +12,64 @@
 .SH "DESCRIPTION"
 \fBblueprint\fR programs track packages and system files in Git\. Use stored blueprints to build new environments anytime\. Blueprints can be used to generate Puppet modules, Chef cookbooks, or POSIX shell code\.
 .
-.TP
-\fBblueprint\-list\fR(1)
-List all blueprints\.
+.IP "\(bu" 4
+\fBblueprint\-list\fR(1): List all blueprints\.
 .
-.TP
-\fBblueprint\-create\fR(1)
-Create a blueprint\.
+.IP "\(bu" 4
+\fBblueprint\-create\fR(1): Create a blueprint\.
 .
-.TP
-\fBblueprint\-show\fR(1)
-Generate code from a blueprint\.
+.IP "\(bu" 4
+\fBblueprint\-rules\fR(1): Create a blueprint from a blueprint\-rules file\.
 .
-.TP
-\fBblueprint\-diff\fR(1)
-Save the difference between two blueprints\.
+.IP "\(bu" 4
+\fBblueprint\-show\fR(1): Generate code from a blueprint\.
 .
-.TP
-\fBblueprint\-split\fR(1)
-Split one blueprint into two others interactively\.
+.IP "\(bu" 4
+\fBblueprint\-diff\fR(1): Save the difference between two blueprints\.
 .
-.TP
-\fBblueprint\-prune\fR(1)
-Select a subset of resources interactively\.
+.IP "\(bu" 4
+\fBblueprint\-split\fR(1): Split one blueprint into two others interactively\.
 .
-.TP
-\fBblueprint\-apply\fR(1)
-Run a blueprint\'s generated shell code\.
+.IP "\(bu" 4
+\fBblueprint\-prune\fR(1): Select a subset of resources interactively\.
 .
-.TP
-\fBblueprint\-push\fR(1)
-Push a blueprint to the Internet\.
+.IP "\(bu" 4
+\fBblueprint\-template\fR(1): Render mustache\.sh templates locally\.
 .
-.TP
-\fBblueprint\-pull\fR(1)
-Pull a blueprint from the Internet\.
+.IP "\(bu" 4
+\fBblueprint\-apply\fR(1): Run a blueprint\'s generated shell code\.
 .
-.TP
-\fBblueprint\-destroy\fR(1)
-Destroy a blueprint\.
+.IP "\(bu" 4
+\fBblueprint\-push\fR(1): Push a blueprint to the Internet\.
 .
-.TP
-\fBblueprint\fR(5)
-Blueprint JSON format\.
+.IP "\(bu" 4
+\fBblueprint\-pull\fR(1): Pull a blueprint from the Internet\.
 .
-.TP
-\fBblueprintignore\fR(5)
-Ignore specific files when creating blueprints\.
+.IP "\(bu" 4
+\fBblueprint\-destroy\fR(1): Destroy a blueprint\.
 .
-.TP
-\fBblueprint\.cfg\fR(5)
-Centralized blueprint service configuration\.
+.IP "\(bu" 4
+\fBblueprint\fR(5): Blueprint JSON format\.
 .
-.TP
-\fBblueprint\fR(7)
-Blueprint Python library\.
+.IP "\(bu" 4
+\fBblueprintignore\fR(5): Ignore specific files when creating blueprints\.
+.
+.IP "\(bu" 4
+\fBblueprint\-rules\fR(5) Enumerate resources in blueprints\.
+.
+.IP "\(bu" 4
+\fBblueprint\.cfg\fR(5): Centralized blueprint service configuration\.
+.
+.IP "\(bu" 4
+\fBblueprint\-template\fR(5): \fBmustache\.sh\fR template language syntax\.
+.
+.IP "\(bu" 4
+\fBblueprint\-template\fR(7): Built\-in template data\.
+.
+.IP "\(bu" 4
+\fBblueprint\fR(7): Blueprint Python library\.
+.
+.IP "" 0
 .
 .SS "Plumbing"
 Much like \fBgit\fR(1) itself, \fBblueprint\fR includes many plumbing tools that make it convenient to inspect blueprints\.
@@ -108,6 +111,10 @@ Optional INI\-style configuration files\. See \fBblueprint\.cfg\fR(5)\.
 .TP
 \fB/etc/blueprintignore\fR, \fB~/\.blueprintignore\fR
 Lists of filename patterns to be ignored when creating blueprints\. See \fBblueprintignore\fR(5)\.
+.
+.TP
+\fB/etc/blueprint\-template\.d\fR
+\fBsource\fR\-able POSIX shell scripts ending in \fB\.sh\fR that set environment variables for use in templates\.
 .
 .SH "THEME SONG"
 The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
