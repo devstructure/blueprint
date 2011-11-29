@@ -13,13 +13,13 @@ If standard input is not a TTY, a blueprint is read from standard input rather t
 
 If a _subtrahend_ is given, it is subtracted from the generated or provided blueprint and the difference is committed as _name_.
 
-If one of `--puppet`, `--chef`, `--sh`, or `--cfn` is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to `stdout`.
+If one of `--puppet`, `--chef`, `--sh`, or `--cfn` is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output.
 
-Debian packages, Ruby gems, Python packages, and PHP PEAR/PECL packages are enumerated in the blueprint.  Debian packages that are listed as `essential`, `important`, `required`, or `standard` and those that are depended upon by `ubuntu-minimal`, `ubuntu-standard`, or `ubuntu-desktop` are ignored.
+Debian packages, Ruby gems, NPM packages, Python packages, PHP PEAR/PECL packages are enumerated in the blueprint.
 
 The contents of system configuration files in `/etc` that have been created or modified from their packaged versions will be included in the blueprint.  If file is found to have a corresponding template (a file with "`.blueprint-template.mustache`" appended to its pathname) and optionally a corresponding data script (a file with "`.blueprint-template.sh`" appended to its pathname), this `template` and `data` are included in the blueprint rather than the file's literal content.
 
-Anything installed in `/usr/local` will be archived and included in the blueprint, tagged with the architecture (_amd64_ or _i386_) of the server.
+Anything installed in `/usr/local` will be archived and included in the blueprint, tagged with the architecture of the local system.
 
 `blueprintignore`(5) provides means for ignoring specific files and packages plus treating arbitrary directories as `/usr/local` is treated.
 

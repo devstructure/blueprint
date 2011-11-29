@@ -5,7 +5,10 @@
 # from the system on which the blueprint is rendered.
 
 /etc/blueprintignore
-/etc/ssh/*_config
+
+#/etc/ssh/*_config
+/etc/ssh
+!/etc/ssh/moduli
 
 :package:apt/openssh-server
 
