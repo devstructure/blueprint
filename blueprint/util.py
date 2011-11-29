@@ -153,3 +153,15 @@ class JSONEncoder(json.JSONEncoder):
 
 def json_dumps(o):
     return JSONEncoder(indent=2, sort_keys=True).encode(o)
+
+
+def unicodeme(s):
+    if isinstance(s, unicode):
+        return s
+    for encoding in ('utf_8', 'latin_1'):
+        try:
+            return unicode(s, encoding)
+        except UnicodeDecodeError:
+            pass
+    # TODO Issue a warning?
+    return s

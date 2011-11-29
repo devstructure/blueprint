@@ -280,6 +280,7 @@ class Rules(defaultdict):
         file says the given file should be ignored.  The starting state
         of the file may be overridden by setting `ignored` to `True`.
         """
+        pathname = util.unicodeme(pathname)
 
         # Determine if the `pathname` matches the `pattern`.  `filename` is
         # given as a convenience.  See `gitignore`(5) for the rules in play.
@@ -291,6 +292,7 @@ class Rules(defaultdict):
                     return os.path.isdir(pathname) if dir_only else True
             else:
                 for p in glob.glob(os.path.join(dirname, pattern)):
+                    p = util.unicodeme(p)
                     if pathname == p or pathname.startswith('{0}/'.format(p)):
                         return os.path.isdir(pathname) if dir_only else True
             return False
