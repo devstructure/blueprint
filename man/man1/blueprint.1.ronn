@@ -37,7 +37,7 @@ blueprint(1) -- reverse engineer server configuration
   Blueprint JSON format.
 * `blueprintignore`(5):
   Ignore specific files when creating blueprints.
-* `blueprint-rules`(5)
+* `blueprint-rules`(5):
   Enumerate resources in blueprints.
 * `blueprint.cfg`(5):
   Centralized blueprint service configuration.
