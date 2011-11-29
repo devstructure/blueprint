@@ -4,13 +4,100 @@
 .TH "BLUEPRINT\-TEMPLATE" "1" "November 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
-\fBblueprint\-template\fR \-
+\fBblueprint\-template\fR \- render mustache\.sh templates locally
 .
 .SH "SYNOPSIS"
 \fBblueprint template\fR [\fB\-q\fR] [\fIpathname\fR]
 .
 .SH "DESCRIPTION"
-FIXME
+\fBblueprint\-template\fR renders the template for the given \fIpathname\fR using the \fBmustache\.sh\fR template rendering engine\. The template for \fIpathname\fR must be stored in \fIpathname\fR\fB\.blueprint\-template\.mustache\fR\. Data meant only for \fIpathname\fR may be stored in \fIpathname\fR\fB\.blueprint\-template\.sh\fR, a \fBsource\fR\-able POSIX shell script\.
+.
+.P
+Data meant for all templates may be stored in files ending in \fB\.sh\fR in \fB/etc/blueprint\-template\.d\fR, again as \fBsource\fR\-able POSIX shell scripts\. Blueprint comes with a selection of suitable data, see \fBblueprint\-template\fR(7)\.
+.
+.P
+This program is meant for use during development and testing of templates; \fBblueprint\-apply\fR(1) and \fBblueprint\-show\fR(1) take care of rendering templates automatically\.
+.
+.P
+Templates may make use of the following syntax:
+.
+.IP "" 4
+.
+.nf
+
+{{VARIABLE}}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBVARIABLE\fR is read from the environment and substituted directly\.
+.
+.IP "" 4
+.
+.nf
+
+{{#VARIABLE}}\|\.\|\.\|\.{{/VARIABLE}}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The intervening \fB\|\.\|\.\|\.\fR is substituted for the entire tag if \fBVARIABLE\fR is in the environmente and is non\-empty\. Other tags may be nested within\.
+.
+.IP "" 4
+.
+.nf
+
+{{^VARIABLE}}\|\.\|\.\|\.{{/VARIABLE}}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The opposite of \fB#\fR sections: the intervening \fB\|\.\|\.\|\.\fR is substituted for the entire tag if \fBVARIABLE\fR is not in the environmente or is empty\. Other tags may be nested within\.
+.
+.IP "" 4
+.
+.nf
+
+{{!COMMENT}}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The tag is removed unconditionally\. Comments do not appear in the rendered output\.
+.
+.IP "" 4
+.
+.nf
+
+{{`COMMAND`}}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBCOMMAND\fR is executed and anything written to standard output is substituted directly\.
+.
+.IP "" 4
+.
+.nf
+
+{{#`COMMAND`}}\|\.\|\.\|\.{{/`COMMAND`}}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBCOMMAND\fR is executed and \fB\|\.\|\.\|\.\fR is rendered once for each line written to standard output\. The environment is unchanged from line\-to\-line except for the value of \fB_M_LINE\fR, which contains each successive line of standard output\.
 .
 .SH "OPTIONS"
 .
@@ -26,7 +113,7 @@ Show a help message\.
 .
 .TP
 \fB/etc/blueprint\-template\.d\fR
-FIXME
+\fBsource\fR\-able POSIX shell scripts ending in \fB\.sh\fR that set environment variables for use in templates\.
 .
 .SH "THEME SONG"
 The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
@@ -36,3 +123,9 @@ Richard Crowley \fIrichard@devstructure\.com\fR
 .
 .SH "SEE ALSO"
 Part of \fBblueprint\fR(1)\.
+.
+.P
+\fBblueprint\-template\fR(7) for built\-in template data\.
+.
+.P
+\fBmustache\fR(5) at \fIhttp://mustache\.github\.com/mustache\.5\.html\fR and \fBmustache\.sh\fR at \fIhttps://github\.com/rcrowley/mustache\.sh\fR\.

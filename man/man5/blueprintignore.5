@@ -20,27 +20,15 @@ baz*
 .fi
 .
 .SH "DESCRIPTION"
-Lines in \fB/etc/blueprintignore\fR and \fB~/\.blueprintignore\fR are interpreted as in \fBgitignore\fR(5)\. Blank lines and lines that begin with a \fB#\fR will be ignored\. Patterns that begin with a \fB!\fR are negated\. As resources are considered for inclusion in a blueprint, the last matching line in \fB/etc/blueprintignore\fR or \fB~/\.blueprintignore\fR (in that order) wins\.
-.
-.P
-The general form of each line is \fB:\fR\fItype\fR\fB:\fR\fIresource\fR, where \fItype\fR is one of \fBfile\fR, \fBpackage\fR, or \fBsource\fR\. The \fBfile\fR type is assumed and typically seen without the full \fB:\fR\-prefixed form\.
-.
-.P
-File resources that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
-.
-.P
-Package resources are of the form \fB:package:\fR\fImanager\fR\fB/\fR\fIpackage\fR\. Ignored packages implicitly ignore their dependencies as well\. Unignored packages (that is, package resources prefixed with \fB!\fR) affect only themselves and not their dependencies\.
-.
-.P
-Source resources must use the full \fB:source:\fR\fIresource\fR format and must be fully\-qualified (that is, begin with a \fB/\fR)\. By default, all directories except \fB/usr/local\fR are ignored as source resources\. If it is necessary to build and install software from source in another directory, use a negated source resource such as \fI!:source:/opt\fR\.
+Lines in \fB/etc/blueprintignore\fR and \fB~/\.blueprintignore\fR are interpreted as in \fBblueprint\-rules\fR(5) but in a negative context \- rules enumerate resources to be ignored and \fB!\fR\-prefixed rules unignore resources\.
 .
 .P
 As part of \fBblueprint\-create\fR(1), the \fB/etc/blueprintignore\fR and \fB~/\.blueprintignore\fR files that were used to create the blueprint are stored in the local blueprint repository\.
 .
 .P
-All APT\- or Yum\-managed packages considered essential to the system are part of the default ignore list\.
+There are many resources that are ignored by default\. These defaults are not meant to be an exhuastive list of exceptions and edge cases\. Rather, they\'re meant to cover typical base installations without hassle\.
 .
-.P
+.SS "Files"
 The following files and directories are part of the default ignore list\. They can be negated using \fB!\fR just like any other pattern\.
 .
 .IP "\(bu" 4
@@ -503,8 +491,17 @@ The following files are ignored if their content matches an expected hash\. They
 .
 .IP "" 0
 .
+.SS "Packages"
+All APT\- or Yum\-managed packages considered essential to the system are part of the default ignore list\.
+.
 .P
-These defaults are not meant to be an exhuastive list of exceptions and edge cases\. Rather, they\'re meant to cover typical base installations without hassle\.
+Debian packages that are listed as \fBessential\fR, \fBimportant\fR, \fBrequired\fR, or \fBstandard\fR and those that are depended upon by \fBubuntu\-minimal\fR, \fBubuntu\-standard\fR, or \fBubuntu\-desktop\fR are ignored\.
+.
+.P
+Yum packages that are part of the \fBbase\fR, \fBcore\fR, or \fBgnome\-desktop\fR groups are ignored\.
+.
+.SS "Sources"
+By default, all directories except \fB/usr/local\fR are ignored as source resources\. If it is necessary to build and install software from source in another directory, use a negated source resource such as \fI!:source:/opt\fR\.
 .
 .SH "FILES"
 .
@@ -531,4 +528,4 @@ The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
 Richard Crowley \fIrichard@devstructure\.com\fR
 .
 .SH "SEE ALSO"
-\fBblueprint\fR(1)\.
+Part of \fBblueprint\fR(1)\.

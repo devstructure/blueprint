@@ -1,0 +1,104 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\-TEMPLATE" "7" "November 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\-template\fR \- built\-in template data
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+{{FQDN}}
+.
+.fi
+.
+.SH "DESCRIPTION"
+Blueprint provides basic data about the local system for use in rendering templates of files\.
+.
+.SS "uname(1) properties"
+.
+.TP
+\fBARCH\fR
+The system\'s hardware architecture\. Probably "i386" or "x86_64"\.
+.
+.TP
+\fBKERNEL\fR
+The kernel name\. This is always "Linux" on systems Blueprint supports\.
+.
+.TP
+\fBKERNEL_RELEASE\fR
+The kernel release\.
+.
+.SS "System properties from <code>/proc</code>"
+.
+.TP
+\fBCORES\fR
+The number of cores in the system\. The semantics of this value when read in a virtualized environment are undefined\.
+.
+.TP
+\fBMEM\fR
+The total amount of memory in the system in bytes\.
+.
+.SS "Network properties"
+.
+.TP
+\fBDNSDOMAINNAME\fR
+The DNS domain name according to \fBdnsdomainname\fR(1)\.
+.
+.TP
+\fBEACH_IP\fR
+Each IPv4 address assigned to an interface, one per line\.
+.
+.TP
+\fBEACH_IPv6\fR
+Each IPv6 address assigned to an interface, one per line\.
+.
+.TP
+\fBFQDN\fR
+The fully\-qualified domain name according to \fBhostname\fR(1)\'s \fB\-\-fqdn\fR option\.
+.
+.TP
+\fBHOSTNAME\fR
+The hostname according to \fBhostname\fR(1)\.
+.
+.TP
+\fBIPv6\fR
+The first IPv6 address assigned to any interface\.
+.
+.TP
+\fBPRIVATE_IP\fR
+The first private IPv4 address assigned to any interface\.
+.
+.TP
+\fBPUBLIC_IP\fR
+The first public IPv4 address assigned to any interface\.
+.
+.SS "LSB properties"
+.
+.TP
+\fBDISTRO\fR
+The distro name\.
+.
+.TP
+\fBRELEASE\fR
+The operating system release codename\.
+.
+.SH "FILES"
+.
+.TP
+\fB/etc/blueprint\-template\.d\fR
+\fBsource\fR\-able POSIX shell scripts ending in \fB\.sh\fR that set environment variables for use in templates\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.
+.
+.P
+\fBmustache\fR(5) at \fIhttp://mustache\.github\.com/mustache\.5\.html\fR and \fBmustache\.sh\fR at \fIhttps://github\.com/rcrowley/mustache\.sh\fR\.
