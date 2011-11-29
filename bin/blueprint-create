@@ -60,9 +60,7 @@ if 1 != len(args):
 b = blueprint.cli.create(options, args)
 
 try:
-    if options.generate is None:
-        pass
-    else:
+    if options.generate is not None:
         try:
             filename = getattr(b, options.generate)(options.relaxed).dumpf()
         except OSError as e:

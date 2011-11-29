@@ -30,6 +30,10 @@ parser.add_option('--cfn',
                   action='store_const',
                   const='cfn',
                   help='generate an AWS CloudFormation template')
+parser.add_option('-m', '--message',
+                  dest='message',
+                  default=None,
+                  help='commit message')
 parser.add_option('-r', '--relaxed',
                   dest='relaxed',
                   default=False,
@@ -52,9 +56,7 @@ if 1 < len(args):
 b = blueprint.cli.read_rules(options, args)
 
 try:
-    if options.generate is None:
-        print(b.dumps())
-    else:
+    if options.generate is not None:
         try:
             filename = getattr(b, options.generate)(options.relaxed).dumpf()
         except OSError as e:

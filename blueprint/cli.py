@@ -93,10 +93,16 @@ def read_rules(options, args):
         r.parse(sys.stdin)
         return blueprint.Blueprint.render(r)
     if pathname is not None:
+        name, _ = os.path.splitext(os.path.basename(pathname))
         try:
             r.parse(open(pathname))
-            return blueprint.Blueprint.render(r,
-                                              name=os.path.basename(pathname))
+            with context_managers.mkdtemp():
+                b = blueprint.Blueprint.render(r, name)
+                b.commit(options.message or '')
+                return b
+        except blueprint.NameError:
+            logging.error('invalid blueprint name {0}'.format(name))
+            sys.exit(1)
         except IOError:
             logging.error('{0} does not exist'.format(pathname))
             sys.exit(1)
