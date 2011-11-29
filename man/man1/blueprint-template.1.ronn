@@ -1,5 +1,5 @@
-blueprint-template(1) -- 
-============================================================
+blueprint-template(1) -- render mustache.sh templates locally
+=============================================================
 
 ## SYNOPSIS
 
@@ -7,7 +7,37 @@ blueprint-template(1) --
 
 ## DESCRIPTION
 
-FIXME
+`blueprint-template` renders the template for the given _pathname_ using the `mustache.sh` template rendering engine.  The template for _pathname_ must be stored in _pathname_`.blueprint-template.mustache`.  Data meant only for _pathname_ may be stored in _pathname_`.blueprint-template.sh`, a `source`-able POSIX shell script.
+
+Data meant for all templates may be stored in files ending in `.sh` in `/etc/blueprint-template.d`, again as `source`-able POSIX shell scripts.  Blueprint comes with a selection of suitable data, see `blueprint-template`(7).
+
+This program is meant for use during development and testing of templates; `blueprint-apply`(1) and `blueprint-show`(1) take care of rendering templates automatically.
+
+Templates may make use of the following syntax:
+
+	{{VARIABLE}}
+
+`VARIABLE` is read from the environment and substituted directly.
+
+	{{#VARIABLE}}...{{/VARIABLE}}
+
+The intervening `...` is substituted for the entire tag if `VARIABLE` is in the environmente and is non-empty.  Other tags may be nested within.
+
+	{{^VARIABLE}}...{{/VARIABLE}}
+
+The opposite of `#` sections: the intervening `...` is substituted for the entire tag if `VARIABLE` is not in the environmente or is empty.  Other tags may be nested within.
+
+	{{!COMMENT}}
+
+The tag is removed unconditionally.  Comments do not appear in the rendered output.
+
+	{{`COMMAND`}}
+
+`COMMAND` is executed and anything written to standard output is substituted directly.
+
+	{{#`COMMAND`}}...{{/`COMMAND`}}
+
+`COMMAND` is executed and `...` is rendered once for each line written to standard output.  The environment is unchanged from line-to-line except for the value of `_M_LINE`, which contains each successive line of standard output.
 
 ## OPTIONS
 
@@ -19,7 +49,7 @@ FIXME
 ## FILES
 
 * `/etc/blueprint-template.d`:
-  FIXME
+  `source`-able POSIX shell scripts ending in `.sh` that set environment variables for use in templates.
 
 ## THEME SONG
 
@@ -32,3 +62,7 @@ Richard Crowley <richard@devstructure.com>
 ## SEE ALSO
 
 Part of `blueprint`(1).
+
+`blueprint-template`(7) for built-in template data.
+
+`mustache`(5) at <http://mustache.github.com/mustache.5.html> and `mustache.sh` at <https://github.com/rcrowley/mustache.sh>.
