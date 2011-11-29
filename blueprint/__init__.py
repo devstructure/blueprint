@@ -114,7 +114,7 @@ class Blueprint(dict):
         return cls(name, **json.loads(s))
 
     @classmethod
-    def render(cls, r, name=None):
+    def rules(cls, r, name=None):
         b = cls(name)
         import backend
         for funcname in backend.__all__:

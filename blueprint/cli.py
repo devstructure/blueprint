@@ -91,13 +91,13 @@ def read_rules(options, args):
     r = rules.none()
     if not os.isatty(sys.stdin.fileno()) or stdin:
         r.parse(sys.stdin)
-        return blueprint.Blueprint.render(r)
+        return blueprint.Blueprint.rules(r)
     if pathname is not None:
         name, _ = os.path.splitext(os.path.basename(pathname))
         try:
             r.parse(open(pathname))
             with context_managers.mkdtemp():
-                b = blueprint.Blueprint.render(r, name)
+                b = blueprint.Blueprint.rules(r, name)
                 b.commit(options.message or '')
                 return b
         except blueprint.NameError:

@@ -268,7 +268,7 @@ def _mtime(pathname):
 class Rules(defaultdict):
     """
     Ordered lists of rules for ignoring/unignoring particular resources.
-    This is used for both `blueprintignore`(5) and `blueprint-render`(1).
+    This is used for both `blueprintignore`(5) and `blueprint-rules`(1).
     """
 
     def __init__(self, *args, **kwargs):
@@ -351,7 +351,7 @@ class Rules(defaultdict):
     def parse(self, f, negate=False):
         """
         Parse rules from the given file-like object.  This is used both for
-        `blueprintignore`(5) and for `blueprint-render`(1).
+        `blueprintignore`(5) and for `blueprint-rules`(1).
         """
         for pattern in f:
             pattern = pattern.rstrip()
