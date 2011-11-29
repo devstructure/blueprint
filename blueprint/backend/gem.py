@@ -32,8 +32,8 @@ def gem(b, r):
             if '1.9.1' == match.group(1) and util.rubygems_virtual():
                 manager = 'ruby{0}'.format(match.group(1))
 
-            # RPM-based distros just have one RubyGems package.
-            elif util.lsb_release_codename() is None:
+            # Oneiric and RPM-based distros just have one RubyGems package.
+            elif util.rubygems_unversioned():
                 manager = 'rubygems'
 
             # Debian-based distros qualify the package name with the version

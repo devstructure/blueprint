@@ -99,6 +99,15 @@ def parse_service(pathname):
         raise ValueError('not a service')
 
 
+def rubygems_unversioned():
+    """
+    Determine whether RubyGems is suffixed by the Ruby language version.
+    It ceased to be on Oneiric.  It always has been on RPM-based distros.
+    """
+    codename = lsb_release_codename()
+    return codename is None or codename[0] >= 'o'
+
+
 def rubygems_update():
     """
     Determine whether the `rubygems-update` gem is needed.  It is needed
