@@ -5,6 +5,7 @@ import json
 import logging
 import os.path
 import re
+import sys
 
 # This must be called early - before the rest of the blueprint library loads.
 logging.basicConfig(format='# [blueprint] %(message)s',
@@ -65,7 +66,7 @@ class Blueprint(dict):
     @classmethod
     def create(cls, name):
         b = cls(name)
-        r = rules.defaults()
+        r = rules.from_files()
         import backend
         for funcname in backend.__all__:
             getattr(backend, funcname)(b, r)
@@ -483,9 +484,11 @@ class Blueprint(dict):
 
     def blueprintignore(self):
         """
-        Return the blueprint's blueprintignore file.  Prior to v3.0.9 this
-        file was stored as .blueprintignore in the repository.  Prior to
-        v3.0.4 this file was stored as .gitignore in the repository.
+        Return an open file pointer to the blueprint's blueprintignore file,
+        which is suitable for passing back to `blueprint.rules.Rules.parse`.
+        Prior to v3.0.9 this file was stored as .blueprintignore in the
+        repository.  Prior to v3.0.4 this file was stored as .gitignore in
+        the repository.
         """
         tree = git.tree(self._commit)
         blob = git.blob(tree, 'blueprintignore')
@@ -493,13 +496,9 @@ class Blueprint(dict):
             blob = git.blob(tree, '.blueprintignore')
         if blob is None:
             blob = git.blob(tree, '.gitignore')
-        import ignore
         if blob is None:
-            return ignore.Rules('')
-        content = git.content(blob)
-        if content is None:
-            return ignore.Rules('')
-        return ignore.Rules(content)
+            return []
+        return git.cat_file(blob)
 
     def walk(self, **kwargs):
         walk.walk(self, **kwargs)

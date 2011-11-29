@@ -86,7 +86,7 @@ The `blueprint.backend` module implements `blueprint-create`(1).  Each module wi
 	import blueprint
 	b = blueprint.Blueprint()
 	import blueprint.rules
-	r = blueprint.rules.Rules.defaults()
+	r = blueprint.rules.defaults()
 	import blueprint.backend
 	for funcname in blueprint.backend.__all__:
 	    getattr(blueprint.backend, funcname)(b, r)
@@ -146,7 +146,7 @@ The `blueprint.managers.ServiceManager` class is like `blueprint.managers.Packag
 
 ### blueprint.rules
 
-The `blueprint.rules.Rules` class is a `defaultdict(list)` subclass that responds to `ignore_file`, `ignore_package`, `ignore_service`, and `ignore_source`.  It is instantiated by `blueprint.rules.Rules.defaults()` to access `/etc/blueprintignore` and `~/.blueprintignore` or by `blueprint.rules.Rules.parse(f)` to parse `blueprintignore`(5) rules from a file-like object.
+The `blueprint.rules.Rules` class is a `defaultdict(list)` subclass that responds to `ignore_file`, `ignore_package`, `ignore_service`, and `ignore_source`.  It is instantiated by `blueprint.rules.defaults()` to access `/etc/blueprintignore` and `~/.blueprintignore` or by `blueprint.rules.Rules.parse(f)` to parse `blueprintignore`(5) rules from a file-like object.
 
 ## FILES
 
