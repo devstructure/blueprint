@@ -66,7 +66,7 @@ class Blueprint(dict):
     @classmethod
     def create(cls, name):
         b = cls(name)
-        r = rules.from_files()
+        r = rules.defaults()
         import backend
         for funcname in backend.__all__:
             getattr(backend, funcname)(b, r)
