@@ -5,8 +5,8 @@
 # from the system on which the blueprint is rendered.
 
 /etc/blueprintignore
+/etc/ssh/*_config
 
-:package:apt/build-essential
 :package:apt/openssh-server
 
 :service:sysvinit/ssh
