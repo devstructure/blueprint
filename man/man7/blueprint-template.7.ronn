@@ -51,11 +51,6 @@ Blueprint provides basic data about the local system for use in rendering templa
 * `RELEASE`:
   The operating system release codename.
 
-## FILES
-
-* `/etc/blueprint-template.d`:
-  `source`-able POSIX shell scripts ending in `.sh` that set environment variables for use in templates.
-
 ## THEME SONG
 
 The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"

@@ -13,6 +13,8 @@ blueprint(1) -- reverse engineer server configuration
   List all blueprints.
 * `blueprint-create`(1):
   Create a blueprint.
+* `blueprint-rules`(1):
+  Create a blueprint from a blueprint-rules file.
 * `blueprint-show`(1):
   Generate code from a blueprint.
 * `blueprint-diff`(1):
@@ -21,6 +23,8 @@ blueprint(1) -- reverse engineer server configuration
   Split one blueprint into two others interactively.
 * `blueprint-prune`(1):
   Select a subset of resources interactively.
+* `blueprint-template`(1):
+  Render mustache.sh templates locally.
 * `blueprint-apply`(1):
   Run a blueprint's generated shell code.
 * `blueprint-push`(1):
@@ -33,8 +37,14 @@ blueprint(1) -- reverse engineer server configuration
   Blueprint JSON format.
 * `blueprintignore`(5):
   Ignore specific files when creating blueprints.
+* `blueprint-rules`(5)
+  Enumerate resources in blueprints.
 * `blueprint.cfg`(5):
   Centralized blueprint service configuration.
+* `blueprint-template`(5):
+  `mustache.sh` template language syntax.
+* `blueprint-template`(7):
+  Built-in template data.
 * `blueprint`(7):
   Blueprint Python library.
 
@@ -63,6 +73,8 @@ Much like `git`(1) itself, `blueprint` includes many plumbing tools that make it
   Optional INI-style configuration files.  See `blueprint.cfg`(5).
 * `/etc/blueprintignore`, `~/.blueprintignore`:
   Lists of filename patterns to be ignored when creating blueprints.  See `blueprintignore`(5).
+* `/etc/blueprint-template.d`:
+  `source`-able POSIX shell scripts ending in `.sh` that set environment variables for use in templates.
 
 ## THEME SONG
 
