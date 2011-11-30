@@ -484,12 +484,12 @@ class Resource(dict):
         """
         if value is None:
             return 'undef'
-        elif any([isinstance(value, t) for t in (int, long, float)]):
-            return value
         elif True == value:
             return 'true'
         elif False == value:
             return 'false'
+        elif any([isinstance(value, t) for t in (int, long, float)]):
+            return value
         elif bare and re.match(r'^[0-9a-zA-Z]+$', u'{0}'.format(
             value)) is not None:
             return value
