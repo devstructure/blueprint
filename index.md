@@ -629,7 +629,7 @@ set -x
 cd "$(dirname "$0")"
 
 mkdir -p "/etc/init"
-cat >"/etc/init/example.conf" <<EOF
+cat &gt;"/etc/init/example.conf" &lt;&lt;EOF
 description "Example"
 start on runlevel [2345]
 stop on runlevel [!2345]
@@ -638,9 +638,9 @@ chdir /usr/local/share/rack/example
 exec unicorn -c /etc/unicorn.conf.rb
 # Dear Blueprint, restart me when /etc/database.yml changes.
 EOF
-MD5SUM="$(md5sum "/etc/nginx/sites-available/example" 2>/dev/null)"
+MD5SUM="$(md5sum "/etc/nginx/sites-available/example" 2&gt;/dev/null)"
 mkdir -p "/etc/nginx/sites-available"
-cat >"/etc/nginx/sites-available/example" <<EOF
+cat &gt;"/etc/nginx/sites-available/example" &lt;&lt;EOF
 server {
 listen 80 default;
 location /static { root /usr/local/share/rack/example/static; }
@@ -648,11 +648,11 @@ location / { proxy_pass http://127.0.0.1:8080; }
 }
 EOF
 [ "$MD5SUM" != "$(md5sum "/etc/nginx/sites-available/example")" ] &amp;&amp; SERVICE_sysvinit_nginx=1
-MD5SUM="$(md5sum "/etc/nginx/sites-enabled/example" 2>/dev/null)"
+MD5SUM="$(md5sum "/etc/nginx/sites-enabled/example" 2&gt;/dev/null)"
 mkdir -p "/etc/nginx/sites-enabled"
 ln -s "/etc/nginx/sites-available/example" "/etc/nginx/sites-enabled/example"
 [ "$MD5SUM" != "$(md5sum "/etc/nginx/sites-enabled/example")" ] &amp;&amp; SERVICE_sysvinit_nginx=1
-MD5SUM="$(md5sum "/etc/unicorn.conf.rb" 2>/dev/null)"
+MD5SUM="$(md5sum "/etc/unicorn.conf.rb" 2&gt;/dev/null)"
 mkdir -p "/etc"
 (
 set +x
@@ -662,7 +662,7 @@ do
     . "$F"
 done
 export WORKER_PROCESSES="$(expr 4 \* $CORES)"
-mustache >"/etc/unicorn.conf.rb" <<EOF
+mustache &gt;"/etc/unicorn.conf.rb" &lt;&lt;EOF
 worker_processes &#123;&#123;WORKER_PROCESSES&#125;&#125;
 EOF
 )
@@ -676,18 +676,18 @@ apt-get -q update
 [ "$(dpkg-query -f'${Version}\n' -W nginx-light)" = "1.0.5-1" ] || apt-get -y -q -o DPkg::Options::=--force-confold install nginx-light=1.0.5-1
 [ "$(dpkg-query -f'${Version}\n' -W ruby-dev)" = "4.8" ] || apt-get -y -q -o DPkg::Options::=--force-confold install ruby-dev=4.8
 [ "$(dpkg-query -f'${Version}\n' -W rubygems)" = "1.7.2-1" ] || apt-get -y -q -o DPkg::Options::=--force-confold install rubygems=1.7.2-1
-gem -i -v0.3.11 fpm >/dev/null || gem install --no-rdoc --no-ri -v0.3.11 fpm
-gem -i -v0.8.5 hpricot >/dev/null || gem install --no-rdoc --no-ri -v0.8.5 hpricot
-gem -i -v1.6.3 json >/dev/null || gem install --no-rdoc --no-ri -v1.6.3 json
-gem -i -v2.6.0 kgio >/dev/null || gem install --no-rdoc --no-ri -v2.6.0 kgio
-gem -i -v0.99.4 mustache >/dev/null || gem install --no-rdoc --no-ri -v0.99.4 mustache
-gem -i -v1.3.5 rack >/dev/null || gem install --no-rdoc --no-ri -v1.3.5 rack
-gem -i -v1.1.4 rack-protection >/dev/null || gem install --no-rdoc --no-ri -v1.1.4 rack-protection
-gem -i -v0.8.0 raindrops >/dev/null || gem install --no-rdoc --no-ri -v0.8.0 raindrops
-gem -i -v1.6.8 rdiscount >/dev/null || gem install --no-rdoc --no-ri -v1.6.8 rdiscount
-gem -i -v1.3.1 sinatra >/dev/null || gem install --no-rdoc --no-ri -v1.3.1 sinatra
-gem -i -v1.3.3 tilt >/dev/null || gem install --no-rdoc --no-ri -v1.3.3 tilt
-gem -i -v4.1.1 unicorn >/dev/null || gem install --no-rdoc --no-ri -v4.1.1 unicorn
+gem -i -v0.3.11 fpm &gt;/dev/null || gem install --no-rdoc --no-ri -v0.3.11 fpm
+gem -i -v0.8.5 hpricot &gt;/dev/null || gem install --no-rdoc --no-ri -v0.8.5 hpricot
+gem -i -v1.6.3 json &gt;/dev/null || gem install --no-rdoc --no-ri -v1.6.3 json
+gem -i -v2.6.0 kgio &gt;/dev/null || gem install --no-rdoc --no-ri -v2.6.0 kgio
+gem -i -v0.99.4 mustache &gt;/dev/null || gem install --no-rdoc --no-ri -v0.99.4 mustache
+gem -i -v1.3.5 rack &gt;/dev/null || gem install --no-rdoc --no-ri -v1.3.5 rack
+gem -i -v1.1.4 rack-protection &gt;/dev/null || gem install --no-rdoc --no-ri -v1.1.4 rack-protection
+gem -i -v0.8.0 raindrops &gt;/dev/null || gem install --no-rdoc --no-ri -v0.8.0 raindrops
+gem -i -v1.6.8 rdiscount &gt;/dev/null || gem install --no-rdoc --no-ri -v1.6.8 rdiscount
+gem -i -v1.3.1 sinatra &gt;/dev/null || gem install --no-rdoc --no-ri -v1.3.1 sinatra
+gem -i -v1.3.3 tilt &gt;/dev/null || gem install --no-rdoc --no-ri -v1.3.3 tilt
+gem -i -v4.1.1 unicorn &gt;/dev/null || gem install --no-rdoc --no-ri -v4.1.1 unicorn
 [ -n "$SERVICE_sysvinit_nginx" ] &amp;&amp; /etc/init.d/nginx restart
 [ -n "$SERVICE_upstart_example" ] &amp;&amp; { restart example || start example; }</code></pre>
 
