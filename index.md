@@ -524,7 +524,7 @@ Blueprint allows configuration files (found in `/etc`) to be specified as templa
 
 In their simplest form, these templates allow substitution of system parameters.
 
-<pre><code>{ {<em>FOO</em>} }</code></pre>
+<pre><code>&#123;&#123;<em>FOO</em>&#125;&#125;</code></pre>
 
 You can also substitute the output of a shell command.
 
