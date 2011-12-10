@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv='content-type' value='text/html;charset=utf8'>
   <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
-  <title>blueprint-git(1) - low-level access to blueprints</title>
+  <title>blueprint-rules(1) - create a blueprint from a blueprint-rules file</title>
   <style type='text/css' media='all'>
   /* style: man */
   body#manpage {margin:0}
@@ -70,32 +70,39 @@
   </div>
 
   <ol class='man-decor man-head man head'>
-    <li class='tl'>blueprint-git(1)</li>
+    <li class='tl'>blueprint-rules(1)</li>
     <li class='tc'>Blueprint</li>
-    <li class='tr'>blueprint-git(1)</li>
+    <li class='tr'>blueprint-rules(1)</li>
   </ol>
 
   <h2 id="NAME">NAME</h2>
 <p class="man-name">
-  <code>blueprint-git</code> - <span class="man-whatis">low-level access to blueprints</span>
+  <code>blueprint-rules</code> - <span class="man-whatis">create a blueprint from a blueprint-rules file</span>
 </p>
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>blueprint git clone</code> [<em>options</em>][<em>...</em>]<br />
-<code>blueprint git</code> [<em>command</em>] [<em>options</em>][<em>...</em>]</p>
+<p><code>blueprint rules</code> [<code>-P</code>|<code>-C</code>|<code>-S</code>|...] [<code>-m</code> <em>message</em>] [<code>-r</code>] [<code>-q</code>] [<em>pathname</em>]</p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p><code>blueprint-git</code> is a convenience wrapper around <span class="man-ref"><code>git</code><span class="s">(1)</span></span> that provides low-level access to blueprints stored in the <code>~/.blueprints.git</code> repository.</p>
+<p><code>blueprint-rules</code> renders the <span class="man-ref"><code>blueprint-rules</code><span class="s">(5)</span></span> file <em>pathname</em> and stores the resulting blueprint in a branch of the local blueprint repository with the commit <em>message</em> (if given).  The branch name is the basename of <em>pathname</em> with its extension (conventionally <code>.blueprint-rules</code>) removed.</p>
 
-<p><code>blueprint git clone</code> will clone the entire repository into the <code>blueprints</code> directory within the current working directory.  Since it is unlikely this repository has a <code>master</code> branch, it is recommended you use <code>blueprint git clone -b</code><em>name</em> to clone the blueprint <em>name</em>.</p>
+<p>If standard input is not a TTY or <em>pathname</em> is <code>-</code>, rules are read from standard input.</p>
 
-<p>All other <span class="man-ref"><code>git</code><span class="s">(1)</span></span> subcommands are executed as given with the appropriate <code>--git-dir</code> set and a temporary working directory which is cleaned up after the command exits.</p>
+<p>The rendered blueprint will contain only the resources enumerated in <em>pathname</em> (or on standard input), opening the possibility of creating multiple orthogonal blueprints from the same system.</p>
+
+<p>If one of <code>--puppet</code>, <code>--chef</code>, <code>--sh</code>, or <code>--cfn</code> is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output.</p>
 
 <h2 id="OPTIONS">OPTIONS</h2>
 
 <dl>
+<dt><code>-P</code>, <code>--puppet</code></dt><dd>Generate a Puppet module.</dd>
+<dt><code>-C</code>, <code>--chef</code></dt><dd>Generate a Chef cookbook.</dd>
+<dt><code>-S</code>, <code>--sh</code></dt><dd>Generate POSIX shell code.</dd>
+<dt class="flush"><code>--cfn</code></dt><dd>Generate an AWS CloudFormation template.</dd>
+<dt><code>-m</code> <em>message</em>, <code>--message=</code><em>message</em></dt><dd>Commit message.</dd>
+<dt><code>-r</code>, <code>--relaxed</code></dt><dd>Relax version constraints in generated code.</dd>
 <dt><code>-q</code>, <code>--quiet</code></dt><dd>Operate quietly.</dd>
 <dt><code>-h</code>, <code>--help</code></dt><dd>Show a help message.</dd>
 </dl>
@@ -114,7 +121,7 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#x72;&#105;&#99;&#x68;&#x61;&#114;&#100;&#64;&#100;&#x65;&#118;&#115;&#x74;&#114;&#x75;&#x63;&#x74;&#x75;&#114;&#x65;&#46;&#x63;&#111;&#x6d;" data-bare-link="true">&#114;&#x69;&#99;&#x68;&#x61;&#114;&#100;&#64;&#x64;&#101;&#x76;&#115;&#x74;&#114;&#x75;&#x63;&#x74;&#x75;&#114;&#101;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#x61;&#x69;&#108;&#x74;&#x6f;&#58;&#114;&#x69;&#x63;&#104;&#x61;&#114;&#100;&#x40;&#100;&#101;&#x76;&#x73;&#116;&#114;&#117;&#99;&#x74;&#x75;&#x72;&#x65;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#114;&#x69;&#99;&#x68;&#97;&#x72;&#x64;&#64;&#x64;&#x65;&#x76;&#115;&#x74;&#x72;&#x75;&#99;&#x74;&#117;&#x72;&#101;&#x2e;&#x63;&#111;&#109;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -123,8 +130,8 @@
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>November 2011</li>
-    <li class='tr'>blueprint-git(1)</li>
+    <li class='tc'>December 2011</li>
+    <li class='tr'>blueprint-rules(1)</li>
   </ol>
 
   </div>

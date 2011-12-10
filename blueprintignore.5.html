@@ -91,24 +91,19 @@ baz*
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p>Lines in <code>/etc/blueprintignore</code> and <code>~/.blueprintignore</code> are interpreted as in <span class="man-ref"><code>gitignore</code><span class="s">(5)</span></span>.  Blank lines and lines that begin with a <code>#</code> will be ignored.  Patterns that begin with a <code>!</code> are negated.  As resources are considered for inclusion in a blueprint, the last matching line in <code>/etc/blueprintignore</code> or <code>~/.blueprintignore</code> (in that order) wins.</p>
-
-<p>The general form of each line is <code>:</code><em>type</em><code>:</code><em>resource</em>, where <em>type</em> is one of <code>file</code>, <code>package</code>, or <code>source</code>.  The <code>file</code> type is assumed and typically seen without the full <code>:</code>-prefixed form.</p>
-
-<p>File resources that do not contain a <code>/</code> are matched using <span class="man-ref"><code>fnmatch</code><span class="s">(3)</span></span> against the last component of each file considered.  Patterns that contain a <code>/</code> but do not begin with a <code>/</code> are expanded relative to <code>/etc</code> before being matched using <span class="man-ref"><code>glob</code><span class="s">(3)</span></span>.</p>
-
-<p>Package resources are of the form <code>:package:</code><em>manager</em><code>/</code><em>package</em>.  Ignored packages implicitly ignore their dependencies as well.  Unignored packages (that is, package resources prefixed with <code>!</code>) affect only themselves and not their dependencies.</p>
-
-<p>Source resources must use the full <code>:source:</code><em>resource</em> format and must be fully-qualified (that is, begin with a <code>/</code>).  By default, all directories except <code>/usr/local</code> are ignored as source resources.  If it is necessary to build and install software from source in another directory, use a negated source resource such as <em>!:source:/opt</em>.</p>
+<p>Lines in <code>/etc/blueprintignore</code> and <code>~/.blueprintignore</code> are interpreted as in <span class="man-ref"><code>blueprint-rules</code><span class="s">(5)</span></span> but in a negative context - rules enumerate resources to be ignored and <code>!</code>-prefixed rules unignore resources.</p>
 
 <p>As part of <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>, the <code>/etc/blueprintignore</code> and <code>~/.blueprintignore</code> files that were used to create the blueprint are stored in the local blueprint repository.</p>
 
-<p>All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.</p>
+<p>There are many resources that are ignored by default.  These defaults are not meant to be an exhuastive list of exceptions and edge cases.  Rather, they're meant to cover typical base installations without hassle.</p>
+
+<h3 id="Files">Files</h3>
 
 <p>The following files and directories are part of the default ignore list.  They can be negated using <code>!</code> just like any other pattern.</p>
 
 <ul>
 <li><code>*~</code></li>
+<li><code>*.blueprint-template.*</code></li>
 <li><code>*.dpkg-*</code></li>
 <li><code>/etc/.git</code></li>
 <li><code>/etc/.pwd.lock</code></li>
@@ -267,7 +262,17 @@ baz*
 </ul>
 
 
-<p>These defaults are not meant to be an exhuastive list of exceptions and edge cases.  Rather, they're meant to cover typical base installations without hassle.</p>
+<h3 id="Packages">Packages</h3>
+
+<p>All APT- or Yum-managed packages considered essential to the system are part of the default ignore list.</p>
+
+<p>Debian packages that are listed as <code>essential</code>, <code>important</code>, <code>required</code>, or <code>standard</code> and those that are depended upon by <code>ubuntu-minimal</code>, <code>ubuntu-standard</code>, or <code>ubuntu-desktop</code> are ignored.</p>
+
+<p>Yum packages that are part of the <code>base</code>, <code>core</code>, or <code>gnome-desktop</code> groups are ignored.</p>
+
+<h3 id="Sources">Sources</h3>
+
+<p>By default, all directories except <code>/usr/local</code> are ignored as source resources.  If it is necessary to build and install software from source in another directory, use a negated source resource such as <em>!:source:/opt</em>.</p>
 
 <h2 id="FILES">FILES</h2>
 
@@ -285,16 +290,16 @@ baz*
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#114;&#x69;&#x63;&#x68;&#97;&#114;&#x64;&#x40;&#x64;&#x65;&#x76;&#x73;&#116;&#114;&#x75;&#x63;&#116;&#117;&#114;&#x65;&#x2e;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#114;&#x69;&#99;&#104;&#x61;&#114;&#100;&#x40;&#x64;&#x65;&#x76;&#x73;&#x74;&#114;&#x75;&#99;&#x74;&#117;&#x72;&#101;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#x3a;&#114;&#105;&#99;&#x68;&#97;&#114;&#x64;&#x40;&#x64;&#x65;&#118;&#115;&#116;&#x72;&#x75;&#99;&#x74;&#117;&#x72;&#x65;&#x2e;&#x63;&#x6f;&#109;" data-bare-link="true">&#x72;&#105;&#x63;&#104;&#x61;&#x72;&#x64;&#x40;&#x64;&#101;&#118;&#x73;&#116;&#114;&#x75;&#x63;&#x74;&#x75;&#x72;&#x65;&#x2e;&#99;&#111;&#109;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p><span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
+<p>Part of <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>October 2011</li>
+    <li class='tc'>December 2011</li>
     <li class='tr'>blueprintignore(5)</li>
   </ol>
 

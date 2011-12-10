@@ -86,9 +86,11 @@
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p><code>blueprint-show</code> generates code from the blueprint <em>name</em> as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the <code>--puppet</code>, <code>--chef</code>, <code>--sh</code>, or <code>--cfn</code> option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to <code>stdout</code>.</p>
+<p><code>blueprint-show</code> generates code from the blueprint <em>name</em> as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the <code>--puppet</code>, <code>--chef</code>, <code>--sh</code>, or <code>--cfn</code> option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to standard output.</p>
 
 <p>If none of <code>--puppet</code>, <code>--chef</code>, <code>--sh</code>, or <code>--cfn</code> are given, the raw JSON data structure that describes the blueprint is printed as described in <span class="man-ref"><code>blueprint</code><span class="s">(5)</span></span>.</p>
+
+<p>The POSIX shell code generator is the only one prepared to handle files to be rendered from a template.  All other code generators will print a warning and ignore such files.</p>
 
 <p>If <em>name</em> is omitted or <code>-</code>, a blueprint is read from standard input and treated in the same manner.  See <span class="man-ref"><code>blueprint</code><span class="s">(5)</span></span> for the details of the format.</p>
 
@@ -119,7 +121,7 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#58;&#x72;&#x69;&#99;&#104;&#x61;&#114;&#100;&#x40;&#x64;&#101;&#118;&#115;&#x74;&#x72;&#117;&#x63;&#x74;&#117;&#x72;&#101;&#x2e;&#x63;&#111;&#x6d;" data-bare-link="true">&#114;&#105;&#99;&#x68;&#97;&#114;&#x64;&#x40;&#100;&#x65;&#x76;&#x73;&#116;&#x72;&#117;&#x63;&#116;&#117;&#x72;&#x65;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>Richard Crowley <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#x72;&#105;&#99;&#x68;&#x61;&#114;&#100;&#64;&#100;&#x65;&#118;&#115;&#x74;&#114;&#x75;&#x63;&#x74;&#x75;&#114;&#x65;&#46;&#x63;&#111;&#x6d;" data-bare-link="true">&#114;&#x69;&#99;&#x68;&#x61;&#114;&#100;&#64;&#x64;&#101;&#x76;&#115;&#x74;&#114;&#x75;&#x63;&#x74;&#x75;&#114;&#101;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -128,7 +130,7 @@
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>October 2011</li>
+    <li class='tc'>December 2011</li>
     <li class='tr'>blueprint-show(1)</li>
   </ol>
 

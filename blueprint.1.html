@@ -89,17 +89,22 @@
 <dl>
 <dt><span class="man-ref"><code>blueprint-list</code><span class="s">(1)</span></span></dt><dd>List all blueprints.</dd>
 <dt><span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span></dt><dd>Create a blueprint.</dd>
+<dt><span class="man-ref"><code>blueprint-rules</code><span class="s">(1)</span></span></dt><dd>Create a blueprint from a blueprint-rules file.</dd>
 <dt><span class="man-ref"><code>blueprint-show</code><span class="s">(1)</span></span></dt><dd>Generate code from a blueprint.</dd>
 <dt><span class="man-ref"><code>blueprint-diff</code><span class="s">(1)</span></span></dt><dd>Save the difference between two blueprints.</dd>
 <dt><span class="man-ref"><code>blueprint-split</code><span class="s">(1)</span></span></dt><dd>Split one blueprint into two others interactively.</dd>
 <dt><span class="man-ref"><code>blueprint-prune</code><span class="s">(1)</span></span></dt><dd>Select a subset of resources interactively.</dd>
+<dt><span class="man-ref"><code>blueprint-template</code><span class="s">(1)</span></span></dt><dd>Render mustache.sh templates locally.</dd>
 <dt><span class="man-ref"><code>blueprint-apply</code><span class="s">(1)</span></span></dt><dd>Run a blueprint's generated shell code.</dd>
 <dt><span class="man-ref"><code>blueprint-push</code><span class="s">(1)</span></span></dt><dd>Push a blueprint to the Internet.</dd>
 <dt><span class="man-ref"><code>blueprint-pull</code><span class="s">(1)</span></span></dt><dd>Pull a blueprint from the Internet.</dd>
 <dt><span class="man-ref"><code>blueprint-destroy</code><span class="s">(1)</span></span></dt><dd>Destroy a blueprint.</dd>
 <dt><span class="man-ref"><code>blueprint</code><span class="s">(5)</span></span></dt><dd>Blueprint JSON format.</dd>
 <dt><span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span></dt><dd>Ignore specific files when creating blueprints.</dd>
+<dt><span class="man-ref"><code>blueprint-rules</code><span class="s">(5)</span></span></dt><dd>Enumerate resources in blueprints.</dd>
 <dt><span class="man-ref"><code>blueprint.cfg</code><span class="s">(5)</span></span></dt><dd>Centralized blueprint service configuration.</dd>
+<dt><span class="man-ref"><code>blueprint-template</code><span class="s">(5)</span></span></dt><dd><code>mustache.sh</code> template language syntax.</dd>
+<dt><span class="man-ref"><code>blueprint-template</code><span class="s">(7)</span></span></dt><dd>Built-in template data.</dd>
 <dt><span class="man-ref"><code>blueprint</code><span class="s">(7)</span></span></dt><dd>Blueprint Python library.</dd>
 </dl>
 
@@ -124,6 +129,7 @@
 <dt><code>~/.blueprints.git</code></dt><dd>The local repsitory where blueprints are stored, each on its own branch.</dd>
 <dt><code>/etc/blueprint.cfg</code>, <code>~/.blueprint.cfg</code></dt><dd>Optional INI-style configuration files.  See <span class="man-ref"><code>blueprint.cfg</code><span class="s">(5)</span></span>.</dd>
 <dt><code>/etc/blueprintignore</code>, <code>~/.blueprintignore</code></dt><dd>Lists of filename patterns to be ignored when creating blueprints.  See <span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span>.</dd>
+<dt><code>/etc/blueprint-template.d</code></dt><dd><code>source</code>-able POSIX shell scripts ending in <code>.sh</code> that set environment variables for use in templates.</dd>
 </dl>
 
 
@@ -133,12 +139,12 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#58;&#x72;&#x69;&#99;&#104;&#x61;&#114;&#100;&#x40;&#x64;&#101;&#118;&#115;&#x74;&#x72;&#117;&#x63;&#x74;&#117;&#x72;&#101;&#x2e;&#x63;&#111;&#x6d;" data-bare-link="true">&#114;&#105;&#99;&#x68;&#97;&#114;&#x64;&#x40;&#100;&#x65;&#x76;&#x73;&#116;&#x72;&#117;&#x63;&#116;&#117;&#x72;&#x65;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>Richard Crowley <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#x72;&#105;&#99;&#x68;&#x61;&#114;&#100;&#64;&#100;&#x65;&#118;&#115;&#x74;&#114;&#x75;&#x63;&#x74;&#x75;&#114;&#x65;&#46;&#x63;&#111;&#x6d;" data-bare-link="true">&#114;&#x69;&#99;&#x68;&#x61;&#114;&#100;&#64;&#x64;&#101;&#x76;&#115;&#x74;&#114;&#x75;&#x63;&#x74;&#x75;&#114;&#101;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>October 2011</li>
+    <li class='tc'>December 2011</li>
     <li class='tr'>blueprint(1)</li>
   </ol>
 

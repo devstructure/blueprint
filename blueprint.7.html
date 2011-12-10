@@ -157,6 +157,29 @@ Executed after a service manager's dependencies are enumerated.</dt><dd></dd>
 
 <p>The <code>blueprint.Blueprint</code> class (not individual instances) supports <code>destroy(</code><em>name</em><code>)</code> to destroy a blueprint, <code>iter()</code> to iterate over the names of blueprints, <code>load(</code><em>f</em><code>)</code> to load blueprint JSON from a file-like object, and <code>loads(</code><em>s</em><code>)</code> to load blueprint JSON from a string.</p>
 
+<h3 id="blueprint-backend">blueprint.backend</h3>
+
+<p>The <code>blueprint.backend</code> module implements <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>.  Each module within (for example, <code>blueprint.backend.apt</code>) must contain a function by the same name (in the example, <code>blueprint.backend.apt.apt</code>) which accepts a <code>blueprint.Blueprint</code> object and a <code>blueprint.rules.Rules</code> object.  When <code>blueprint.backend</code> is imported, it finds all such functions, lists them in <code>blueprint.backend.__all__</code>, and imports the function.  Use the backend functions thus:</p>
+
+<pre><code>import blueprint
+b = blueprint.Blueprint()
+import blueprint.rules
+r = blueprint.rules.defaults()
+import blueprint.backend
+for funcname in blueprint.backend.__all__:
+    getattr(blueprint.backend, funcname)(b, r)
+</code></pre>
+
+<h3 id="blueprint-context_managers">blueprint.context_managers</h3>
+
+<p>The <code>blueprint.context_managers</code> module implements context managers used throughout <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
+
+<dl>
+<dt><code>blueprint.context_managers.cd(</code><em>new_cwd</em><code>)</code></dt><dd>Execute in a different working directory.  The property <code>old_cwd</code> is available on the context object containing the previous working directory.</dd>
+<dt><code>blueprint.context_managers.mkdtemp(dir=</code><em>None</em><code>)</code></dt><dd>Create a temporary directory and execute with it as the working directory.  The property <code>cwd</code> is available on the context object containing the previous working directory.  When the context closes, the temporary directory and all its contents are removed recursively.</dd>
+</dl>
+
+
 <h3 id="blueprint-frontend">blueprint.frontend</h3>
 
 <p><code>blueprint.frontend.puppet.Manifest</code>, <code>blueprint.frontend.chef.Cookbook</code>, and <code>blueprint.frontend.sh.Script</code> all implement similar interfaces to code generation.</p>
@@ -166,23 +189,6 @@ Executed after a service manager's dependencies are enumerated.</dt><dd></dd>
 <p><code>dumps()</code> returns a string containing code in the language implemented by the class that received the call.  If the blueprint contains source tarballs, <code>dumps()</code> may raise <code>ValueError</code>.</p>
 
 <p><code>dumpf(gzip=</code><em>False</em><code>)</code> returns the name of a file, possibly in a newly-created directory, containing code in the language implemented by the class that received the call.  The file or directory is created in the current working directory.  If <code>gzip=</code><em>True</em>, the file or directory will compressed and the resulting tarball will be left in the current working directory.</p>
-
-<h3 id="blueprint-managers">blueprint.managers</h3>
-
-<p>The <code>blueprint.managers.PackageManager</code> class is a <code>unicode</code> subclass that is used as the key in the <code>packages</code> dictionary.  It is a callable that can translate package names and versions into shell commands for installing the package.  For example: <code>blueprint.managers.PackageManager(</code><em>'apt'</em><code>)(</code><em>'python'</em><code>,</code><em>'2.6.6-2ubuntu1'</em><code>)</code>.</p>
-
-<p>The <code>blueprint.managers.ServiceManager</code> class is like <code>blueprint.managers.PackageManager</code> but the callables to generate restart commands accept only one argument: the service name.  For example: <code>blueprint.managers.ServiceManager(</code><em>'sysvinit'</em><code>)(</code><em>'ssh'</em><code>)</code>.</p>
-
-<h3 id="blueprint-backend">blueprint.backend</h3>
-
-<p>The <code>blueprint.backend</code> module implements <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>.  Each module within (for example, <code>blueprint.backend.apt</code>) must contain a function by the same name (in the example, <code>blueprint.backend.apt.apt</code>) which accepts a <code>blueprint.Blueprint</code> object as its only argument.  When <code>blueprint.backend</code> is imported, it finds all such functions, lists them in <code>blueprint.backend.__all__</code>, and imports the function.  Use the backend functions thus:</p>
-
-<pre><code>import blueprint
-b = blueprint.Blueprint()
-import blueprint.backend
-for funcname in blueprint.backend.__all__:
-    getattr(blueprint.backend, funcname)(b)
-</code></pre>
 
 <h3 id="blueprint-git">blueprint.git</h3>
 
@@ -199,16 +205,6 @@ for funcname in blueprint.backend.__all__:
 </dl>
 
 
-<h3 id="blueprint-context_managers">blueprint.context_managers</h3>
-
-<p>The <code>blueprint.context_managers</code> module implements context managers used throughout <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
-
-<dl>
-<dt><code>blueprint.context_managers.cd(</code><em>new_cwd</em><code>)</code></dt><dd>Execute in a different working directory.  The property <code>old_cwd</code> is available on the context object containing the previous working directory.</dd>
-<dt><code>blueprint.context_managers.mkdtemp(dir=</code><em>None</em><code>)</code></dt><dd>Create a temporary directory and execute with it as the working directory.  The property <code>cwd</code> is available on the context object containing the previous working directory.  When the context closes, the temporary directory and all its contents are removed recursively.</dd>
-</dl>
-
-
 <h3 id="blueprint-io">blueprint.io</h3>
 
 <dl>
@@ -217,6 +213,16 @@ for funcname in blueprint.backend.__all__:
 <dt><code>blueprint.io.secret(</code><em>server</em><code>)</code></dt><dd>Fetch a new secret from <em>server</em>.</dd>
 </dl>
 
+
+<h3 id="blueprint-managers">blueprint.managers</h3>
+
+<p>The <code>blueprint.managers.PackageManager</code> class is a <code>unicode</code> subclass that is used as the key in the <code>packages</code> dictionary.  It is a callable that can translate package names and versions into shell commands for installing the package.  For example: <code>blueprint.managers.PackageManager(</code><em>'apt'</em><code>)(</code><em>'python'</em><code>,</code><em>'2.6.6-2ubuntu1'</em><code>)</code>.</p>
+
+<p>The <code>blueprint.managers.ServiceManager</code> class is like <code>blueprint.managers.PackageManager</code> but the callables to generate restart commands accept only one argument: the service name.  For example: <code>blueprint.managers.ServiceManager(</code><em>'sysvinit'</em><code>)(</code><em>'ssh'</em><code>)</code>.</p>
+
+<h3 id="blueprint-rules">blueprint.rules</h3>
+
+<p>The <code>blueprint.rules.Rules</code> class is a <code>defaultdict(list)</code> subclass that responds to <code>ignore_file</code>, <code>ignore_package</code>, <code>ignore_service</code>, and <code>ignore_source</code>.  It is instantiated by <code>blueprint.rules.defaults()</code> to access <code>/etc/blueprintignore</code> and <code>~/.blueprintignore</code> or by <code>blueprint.rules.Rules.parse(f)</code> to parse <span class="man-ref"><code>blueprintignore</code><span class="s">(5)</span></span> rules from a file-like object.</p>
 
 <h2 id="FILES">FILES</h2>
 
@@ -231,7 +237,7 @@ for funcname in blueprint.backend.__all__:
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#114;&#105;&#x63;&#x68;&#x61;&#114;&#x64;&#64;&#x64;&#101;&#x76;&#115;&#116;&#114;&#x75;&#x63;&#x74;&#x75;&#x72;&#x65;&#46;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#105;&#99;&#104;&#x61;&#114;&#x64;&#x40;&#100;&#101;&#118;&#115;&#116;&#x72;&#117;&#99;&#116;&#x75;&#114;&#101;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#114;&#x69;&#99;&#x68;&#x61;&#x72;&#100;&#x40;&#100;&#x65;&#x76;&#115;&#116;&#114;&#x75;&#99;&#116;&#117;&#114;&#101;&#x2e;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#x69;&#99;&#104;&#97;&#x72;&#x64;&#64;&#100;&#x65;&#x76;&#x73;&#116;&#x72;&#x75;&#x63;&#116;&#117;&#x72;&#x65;&#46;&#x63;&#x6f;&#109;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
@@ -240,7 +246,7 @@ for funcname in blueprint.backend.__all__:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>October 2011</li>
+    <li class='tc'>December 2011</li>
     <li class='tr'>blueprint(7)</li>
   </ol>
 

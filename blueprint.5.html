@@ -95,6 +95,21 @@
       "group": "GROUP",
       "mode": "MODE",
       "owner": "OWNER",
+      "template": "TEMPLATE"
+    },
+    "PATHNAME": {
+      "dat": "DATA"
+      "encoding": "ENCODING",
+      "group": "GROUP",
+      "mode": "MODE",
+      "owner": "OWNER",
+      "template": "TEMPLATE"
+    },
+    "PATHNAME": {
+      "encoding": "ENCODING",
+      "group": "GROUP",
+      "mode": "MODE",
+      "owner": "OWNER",
       "source": "SOURCE"
     }
   },
@@ -149,7 +164,9 @@
 
 <p>Each key in the optional <code>files</code> object is the fully-qualified pathname to a file.  These pathnames should be traversed in alphabetical order.  The associated value contains the <code>owner</code>, owning <code>group</code>, <code>mode</code> (a string containing the full 6-digit octal representation), <code>content</code>, and the <code>encoding</code> of content (one of <em>plain</em> or <em>base64</em>).  Each file must be placed at its pathname and its metadata must be updated when the blueprint is applied.</p>
 
-<p>For compatibility with AWS <code>cfn-init</code>, <code>source</code> takes precedence over the <code>content</code>.  If a file with a <code>source</code> is encountered, the <code>source</code> URL should be fetched as the file's content.  Blueprint will never generate such objects.</p>
+<p>The file's content may alternately be specified as <code>template</code> and (optionally) <code>data</code> which contain a <code>mustache.sh</code> template in the <span class="man-ref"><code>mustache</code><span class="s">(5)</span></span> format and POSIX shell code, respectively.  When a blueprint is applied, the template should be given as standard input to <code>mustache.sh</code> with this data and other default data available in the environment.  The resulting standard output should be taken as the file's content.  A copy of <code>mustache.sh</code> is distributed with Blueprint.</p>
+
+<p>For compatibility with AWS <code>cfn-init</code>, <code>source</code> takes precedence over <code>content</code>.  If a file with a <code>source</code> is encountered, the <code>source</code> URL should be fetched as the file's content.  Blueprint will never generate such objects.</p>
 
 <h3 id="Packages">Packages</h3>
 
@@ -173,16 +190,18 @@
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Richard Crowley <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#114;&#105;&#x63;&#x68;&#x61;&#114;&#x64;&#64;&#x64;&#101;&#x76;&#115;&#116;&#114;&#x75;&#x63;&#x74;&#x75;&#x72;&#x65;&#46;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#105;&#99;&#104;&#x61;&#114;&#x64;&#x40;&#100;&#101;&#118;&#115;&#116;&#x72;&#117;&#99;&#116;&#x75;&#114;&#101;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#114;&#x69;&#99;&#x68;&#x61;&#x72;&#100;&#x40;&#100;&#x65;&#x76;&#115;&#116;&#114;&#x75;&#99;&#116;&#117;&#114;&#101;&#x2e;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#x69;&#99;&#104;&#97;&#x72;&#x64;&#64;&#100;&#x65;&#x76;&#x73;&#116;&#x72;&#x75;&#x63;&#116;&#117;&#x72;&#x65;&#46;&#x63;&#x6f;&#109;</a></p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p><span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
+<p>Part of <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
+
+<p><span class="man-ref"><code>mustache</code><span class="s">(5)</span></span> at <a href="http://mustache.github.com/mustache.5.html" data-bare-link="true">http://mustache.github.com/mustache.5.html</a> and <code>mustache.sh</code> at <a href="https://github.com/rcrowley/mustache.sh" data-bare-link="true">https://github.com/rcrowley/mustache.sh</a>.</p>
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'>DevStructure</li>
-    <li class='tc'>October 2011</li>
+    <li class='tc'>December 2011</li>
     <li class='tr'>blueprint(5)</li>
   </ol>
 

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>blueprint-rules(5) - enumerate resources in blueprints</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+  <style type='text/css' media='all'>
+  /* style: toc */
+  .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
+  .man-navigation a,.man-navigation a:hover,.man-navigation a:link,.man-navigation a:visited {display:block;margin:0;padding:5px 2px 5px 30px;color:#999;text-decoration:none}
+  .man-navigation a:hover {color:#111;text-decoration:underline}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#EXAMPLES">EXAMPLES</a>
+    <a href="#FILES">FILES</a>
+    <a href="#THEME-SONG">THEME SONG</a>
+    <a href="#AUTHOR">AUTHOR</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>blueprint-rules(5)</li>
+    <li class='tc'>Blueprint</li>
+    <li class='tr'>blueprint-rules(5)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>blueprint-rules</code> - <span class="man-whatis">enumerate resources in blueprints</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<pre><code>/etc/ssh
+:package:apt/openssh-server
+:service:sysvinit/ssh
+</code></pre>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><code>blueprint-rules</code> files, typically seen with the <code>.blueprint-rules</code> extension or with negated meaning as <code>/etc/blueprintignore</code> and <code>~/.blueprintignore</code>, contain an ordered list of rules that determine whether resources are included in blueprints.</p>
+
+<p>The general form has its origins in <span class="man-ref"><code>gitignore</code><span class="s">(5)</span></span>: any valid <code>gitignore</code> file is also a valid <code>blueprint-rules</code> file.</p>
+
+<p>Blank lines and lines that begin with a <code>#</code> will be ignored.</p>
+
+<p>The general form of each line is <code>:</code><em>type</em><code>:</code><em>resource</em>, where <em>type</em> is one of <code>file</code>, <code>package</code>, <code>service</code>, or <code>source</code>.  The <code>file</code> type is assumed when a rule omits the <code>:</code><em>type</em><code>:</code> prefix.</p>
+
+<p>The meaning of a rule that begins with a <code>!</code> is negated.</p>
+
+<h3 id="File-resources">File resources</h3>
+
+<p>File resources that do not contain a <code>/</code> are matched using <span class="man-ref"><code>fnmatch</code><span class="s">(3)</span></span> against the last component of each file considered.  Patterns that contain a <code>/</code> but do not begin with a <code>/</code> are expanded relative to <code>/etc</code> before being matched using <span class="man-ref"><code>glob</code><span class="s">(3)</span></span>.</p>
+
+<h3 id="Package-resources">Package resources</h3>
+
+<p>Package resources are of the form <code>:package:</code><em>manager</em><code>/</code><em>package</em>.  Note that the <em>manager</em> is not a colloquial name (for example, "<code>gem</code>") but rather the specific name of the package manager's package (in the example, on Debian, "<code>rubygems1.8</code>").</p>
+
+<p>A rule that ignores a package implicitly ignores its dependencies as well.  This empirically results in the most compact, yet complete, blueprints.  A rule that includes a package takes no such implicit action.</p>
+
+<h3 id="Service-resources">Service resources</h3>
+
+<p>Service resources are of the form <code>:service:</code><em>manager</em><code>/</code><em>service</em>.  Ignoring a service will prevent Blueprint from taking action on its behalf.</p>
+
+<h3 id="Source-resources">Source resources</h3>
+
+<p>Source resources are of the form <code>:source:</code><em>pathname</em> format and must be fully-qualified (that is, begin with a <code>/</code>).</p>
+
+<h2 id="EXAMPLES">EXAMPLES</h2>
+
+<h3 id="ssh-blueprint-rules">ssh.blueprint-rules</h3>
+
+<p><code>ssh.blueprint-rules</code> enumerates the resources that install and configure an SSH server, while ignoring <code>/etc/ssh/moduli</code>.</p>
+
+<pre><code>/etc/ssh
+!/etc/ssh/moduli
+:package:apt/openssh-server
+:service:sysvinit/ssh
+</code></pre>
+
+<h3 id="-etc-blueprintignore">/etc/blueprintignore</h3>
+
+<p><code>/etc/blueprintignore</code> is parsed in a negative context - it enumerates resources that should be ignored by <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span>.</p>
+
+<pre><code>/etc/apt/sources.list
+/etc/ssl/certs
+:package:apt/build-essential
+!:package:apt/build-essential
+</code></pre>
+
+<p>This example takes advantage of an emergent behavior: by ignoring and immediately unignoring (with the <code>!</code> rule) the package <code>build-essential</code>, <span class="man-ref"><code>blueprint-create</code><span class="s">(1)</span></span> will include <code>build-essential</code> but not its dependencies, thus creating a more compact blueprint.</p>
+
+<h2 id="FILES">FILES</h2>
+
+<dl>
+<dt><code>/etc/blueprintignore</code>, <code>~/.blueprintignore</code></dt><dd>Lists of filename patterns to be ignored when creating blueprints.</dd>
+</dl>
+
+
+<h2 id="THEME-SONG">THEME SONG</h2>
+
+<p>The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"</p>
+
+<h2 id="AUTHOR">AUTHOR</h2>
+
+<p>Richard Crowley <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#114;&#x69;&#99;&#x68;&#x61;&#x72;&#100;&#x40;&#100;&#x65;&#x76;&#115;&#116;&#114;&#x75;&#99;&#116;&#117;&#114;&#101;&#x2e;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#x72;&#x69;&#99;&#104;&#97;&#x72;&#x64;&#64;&#100;&#x65;&#x76;&#x73;&#116;&#x72;&#x75;&#x63;&#116;&#117;&#x72;&#x65;&#46;&#x63;&#x6f;&#109;</a></p>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p>Part of <span class="man-ref"><code>blueprint</code><span class="s">(1)</span></span>.</p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'>DevStructure</li>
+    <li class='tc'>December 2011</li>
+    <li class='tr'>blueprint-rules(5)</li>
+  </ol>
+
+  </div>
+</body>
+</html>
