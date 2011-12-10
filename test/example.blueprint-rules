@@ -1,0 +1,16 @@
+:source:/usr/local
+
+/etc/init/example.conf
+/etc/nginx/sites-*/example
+/etc/unicorn.conf.rb
+
+:package:apt/libmysqlclient-dev
+:package:apt/mysql-client-5.1
+:package:apt/nginx-common
+:package:apt/nginx-light
+:package:apt/ruby-dev
+:package:apt/rubygems
+:package:rubygems/*
+
+:service:sysvinit/nginx
+:service:upstart/example
