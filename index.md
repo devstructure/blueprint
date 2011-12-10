@@ -54,7 +54,7 @@ Manuals
 
 * [`blueprint-git`(1)](http://devstructure.github.com/blueprint/blueprint-git.1.html): low-level access to blueprints.
 * [`blueprint-show-files`(1)](http://devstructure.github.com/blueprint/blueprint-show-files.1.html): show files in a blueprint.
-* [`blueprint-show-ignore`(1)](http://devstructure.github.com/blueprint/blueprintshow-ignore-.1.html): show `blueprintignore`(5) rules from a blueprint.
+* [`blueprint-show-ignore`(1)](http://devstructure.github.com/blueprint/blueprint-show-ignore.1.html): show `blueprintignore`(5) rules from a blueprint.
 * [`blueprint-show-packages`(1)](http://devstructure.github.com/blueprint/blueprint-show-packages.1.html): show packages in a blueprint.
 * [`blueprint-show-services`(1)](http://devstructure.github.com/blueprint/blueprint-show-services.1.html): show services in a blueprint.
 * [`blueprint-show-sources`(1)](http://devstructure.github.com/blueprint/blueprint-show-sources.1.html): show source tarballs in a blueprint.
