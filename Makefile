@@ -44,6 +44,7 @@ install-bin:
 install-lib:
 	find blueprint -type d -printf %P\\0 | xargs -0r -I__ install -d $(DESTDIR)$(pydir)/blueprint/__
 	find blueprint -type f -name \*.py -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/__ $(DESTDIR)$(pydir)/blueprint/__
+	install -m644 blueprint/frontend/cfn.json $(DESTDIR)$(pydir)/blueprint/frontend/
 	install -m644 blueprint/frontend/mustache.sh $(DESTDIR)$(pydir)/blueprint/frontend/
 	find blueprint/frontend/blueprint-template.d -type f -name \*.sh -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/frontend/blueprint-template.d/__ $(DESTDIR)$(pydir)/blueprint/frontend/blueprint-template.d/__
 	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall $(DESTDIR)$(pydir)/blueprint
