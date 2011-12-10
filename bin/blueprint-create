@@ -34,11 +34,6 @@ parser.add_option('--cfn',
                   action='store_const',
                   const='cfn',
                   help='generate an AWS CloudFormation template')
-parser.add_option('-I', '--ignore',
-                  dest='generate',
-                  action='store_const',
-                  const='ignore',
-                  help='show the blueprint\'s blueprintignore(5) rules')
 parser.add_option('-m', '--message',
                   dest='message',
                   default=None,
@@ -65,12 +60,7 @@ if 1 != len(args):
 b = blueprint.cli.create(options, args)
 
 try:
-    if options.generate is None:
-        pass
-    elif 'ignore' == options.generate:
-        logging.warning('-I is deprecated, use blueprint-show-ignore instead')
-        sys.stdout.write(b.blueprintignore().dumps())
-    else:
+    if options.generate is not None:
         try:
             filename = getattr(b, options.generate)(options.relaxed).dumpf()
         except OSError as e:

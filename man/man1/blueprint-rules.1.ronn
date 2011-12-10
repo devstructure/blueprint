@@ -1,0 +1,52 @@
+blueprint-rules(1) -- create a blueprint from a blueprint-rules file
+====================================================================
+
+## SYNOPSIS
+
+`blueprint rules` [`-P`|`-C`|`-S`|...] [`-m` _message_] [`-r`] [`-q`] [_pathname_]  
+
+## DESCRIPTION
+
+`blueprint-rules` renders the `blueprint-rules`(5) file _pathname_ and stores the resulting blueprint in a branch of the local blueprint repository with the commit _message_ (if given).  The branch name is the basename of _pathname_ with its extension (conventionally `.blueprint-rules`) removed.
+
+If standard input is not a TTY or _pathname_ is `-`, rules are read from standard input.
+
+The rendered blueprint will contain only the resources enumerated in _pathname_ (or on standard input), opening the possibility of creating multiple orthogonal blueprints from the same system.
+
+If one of `--puppet`, `--chef`, `--sh`, or `--cfn` is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output.
+
+## OPTIONS
+
+* `-P`, `--puppet`:
+  Generate a Puppet module.
+* `-C`, `--chef`:
+  Generate a Chef cookbook.
+* `-S`, `--sh`:
+  Generate POSIX shell code.
+* `--cfn`:
+  Generate an AWS CloudFormation template.
+* `-m` _message_, `--message=`_message_:
+  Commit message.
+* `-r`, `--relaxed`:
+  Relax version constraints in generated code.
+* `-q`, `--quiet`:
+  Operate quietly.
+* `-h`, `--help`:
+  Show a help message.
+
+## FILES
+
+* `~/.blueprints.git`:
+  The local repsitory where blueprints are stored, each on its own branch.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

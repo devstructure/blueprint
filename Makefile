@@ -1,4 +1,4 @@
-VERSION=3.3.0
+VERSION=3.4.0
 BUILD=1
 
 PYTHON=$(shell which python2.7 || which python27 || which python2.6 || which python26 || which python)
@@ -44,6 +44,7 @@ install-bin:
 install-lib:
 	find blueprint -type d -printf %P\\0 | xargs -0r -I__ install -d $(DESTDIR)$(pydir)/blueprint/__
 	find blueprint -type f -name \*.py -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/__ $(DESTDIR)$(pydir)/blueprint/__
+	install -m644 blueprint/frontend/cfn.json $(DESTDIR)$(pydir)/blueprint/frontend/
 	install -m644 blueprint/frontend/mustache.sh $(DESTDIR)$(pydir)/blueprint/frontend/
 	find blueprint/frontend/blueprint-template.d -type f -name \*.sh -printf %P\\0 | xargs -0r -I__ install -m644 blueprint/frontend/blueprint-template.d/__ $(DESTDIR)$(pydir)/blueprint/frontend/blueprint-template.d/__
 	PYTHONPATH=$(DESTDIR)$(pydir) $(PYTHON) -mcompileall $(DESTDIR)$(pydir)/blueprint
@@ -85,7 +86,7 @@ build:
 	make build-pypi
 
 build-deb:
-	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
+	make clean all install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	FPM_EDITOR="echo 'Replaces: blueprint-io' >>" fpm -s dir -t deb -C debian \
 		-n blueprint -v $(VERSION)-$(BUILD)py$(PYTHON_VERSION) -a all \
 		-d git-core \

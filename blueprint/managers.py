@@ -156,8 +156,8 @@ class ServiceManager(unicode):
         """
 
         if 'upstart' == self:
-            return '[ -n "${0}" ] && restart {1}'.format(self.env_var(service),
-                                                         service)
+            return ('[ -n "${0}" ] && {{{{ restart {1} || start {1}; }}}}'.
+                format(self.env_var(service), service))
 
         return '[ -n "${0}" ] && /etc/init.d/{1} restart'.format(
             self.env_var(service), service)

@@ -10,6 +10,7 @@ import sys
 
 import blueprint
 import context_managers
+import rules
 
 
 def create(options, args):
@@ -74,4 +75,39 @@ def read(options, args):
         logging.error('invalid blueprint name {0}'.format(name))
         sys.exit(1)
     logging.error('no blueprint found on standard input')
+    sys.exit(1)
+
+
+def read_rules(options, args):
+    """
+    Instantiate and return a Blueprint object created by rules read from
+    either standard input or the given pathname.
+    """
+    try:
+        pathname = args[0]
+    except IndexError:
+        pathname = None
+    pathname, stdin = '-' == pathname and (None, True) or (pathname, False)
+    r = rules.none()
+    if not os.isatty(sys.stdin.fileno()) or stdin:
+        r.parse(sys.stdin)
+        with context_managers.mkdtemp():
+            b = blueprint.Blueprint.rules(r, 'blueprint-rendered-rules')
+            b.commit(options.message or '')
+            return b
+    if pathname is not None:
+        name, _ = os.path.splitext(os.path.basename(pathname))
+        try:
+            r.parse(open(pathname))
+            with context_managers.mkdtemp():
+                b = blueprint.Blueprint.rules(r, name)
+                b.commit(options.message or '')
+                return b
+        except blueprint.NameError:
+            logging.error('invalid blueprint name {0}'.format(name))
+            sys.exit(1)
+        except IOError:
+            logging.error('{0} does not exist'.format(pathname))
+            sys.exit(1)
+    logging.error('no rules found on standard input')
     sys.exit(1)

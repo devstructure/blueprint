@@ -10,6 +10,7 @@ import os.path
 import re
 import subprocess
 
+import util
 import walk
 
 
@@ -42,13 +43,7 @@ def services(b):
             if match.group(1) in b.files:
                 b.add_service_file(manager, service, match.group(1))
         for dirname in b.sources.iterkeys():
-            if not isinstance(content, unicode):
-                for encoding in ('utf_8', 'latin_1'):
-                    try:
-                        content = unicode(content, encoding)
-                        break
-                    except UnicodeDecodeError:
-                        pass
+            content = util.unicodeme(content)
             if dirname in content:
                 b.add_service_source(manager, service, dirname)
 

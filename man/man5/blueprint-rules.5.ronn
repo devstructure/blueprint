@@ -1,0 +1,77 @@
+blueprint-rules(5) -- enumerate resources in blueprints
+=======================================================
+
+## SYNOPSIS
+
+	/etc/ssh
+	:package:apt/openssh-server
+	:service:sysvinit/ssh
+
+## DESCRIPTION
+
+`blueprint-rules` files, typically seen with the `.blueprint-rules` extension or with negated meaning as `/etc/blueprintignore` and `~/.blueprintignore`, contain an ordered list of rules that determine whether resources are included in blueprints.
+
+The general form has its origins in `gitignore`(5): any valid `gitignore` file is also a valid `blueprint-rules` file.
+
+Blank lines and lines that begin with a `#` will be ignored.
+
+The general form of each line is `:`_type_`:`_resource_, where _type_ is one of `file`, `package`, `service`, or `source`.  The `file` type is assumed when a rule omits the `:`_type_`:` prefix.
+
+The meaning of a rule that begins with a `!` is negated.
+
+### File resources
+
+File resources that do not contain a `/` are matched using `fnmatch`(3) against the last component of each file considered.  Patterns that contain a `/` but do not begin with a `/` are expanded relative to `/etc` before being matched using `glob`(3).
+
+### Package resources
+
+Package resources are of the form `:package:`_manager_`/`_package_.  Note that the _manager_ is not a colloquial name (for example, "`gem`") but rather the specific name of the package manager's package (in the example, on Debian, "`rubygems1.8`").
+
+A rule that ignores a package implicitly ignores its dependencies as well.  This empirically results in the most compact, yet complete, blueprints.  A rule that includes a package takes no such implicit action.
+
+### Service resources
+
+Service resources are of the form `:service:`_manager_`/`_service_.  Ignoring a service will prevent Blueprint from taking action on its behalf.
+
+### Source resources
+
+Source resources are of the form `:source:`_pathname_ format and must be fully-qualified (that is, begin with a `/`).
+
+## EXAMPLES
+
+### ssh.blueprint-rules
+
+`ssh.blueprint-rules` enumerates the resources that install and configure an SSH server, while ignoring `/etc/ssh/moduli`.
+
+	/etc/ssh
+	!/etc/ssh/moduli
+	:package:apt/openssh-server
+	:service:sysvinit/ssh
+
+### /etc/blueprintignore
+
+`/etc/blueprintignore` is parsed in a negative context - it enumerates resources that should be ignored by `blueprint-create`(1).
+
+	/etc/apt/sources.list
+	/etc/ssl/certs
+	:package:apt/build-essential
+	!:package:apt/build-essential
+
+This example takes advantage of an emergent behavior: by ignoring and immediately unignoring (with the `!` rule) the package `build-essential`, `blueprint-create`(1) will include `build-essential` but not its dependencies, thus creating a more compact blueprint.
+
+## FILES
+
+* `/etc/blueprintignore`, `~/.blueprintignore`:
+  Lists of filename patterns to be ignored when creating blueprints.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).

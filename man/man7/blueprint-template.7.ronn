@@ -1,0 +1,66 @@
+blueprint-template(7) -- built-in template data
+===============================================
+
+## SYNOPSIS
+
+	{{FQDN}}
+
+## DESCRIPTION
+
+Blueprint provides basic data about the local system for use in rendering templates of files.
+
+### uname(1) properties
+
+* `ARCH`:
+  The system's hardware architecture.  Probably "i386" or "x86_64".
+* `KERNEL`:
+  The kernel name.  This is always "Linux" on systems Blueprint supports.
+* `KERNEL_RELEASE`:
+  The kernel release.
+
+### System properties from `/proc`
+
+* `CORES`:
+  The number of cores in the system.  The semantics of this value when read in a virtualized environment are undefined.
+* `MEM`:
+  The total amount of memory in the system in bytes.
+
+### Network properties
+
+* `DNSDOMAINNAME`:
+  The DNS domain name according to `dnsdomainname`(1).
+* `EACH_IP`:
+  Each IPv4 address assigned to an interface, one per line.
+* `EACH_IPv6`:
+  Each IPv6 address assigned to an interface, one per line.
+* `FQDN`:
+  The fully-qualified domain name according to `hostname`(1)'s `--fqdn` option.
+* `HOSTNAME`:
+  The hostname according to `hostname`(1).
+* `IPv6`:
+  The first IPv6 address assigned to any interface.
+* `PRIVATE_IP`:
+  The first private IPv4 address assigned to any interface.
+* `PUBLIC_IP`:
+  The first public IPv4 address assigned to any interface.
+
+### LSB properties
+
+* `DISTRO`:
+  The distro name.
+* `RELEASE`:
+  The operating system release codename.
+
+## THEME SONG
+
+The Flaming Lips - "The W.A.N.D. (The Will Always Negates Defeat)"
+
+## AUTHOR
+
+Richard Crowley <richard@devstructure.com>
+
+## SEE ALSO
+
+Part of `blueprint`(1).
+
+`mustache`(5) at <http://mustache.github.com/mustache.5.html> and `mustache.sh` at <https://github.com/rcrowley/mustache.sh>.

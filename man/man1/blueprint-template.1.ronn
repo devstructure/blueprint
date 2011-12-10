@@ -1,13 +1,17 @@
-blueprint-template(1) -- 
-============================================================
+blueprint-template(1) -- render mustache.sh templates locally
+=============================================================
 
 ## SYNOPSIS
 
-`blueprint template` [`-q`] [_pathname_]  
+`blueprint template` [`-q`] _pathname_  
 
 ## DESCRIPTION
 
-FIXME
+`blueprint-template` renders the template for the given _pathname_ using the `mustache.sh` template rendering engine.  The template for _pathname_ must be stored in _pathname_`.blueprint-template.mustache`.  Data meant only for _pathname_ may be stored in _pathname_`.blueprint-template.sh`, a `source`-able POSIX shell script.
+
+Data meant for all templates may be stored in files ending in `.sh` in `/etc/blueprint-template.d`, again as `source`-able POSIX shell scripts.  Blueprint comes with a selection of suitable data, see `blueprint-template`(7).
+
+This program is meant for use during development and testing of templates; `blueprint-apply`(1) and `blueprint-show`(1) take care of rendering templates automatically.
 
 ## OPTIONS
 
@@ -19,7 +23,7 @@ FIXME
 ## FILES
 
 * `/etc/blueprint-template.d`:
-  FIXME
+  `source`-able POSIX shell scripts ending in `.sh` that set environment variables for use in templates.
 
 ## THEME SONG
 
@@ -32,3 +36,7 @@ Richard Crowley <richard@devstructure.com>
 ## SEE ALSO
 
 Part of `blueprint`(1).
+
+`blueprint-template`(5) for `mustache.sh` template language syntax.
+
+`blueprint-template`(7) for built-in template data.

@@ -8,8 +8,6 @@ import os
 import re
 import subprocess
 
-from blueprint import ignore
-
 
 # Precompile a pattern to extract the manager from a pathname.
 pattern_manager = re.compile(r'lib/(python[^/]+)/(dist|site)-packages')
@@ -23,7 +21,7 @@ pattern_egginfo = re.compile(r'\.egg-info$')
 pattern = re.compile(r'^([^-]+)-([^-]+).*\.egg(-info)?$')
 
 
-def pypi(b):
+def pypi(b, r):
     logging.info('searching for Python packages')
 
     # Look for packages in the typical places.  `pip` has its `freeze`
@@ -58,15 +56,17 @@ def pypi(b):
                 # looking for `dpkg-query` prove this is RPM-based.  In
                 # that case, the dependencies get a bit simpler.
                 try:
-                    _dpkg_query(b, manager, package, version, entry, pathname)
+                    _dpkg_query(b, r,
+                                manager, package, version,
+                                entry, pathname)
                 except OSError:
                     try:
-                        _rpm(b, manager, package, version, entry, pathname)
+                        _rpm(b, r, manager, package, version, entry, pathname)
                     except OSError:
                         logging.warning('neither dpkg nor rpm found')
 
 
-def _dpkg_query(b, manager, package, version, entry, pathname):
+def _dpkg_query(b, r, manager, package, version, entry, pathname):
     """
     Resolve dependencies on Debian-based systems.
     """
@@ -94,7 +94,7 @@ def _dpkg_query(b, manager, package, version, entry, pathname):
         versions = b.packages['apt'][manager]
         if stdout not in versions:
             versions.add(stdout)
-        if not ignore.package(manager, package):
+        if not r.ignore_package(manager, package):
             b.add_package(manager, package, version)
 
     # This package was installed via `pip`.  Figure out how
@@ -108,14 +108,14 @@ def _dpkg_query(b, manager, package, version, entry, pathname):
                              stderr=subprocess.PIPE)
         p.communicate()
         if 0 != p.returncode:
-            if not ignore.package('pip', package):
+            if not r.ignore_package('pip', package):
                 b.add_package('pip', package, version)
         else:
-            if not ignore.package('python-pip', package):
+            if not r.ignore_package('python-pip', package):
                 b.add_package('python-pip', package, version)
 
 
-def _rpm(b, manager, package, version, entry, pathname):
+def _rpm(b, r, manager, package, version, entry, pathname):
     """
     Resolve dependencies on RPM-based systems.
     """
@@ -146,7 +146,7 @@ def _rpm(b, manager, package, version, entry, pathname):
         versions = b.packages['yum']['python']
         if stdout not in versions:
             versions.add(stdout)
-        if not ignore.package('python', package):
+        if not r.ignore_package('python', package):
             b.add_package('python', package, version)
 
     # This package was installed via `pip`.  Figure out how
@@ -160,8 +160,8 @@ def _rpm(b, manager, package, version, entry, pathname):
                              stderr=subprocess.PIPE)
         p.communicate()
         if 0 != p.returncode:
-            if not ignore.package('pip', package):
+            if not r.ignore_package('pip', package):
                 b.add_package('pip', package, version)
         else:
-            if not ignore.package('python-pip', package):
+            if not r.ignore_package('python-pip', package):
                 b.add_package('python-pip', package, version)

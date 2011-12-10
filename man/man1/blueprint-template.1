@@ -4,13 +4,19 @@
 .TH "BLUEPRINT\-TEMPLATE" "1" "November 2011" "DevStructure" "Blueprint"
 .
 .SH "NAME"
-\fBblueprint\-template\fR \-
+\fBblueprint\-template\fR \- render mustache\.sh templates locally
 .
 .SH "SYNOPSIS"
-\fBblueprint template\fR [\fB\-q\fR] [\fIpathname\fR]
+\fBblueprint template\fR [\fB\-q\fR] \fIpathname\fR
 .
 .SH "DESCRIPTION"
-FIXME
+\fBblueprint\-template\fR renders the template for the given \fIpathname\fR using the \fBmustache\.sh\fR template rendering engine\. The template for \fIpathname\fR must be stored in \fIpathname\fR\fB\.blueprint\-template\.mustache\fR\. Data meant only for \fIpathname\fR may be stored in \fIpathname\fR\fB\.blueprint\-template\.sh\fR, a \fBsource\fR\-able POSIX shell script\.
+.
+.P
+Data meant for all templates may be stored in files ending in \fB\.sh\fR in \fB/etc/blueprint\-template\.d\fR, again as \fBsource\fR\-able POSIX shell scripts\. Blueprint comes with a selection of suitable data, see \fBblueprint\-template\fR(7)\.
+.
+.P
+This program is meant for use during development and testing of templates; \fBblueprint\-apply\fR(1) and \fBblueprint\-show\fR(1) take care of rendering templates automatically\.
 .
 .SH "OPTIONS"
 .
@@ -26,7 +32,7 @@ Show a help message\.
 .
 .TP
 \fB/etc/blueprint\-template\.d\fR
-FIXME
+\fBsource\fR\-able POSIX shell scripts ending in \fB\.sh\fR that set environment variables for use in templates\.
 .
 .SH "THEME SONG"
 The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
@@ -36,3 +42,9 @@ Richard Crowley \fIrichard@devstructure\.com\fR
 .
 .SH "SEE ALSO"
 Part of \fBblueprint\fR(1)\.
+.
+.P
+\fBblueprint\-template\fR(5) for \fBmustache\.sh\fR template language syntax\.
+.
+.P
+\fBblueprint\-template\fR(7) for built\-in template data\.

@@ -24,6 +24,7 @@ if 1 < len(args):
 b = blueprint.cli.read(options, args)
 
 try:
-    sys.stdout.write(b.blueprintignore().dumps())
+    for line in b.blueprintignore():
+        sys.stdout.write(line)
 except IOError:
     pass

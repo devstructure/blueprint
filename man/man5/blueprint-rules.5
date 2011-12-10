@@ -1,0 +1,99 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "BLUEPRINT\-RULES" "5" "November 2011" "DevStructure" "Blueprint"
+.
+.SH "NAME"
+\fBblueprint\-rules\fR \- enumerate resources in blueprints
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+/etc/ssh
+:package:apt/openssh\-server
+:service:sysvinit/ssh
+.
+.fi
+.
+.SH "DESCRIPTION"
+\fBblueprint\-rules\fR files, typically seen with the \fB\.blueprint\-rules\fR extension or with negated meaning as \fB/etc/blueprintignore\fR and \fB~/\.blueprintignore\fR, contain an ordered list of rules that determine whether resources are included in blueprints\.
+.
+.P
+The general form has its origins in \fBgitignore\fR(5): any valid \fBgitignore\fR file is also a valid \fBblueprint\-rules\fR file\.
+.
+.P
+Blank lines and lines that begin with a \fB#\fR will be ignored\.
+.
+.P
+The general form of each line is \fB:\fR\fItype\fR\fB:\fR\fIresource\fR, where \fItype\fR is one of \fBfile\fR, \fBpackage\fR, \fBservice\fR, or \fBsource\fR\. The \fBfile\fR type is assumed when a rule omits the \fB:\fR\fItype\fR\fB:\fR prefix\.
+.
+.P
+The meaning of a rule that begins with a \fB!\fR is negated\.
+.
+.SS "File resources"
+File resources that do not contain a \fB/\fR are matched using \fBfnmatch\fR(3) against the last component of each file considered\. Patterns that contain a \fB/\fR but do not begin with a \fB/\fR are expanded relative to \fB/etc\fR before being matched using \fBglob\fR(3)\.
+.
+.SS "Package resources"
+Package resources are of the form \fB:package:\fR\fImanager\fR\fB/\fR\fIpackage\fR\. Note that the \fImanager\fR is not a colloquial name (for example, "\fBgem\fR") but rather the specific name of the package manager\'s package (in the example, on Debian, "\fBrubygems1\.8\fR")\.
+.
+.P
+A rule that ignores a package implicitly ignores its dependencies as well\. This empirically results in the most compact, yet complete, blueprints\. A rule that includes a package takes no such implicit action\.
+.
+.SS "Service resources"
+Service resources are of the form \fB:service:\fR\fImanager\fR\fB/\fR\fIservice\fR\. Ignoring a service will prevent Blueprint from taking action on its behalf\.
+.
+.SS "Source resources"
+Source resources are of the form \fB:source:\fR\fIpathname\fR format and must be fully\-qualified (that is, begin with a \fB/\fR)\.
+.
+.SH "EXAMPLES"
+.
+.SS "ssh\.blueprint\-rules"
+\fBssh\.blueprint\-rules\fR enumerates the resources that install and configure an SSH server, while ignoring \fB/etc/ssh/moduli\fR\.
+.
+.IP "" 4
+.
+.nf
+
+/etc/ssh
+!/etc/ssh/moduli
+:package:apt/openssh\-server
+:service:sysvinit/ssh
+.
+.fi
+.
+.IP "" 0
+.
+.SS "/etc/blueprintignore"
+\fB/etc/blueprintignore\fR is parsed in a negative context \- it enumerates resources that should be ignored by \fBblueprint\-create\fR(1)\.
+.
+.IP "" 4
+.
+.nf
+
+/etc/apt/sources\.list
+/etc/ssl/certs
+:package:apt/build\-essential
+!:package:apt/build\-essential
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This example takes advantage of an emergent behavior: by ignoring and immediately unignoring (with the \fB!\fR rule) the package \fBbuild\-essential\fR, \fBblueprint\-create\fR(1) will include \fBbuild\-essential\fR but not its dependencies, thus creating a more compact blueprint\.
+.
+.SH "FILES"
+.
+.TP
+\fB/etc/blueprintignore\fR, \fB~/\.blueprintignore\fR
+Lists of filename patterns to be ignored when creating blueprints\.
+.
+.SH "THEME SONG"
+The Flaming Lips \- "The W\.A\.N\.D\. (The Will Always Negates Defeat)"
+.
+.SH "AUTHOR"
+Richard Crowley \fIrichard@devstructure\.com\fR
+.
+.SH "SEE ALSO"
+Part of \fBblueprint\fR(1)\.

@@ -19,16 +19,16 @@ If standard input is not a TTY, a blueprint is read from standard input rather t
 If a \fIsubtrahend\fR is given, it is subtracted from the generated or provided blueprint and the difference is committed as \fIname\fR\.
 .
 .P
-If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to \fBstdout\fR\.
+If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output\.
 .
 .P
-Debian packages, Ruby gems, Python packages, and PHP PEAR/PECL packages are enumerated in the blueprint\. Debian packages that are listed as \fBessential\fR, \fBimportant\fR, \fBrequired\fR, or \fBstandard\fR and those that are depended upon by \fBubuntu\-minimal\fR, \fBubuntu\-standard\fR, or \fBubuntu\-desktop\fR are ignored\.
+Debian packages, Ruby gems, NPM packages, Python packages, PHP PEAR/PECL packages are enumerated in the blueprint\.
 .
 .P
 The contents of system configuration files in \fB/etc\fR that have been created or modified from their packaged versions will be included in the blueprint\. If file is found to have a corresponding template (a file with "\fB\.blueprint\-template\.mustache\fR" appended to its pathname) and optionally a corresponding data script (a file with "\fB\.blueprint\-template\.sh\fR" appended to its pathname), this \fBtemplate\fR and \fBdata\fR are included in the blueprint rather than the file\'s literal content\.
 .
 .P
-Anything installed in \fB/usr/local\fR will be archived and included in the blueprint, tagged with the architecture (\fIamd64\fR or \fIi386\fR) of the server\.
+Anything installed in \fB/usr/local\fR will be archived and included in the blueprint, tagged with the architecture of the local system\.
 .
 .P
 \fBblueprintignore\fR(5) provides means for ignoring specific files and packages plus treating arbitrary directories as \fB/usr/local\fR is treated\.

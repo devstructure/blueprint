@@ -7,7 +7,7 @@ blueprint-show(1) -- generate code from a blueprint
 
 ## DESCRIPTION
 
-`blueprint-show` generates code from the blueprint _name_ as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the `--puppet`, `--chef`, `--sh`, or `--cfn` option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to `stdout`.
+`blueprint-show` generates code from the blueprint _name_ as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the `--puppet`, `--chef`, `--sh`, or `--cfn` option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to standard output.
 
 If none of `--puppet`, `--chef`, `--sh`, or `--cfn` are given, the raw JSON data structure that describes the blueprint is printed as described in `blueprint`(5).
 

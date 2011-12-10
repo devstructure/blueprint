@@ -1,7 +1,7 @@
 # LSB properties for use in Blueprint file templates.
 
 # The distro name.
-DISTRO="$(lsb_release -si 2>/dev/null || {
+export DISTRO="$(lsb_release -si 2>/dev/null || {
 	if [ -f "/etc/debian_version" ]
 	then echo "Debian"
 	elif [ -f "/etc/fedora-release" ]
@@ -18,7 +18,7 @@ DISTRO="$(lsb_release -si 2>/dev/null || {
 })"
 
 # The operating system release codename.
-RELEASE="$(lsb_release -sc 2>/dev/null || {
+export RELEASE="$(lsb_release -sc 2>/dev/null || {
 	if [ -f "/etc/debian_version" ]
 	then cat "/etc/debian_version"
 	elif [ -f "/etc/redhat-release" ]

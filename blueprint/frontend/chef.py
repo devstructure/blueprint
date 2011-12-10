@@ -357,12 +357,12 @@ class Resource(dict):
         """
         if value is None:
             return 'nil'
-        elif any([isinstance(value, t) for t in (int, long, float)]):
-            return value
         elif True == value:
             return 'true'
         elif False == value:
             return 'false'
+        elif any([isinstance(value, t) for t in (int, long, float)]):
+            return value
         elif 1 < len(value) and ':' == value[0]:
             return value
         elif hasattr(value, 'bare') or isinstance(value, util.BareString):

@@ -116,6 +116,6 @@ Richard Crowley <richard@devstructure.com>
 
 ## SEE ALSO
 
-`blueprint`(1).
+Part of `blueprint`(1).
 
 `mustache`(5) at <http://mustache.github.com/mustache.5.html> and `mustache.sh` at <https://github.com/rcrowley/mustache.sh>.
