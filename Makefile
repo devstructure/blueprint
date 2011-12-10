@@ -86,7 +86,7 @@ build:
 	make build-pypi
 
 build-deb:
-	make install prefix=/usr sysconfdir=/etc DESTDIR=debian
+	make clean all install prefix=/usr sysconfdir=/etc DESTDIR=debian
 	FPM_EDITOR="echo 'Replaces: blueprint-io' >>" fpm -s dir -t deb -C debian \
 		-n blueprint -v $(VERSION)-$(BUILD)py$(PYTHON_VERSION) -a all \
 		-d git-core \
