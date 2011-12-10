@@ -528,11 +528,11 @@ In their simplest form, these templates allow substitution of system parameters.
 
 You can also substitute the output of a shell command.
 
-<pre><code>{{`<em>echo foo</em>`}}</code></pre>
+<pre><code>&#123;&#123;`<em>echo foo</em>`&#125;&#125;</code></pre>
 
 More complex uses can iterate over the lines of output from a shell command.
 
-<pre><code>{{#`<em>echo foo; echo bar; echo baz</em>`}}<br />{{_M_LINE}}<br />{{/`<em>echo foo; echo bar; echo baz</em>`}}</code></pre>
+<pre><code>&#123;&#123;#`<em>echo foo; echo bar; echo baz</em>`&#125;&#125;<br />&#123;&#123;_M_LINE&#125;&#125;<br />&#123;&#123;/`<em>echo foo; echo bar; echo baz</em>`&#125;&#125;</code></pre>
 
 Blueprint ships with a small helping of common system parameters:
 
@@ -557,11 +557,11 @@ Our Unicorn configuration statically assumes four workers is the best configurat
 
 Configure Unicorn to use one worker per CPU in `/etc/unicorn.conf.rb.blueprint-template.mustache`:
 
-	worker_processes {{CORES}}
+	worker_processes &#123;&#123;CORES&#125;&#125;
 
 Configure Unicorn to use four workers per CPU in `/etc/unicorn.conf.rb.blueprint-template.mustache`:
 
-	worker_processes {{`expr 4 \* $CORES`}}
+	worker_processes &#123;&#123;`expr 4 \* $CORES`&#125;&#125;
 
 Or, you can extract computation out of the template and into `/etc/unicorn.conf.rb.blueprint-template.sh`:
 
@@ -569,7 +569,7 @@ Or, you can extract computation out of the template and into `/etc/unicorn.conf.
 
 `/etc/unicorn.conf.rb.blueprint-template.mustache` becomes:
 
-	worker_processes {{WORKER_PROCESSES}}
+	worker_processes &#123;&#123;WORKER_PROCESSES&#125;&#125;
 
 Now Blueprint can scale this Unicorn configuration up and down as the system allows or requires.
 
@@ -642,8 +642,10 @@ Running `blueprint show -S example` creates `example/bootstrap.sh` as follows an
 	mkdir -p "/etc/nginx/sites-available"
 	cat >"/etc/nginx/sites-available/example" <<EOF
 	server {
-	    listen 80 default;    location /static { root /usr/local/share/rack/example/static; }
-	    location / { proxy_pass http://127.0.0.1:8080; }}
+		listen 80 default;
+		location /static { root /usr/local/share/rack/example/static; }
+		location / { proxy_pass http://127.0.0.1:8080; }
+	}
 	EOF
 	[ "$MD5SUM" != "$(md5sum "/etc/nginx/sites-available/example")" ] && SERVICE_sysvinit_nginx=1
 	MD5SUM="$(md5sum "/etc/nginx/sites-enabled/example" 2>/dev/null)"
@@ -661,7 +663,7 @@ Running `blueprint show -S example` creates `example/bootstrap.sh` as follows an
 	done
 	export WORKER_PROCESSES="$(expr 4 \* $CORES)"
 	mustache >"/etc/unicorn.conf.rb" <<EOF
-	worker_processes {{WORKER_PROCESSES}}
+	worker_processes &#123;&#123;WORKER_PROCESSES&#125;&#125;
 	EOF
 	)
 	[ "$MD5SUM" != "$(md5sum "/etc/unicorn.conf.rb")" ] && SERVICE_upstart_example=1
