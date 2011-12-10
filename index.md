@@ -709,7 +709,7 @@ The first time you run this command it will prompt you with the contents of `/et
 
 Just as `blueprint-show`'s `-S` option helps bootstrap systems with zero dependencies, `devstructure.com` can generate shell scripts remotely so Blueprint doesn't have to be installed ahead of time.  You can bootstrap a new system from a pushed blueprint in one command:
 
-<pre><code>curl https://devstructure.com/<em>secret</em>/<em>name<em>/<em>name</em>.sh | sh</code></pre>
+<pre><code>curl https://devstructure.com/<em>secret</em>/<em>name</em>/<em>name</em>.sh | sh</code></pre>
 
 An open-source edition of the server is in the works.
 
