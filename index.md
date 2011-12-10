@@ -5,30 +5,29 @@ layout: default
 Blueprint
 =========
 
-Table of contents
------------------
+Blueprint is a simple configuration management tool that reverse-engineers servers.  It figures out what you've done manually, stores it locally in a Git repository, generates code that's able to do the same things you've done manually, and helps you deploy those changes to production.
 
-1.  [Introduction](#introduction)
-2.  [Philosophy](#philosophy)
-3.  [Installation](#installation)
-4.  [Reverse-engineering systems with blueprint-create](#create)
-5.  [Inspecting blueprints](#inspect)
-6.  [Ignoring particular resources](#ignore)
-7.  [Rules files and blueprint-rules](#rules)
-8.  [Diffing, splitting and pruning existing blueprints](#diff-split-prune)
-9.  [Rendering templates of configuration files](#templates)
-10. [Controlling service restart conditions](#services)
-11. [Generating POSIX shell scripts](#sh)
-12. [Sharing and distributing blueprints](#push-pull)
-13. [Generating Puppet modules and Chef cookbooks](#puppet-chef)
-14. [Integrating with AWS CloudFormation](#cloudformation)
-15. [Deploying your application with Blueprint](#deploy)
-16. [Local Git repository](#git)
-17. [Contributing to Blueprint](#contributing)
-18. [Alternatives to Blueprint](#alternatives)
+<h2 id="toc">Table of contents</h2>
 
-Manuals
--------
+1.  [Philosophy](#philosophy)
+2.  [Installation](#installation)
+3.  [Reverse-engineering systems with blueprint-create](#create)
+4.  [Inspecting blueprints](#inspect)
+5.  [Ignoring particular resources](#ignore)
+6.  [Rules files and blueprint-rules](#rules)
+7.  [Diffing, splitting and pruning existing blueprints](#diff-split-prune)
+8.  [Rendering templates of configuration files](#templates)
+9. [Controlling service restart conditions](#services)
+10. [Generating POSIX shell scripts](#sh)
+11. [Sharing and distributing blueprints](#push-pull)
+12. [Generating Puppet modules and Chef cookbooks](#puppet-chef)
+13. [Integrating with AWS CloudFormation](#cloudformation)
+14. [Deploying your application with Blueprint](#deploy)
+15. [Local Git repository](#git)
+16. [Contributing to Blueprint](#contributing)
+17. [Alternatives to Blueprint](#alternatives)
+
+<h2 id="man">Manuals</h2>
 
 * [`blueprint-list`(1)](http://devstructure.github.com/blueprint/blueprint-list.1.html): list all blueprints.
 * [`blueprint-create`(1)](http://devstructure.github.com/blueprint/blueprint-create.1.html): create a blueprint.
@@ -58,12 +57,6 @@ Manuals
 * [`blueprint-show-packages`(1)](http://devstructure.github.com/blueprint/blueprint-show-packages.1.html): show packages in a blueprint.
 * [`blueprint-show-services`(1)](http://devstructure.github.com/blueprint/blueprint-show-services.1.html): show services in a blueprint.
 * [`blueprint-show-sources`(1)](http://devstructure.github.com/blueprint/blueprint-show-sources.1.html): show source tarballs in a blueprint.
-
-----
-
-<h1 id="introduction">Introduction</h1>
-
-Blueprint is a simple configuration management tool that reverse-engineers servers.  It figures out what you've done manually, stores it locally in a Git repository, generates code that's able to do the same things you've done manually, and helps you deploy those changes to production.
 
 ----
 
