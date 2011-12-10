@@ -5,7 +5,7 @@ layout: default
 Blueprint
 =========
 
-Blueprint is a simple configuration management tool that reverse-engineers servers.  It figures out what you've done manually, stores it locally in a Git repository, generates code that's able to do the same things you've done manually, and helps you deploy those changes to production.
+Blueprint is a simple configuration management tool that reverse-engineers servers.  It figures out what you've done manually, stores it locally in a Git repository, generates code that's able to recreate your efforts, and helps you deploy those changes to production.
 
 <h2 id="toc">Table of contents</h2>
 
