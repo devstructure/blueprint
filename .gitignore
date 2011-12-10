@@ -1,4 +1,5 @@
 *
 !.gitignore
+!_layouts
 !*.html
 !*.md
