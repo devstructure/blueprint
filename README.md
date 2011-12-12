@@ -8,7 +8,7 @@
 * Convert blueprints to Puppet or Chef.
 * No DSLs, no extra servers, no workflow changes.
 
-Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7.
+Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7. Comprehensive documentation and examples in the [Blueprint book](http://devstructure.github.com/blueprint/).
 
 ### Blueprint I/O moves blueprints around
 
@@ -87,27 +87,33 @@ DevStructure maintains Debian packages and Python eggs for Blueprint.  See [Inst
 
 ## Documentation
 
+The [Blueprint book](http://devstructure.github.com/blueprint/) is a comprehensive overview of the tool including philosophy, installation and detailed examples.
+
 The [Blueprint tutorial](https://devstructure.com/docs/tutorial.html) works through creating and deploying a simple web application via Blueprint.
 
 The HTTP [endpoints](https://devstructure.com/docs/endpoints.html) and [protocols](https://devstructure.com/docs/protocols.html) used by `blueprint-push`(1) and `blueprint-pull`(1) are documented so that others may run compatible servers.
 
 ## Manuals
 
-* [`blueprint`(1)](http://devstructure.github.com/blueprint/blueprint.1.html)
-* [`blueprint-list`(1)](http://devstructure.github.com/blueprint/blueprint-list.1.html)
-* [`blueprint-create`(1)](http://devstructure.github.com/blueprint/blueprint-create.1.html)
-* [`blueprint-show`(1)](http://devstructure.github.com/blueprint/blueprint-show.1.html)
-* [`blueprint-diff`(1)](http://devstructure.github.com/blueprint/blueprint-diff.1.html)
-* [`blueprint-split`(1)](http://devstructure.github.com/blueprint/blueprint-split.1.html)
-* [`blueprint-prune`(1)](http://devstructure.github.com/blueprint/blueprint-prune.1.html)
-* [`blueprint-apply`(1)](http://devstructure.github.com/blueprint/blueprint-apply.1.html)
-* [`blueprint-push`(1)](http://devstructure.github.com/blueprint/blueprint-push.1.html)
-* [`blueprint-pull`(1)](http://devstructure.github.com/blueprint/blueprint-pull.1.html)
-* [`blueprint-destroy`(1)](http://devstructure.github.com/blueprint/blueprint-destroy.1.html)
-* [`blueprint`(5)](http://devstructure.github.com/blueprint/blueprint.5.html)
-* [`blueprintignore`(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html)
-* [`blueprint.cfg`(5)](http://devstructure.github.com/blueprint/blueprint.cfg.5.html)
-* [`blueprint`(7)](http://devstructure.github.com/blueprint/blueprint.7.html)
+* [`blueprint-list`(1)](http://devstructure.github.com/blueprint/blueprint-list.1.html): list all blueprints.
+* [`blueprint-create`(1)](http://devstructure.github.com/blueprint/blueprint-create.1.html): create a blueprint.
+* [`blueprint-rules`(1)](http://devstructure.github.com/blueprint/blueprint-rules.1.html): create a blueprint from a blueprint-rules file.
+* [`blueprint-show`(1)](http://devstructure.github.com/blueprint/blueprint-show.1.html): generate code from a blueprint.
+* [`blueprint-diff`(1)](http://devstructure.github.com/blueprint/blueprint-diff.1.html): save the difference between two blueprints.
+* [`blueprint-split`(1)](http://devstructure.github.com/blueprint/blueprint-split.1.html): split one blueprint into two others interactively.
+* [`blueprint-prune`(1)](http://devstructure.github.com/blueprint/blueprint-prune.1.html): select a subset of resources interactively.
+* [`blueprint-template`(1)](http://devstructure.github.com/blueprint/blueprint-template.1.html): render mustache.sh templates locally.
+* [`blueprint-apply`(1)](http://devstructure.github.com/blueprint/blueprint-apply.1.html): run a blueprint's generated shell code.
+* [`blueprint-push`(1)](http://devstructure.github.com/blueprint/blueprint-push.1.html): push a blueprint to the Internet.
+* [`blueprint-pull`(1)](http://devstructure.github.com/blueprint/blueprint-pull.1.html): pull a blueprint from the Internet.
+* [`blueprint-destroy`(1)](http://devstructure.github.com/blueprint/blueprint-destroy.1.html): destroy a blueprint.
+* [`blueprint`(5)](http://devstructure.github.com/blueprint/blueprint.5.html): Blueprint JSON format.
+* [`blueprintignore`(5)](http://devstructure.github.com/blueprint/blueprintignore.5.html): ignore specific files when creating blueprints.
+* [`blueprint-rules`(5)](http://devstructure.github.com/blueprint/blueprint-rules.5.html): enumerate resources in blueprints.
+* [`blueprint.cfg`(5)](http://devstructure.github.com/blueprint/blueprint.cfg.5.html): centralized blueprint service configuration.
+* [`blueprint-template`(5)](http://devstructure.github.com/blueprint/blueprint-template.5.html): `mustache.sh` template language syntax.
+* [`blueprint-template`(7)](http://devstructure.github.com/blueprint/blueprint-template.7.html): built-in template data.
+* [`blueprint`(7)](http://devstructure.github.com/blueprint/blueprint.7.html): Blueprint Python library.
 
 ### Plumbing
 
@@ -124,7 +130,7 @@ Blueprint is [BSD-licensed](https://github.com/devstructure/blueprint/blob/maste
 
 * Source code: <https://github.com/devstructure/blueprint>
 * Issue tracker: <https://github.com/devstructure/blueprint/issues>
-* Documentation: <https://devstructure.com/docs/>
+* Documentation: <http://devstructure.github.com/blueprint/>
 * Wiki: <https://github.com/devstructure/blueprint/wiki>
 * Mailing list: <https://groups.google.com/forum/#!forum/blueprint-users>
 * IRC: `#devstructure` on Freenode
