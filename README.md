@@ -8,7 +8,7 @@
 * Convert blueprints to Puppet or Chef.
 * No DSLs, no extra servers, no workflow changes.
 
-Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7. Comprehensive documentation and examples in the [Blueprint book](http://devstructure.github.com/blueprint/).
+Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7.  Comprehensive documentation and examples in the [Blueprint book](http://devstructure.github.com/blueprint/).
 
 ### Blueprint I/O moves blueprints around
 
@@ -17,7 +17,7 @@ Blueprint looks inside popular package managers, finds changes you made to confi
 * Push and pull blueprints anywhere.
 * Bootstrap servers painlessly.
 
-Blueprint I/O pushes and pulls blueprints to and from a Blueprint I/O Server, making it easy to use blueprints anywhere. DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3. Alternatively, you can build your own backend server implementing the Blueprint I/O API.
+Blueprint I/O pushes and pulls blueprints to and from a Blueprint I/O Server, making it easy to use blueprints anywhere.  DevStructure provides a free Blueprint I/O Server at <https://devstructure.com>, which stores blueprints in Amazon S3.  Alternatively, you can build your own backend server implementing the Blueprint I/O API.
 
 ## Usage
 
@@ -43,7 +43,7 @@ Blueprint generates shell code from my-first-blueprint and executes it on the se
 
 	blueprint diff foo bar baz
 
-Blueprint subtracts bar from foo. Files, packages and source that appears in foo but not bar will be carried over to baz and everything else will be dropped.
+Blueprint subtracts `bar` from `foo`.  Files, packages and sources that appears in `foo` but not `bar` will be carried over to `baz` and everything else will be dropped.
 
 ### Push a blueprint
 
@@ -89,9 +89,7 @@ DevStructure maintains Debian packages and Python eggs for Blueprint.  See [Inst
 
 ## Documentation
 
-The [Blueprint book](http://devstructure.github.com/blueprint/) is a comprehensive overview of the tool including philosophy, installation and detailed examples.
-
-The [Blueprint tutorial](https://devstructure.com/docs/tutorial.html) works through creating and deploying a simple web application via Blueprint.
+The prose [documentation](http://devstructure.github.com/blueprint/) provides a comprehensive overview of the tool including philosophy, installation, and detailed examples.
 
 The HTTP [endpoints](https://devstructure.com/docs/endpoints.html) and [protocols](https://devstructure.com/docs/protocols.html) used by `blueprint-push`(1) and `blueprint-pull`(1) are documented so that others may run compatible servers.
 
@@ -119,12 +117,12 @@ The HTTP [endpoints](https://devstructure.com/docs/endpoints.html) and [protocol
 
 ### Plumbing
 
-* [`blueprint-git`(1)](http://devstructure.github.com/blueprint/blueprint-git.1.html)
-* [`blueprint-show-files`(1)](http://devstructure.github.com/blueprint/blueprint-show-files.1.html)
-* [`blueprint-show-ignore`(1)](http://devstructure.github.com/blueprint/blueprint-show-ignore.1.html)
-* [`blueprint-show-packages`(1)](http://devstructure.github.com/blueprint/blueprint-show-packages.1.html)
-* [`blueprint-show-services`(1)](http://devstructure.github.com/blueprint/blueprint-show-services.1.html)
-* [`blueprint-show-sources`(1)](http://devstructure.github.com/blueprint/blueprint-show-sources.1.html)
+* [`blueprint-git`(1)](http://devstructure.github.com/blueprint/blueprint-git.1.html): low-level access to blueprints.
+* [`blueprint-show-files`(1)](http://devstructure.github.com/blueprint/blueprint-show-files.1.html): show files in a blueprint.
+* [`blueprint-show-ignore`(1)](http://devstructure.github.com/blueprint/blueprint-show-ignore.1.html): show `blueprintignore`(5) rules from a blueprint.
+* [`blueprint-show-packages`(1)](http://devstructure.github.com/blueprint/blueprint-show-packages.1.html): show packages in a blueprint.
+* [`blueprint-show-services`(1)](http://devstructure.github.com/blueprint/blueprint-show-services.1.html): show services in a blueprint.
+* [`blueprint-show-sources`(1)](http://devstructure.github.com/blueprint/blueprint-show-sources.1.html): show source tarballs in a blueprint.
 
 ## Contribute
 
