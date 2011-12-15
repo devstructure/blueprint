@@ -98,7 +98,7 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
                                ('do',),
                                ('\t. "$F"',),
                                ('done',),
-                               (f['data'].rstrip(),),
+                               (f.get('data', '').rstrip(),),
                                (command(*commands,
                                         escape_stdin=True,
                                         stdin=f['template'],
