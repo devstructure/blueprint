@@ -28,6 +28,9 @@ clean:
 		man/man*/*.html
 	find . -name \*.pyc -delete
 
+test:
+	nosetests --nocapture --with-coverage --cover-package=blueprint
+
 install: install-bin install-lib install-man install-sysconf
 
 install-bin:
@@ -134,4 +137,4 @@ gh-pages: man
 	git push origin gh-pages
 	git checkout -q master
 
-.PHONY: all clean install install-bin install-lib install-man install-sysconf uninstall uninstall-bin uninstall-lib uninstall-man uninstall-sysconf build build-deb build-pypi deploy deploy-deb deploy-deb-2.6 deploy-deb-2.7 deploy-pypi man gh-pages
+.PHONY: all clean test install install-bin install-lib install-man install-sysconf uninstall uninstall-bin uninstall-lib uninstall-man uninstall-sysconf build build-deb build-pypi deploy deploy-deb deploy-deb-2.6 deploy-deb-2.7 deploy-pypi man gh-pages

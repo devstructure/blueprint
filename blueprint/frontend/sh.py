@@ -37,7 +37,7 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
            service_source=service_source)
 
     commit = git.rev_parse(b.name)
-    tree = git.tree(commit)
+    tree = None if commit is None else git.tree(commit)
     def source(dirname, filename, gen_content, url):
         """
         Extract a source tarball.
@@ -55,7 +55,7 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
             else:
                 s.add('tar xf "{0}" -C "{1}"', args=(filename, dirname))
         elif secret is not None:
-            s.add_list(('curl -O "{0}/{1}/{2}/{3}"',)
+            s.add_list(('curl -O "{0}/{1}/{2}/{3}"',),
                        ('wget "{0}/{1}/{2}/{3}"',),
                        args=(server, secret, b.name, filename),
                        operator='||')

@@ -1,9 +1,9 @@
 import logging
 import sys
 
+from blueprint import Blueprint
 from blueprint import cfg
 from blueprint import git
-from blueprint import Blueprint
 import http
 
 

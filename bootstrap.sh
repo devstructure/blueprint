@@ -10,10 +10,12 @@ sudo apt-get -q update
 sudo apt-get -q -y install \
 	"build-essential" \
 	"git-core" \
-	"python" "python-setuptools" \
+	"python" "python-dev" "python-pip" "python-setuptools" \
 	"ruby" "ruby-dev" "rubygems" \
 
 sudo gem install --no-rdoc --no-ri "fpm"
+
+sudo pip install boto flask gunicorn nose nose_cov
 
 mkdir -p "$HOME/work"
 cd "$HOME/work"

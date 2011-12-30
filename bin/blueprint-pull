@@ -35,8 +35,9 @@ if url.scheme and url.netloc:
     server = urlparse.urlunparse((url.scheme, url.netloc, '', '', '', ''))
     secret, name = match.group(1, 2)
 else:
-    server, secret = cfg.get('io', 'server'), cfg.get('io', 'secret')
-    if secret is None:
+    try:
+        server, secret = cfg.get('io', 'server'), cfg.get('io', 'secret')
+    except (NoOptionError, NoSectionError):
         logging.error(
             'secret not found - use a blueprint URL or configure your secret')
         sys.exit(1)
