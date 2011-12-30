@@ -95,8 +95,35 @@ secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-
 <h3 id="-io-">[io]</h3>
 
 <dl>
+<dt><code>max_content_length</code></dt><dd>The maximal <code>Content-Length</code> to allow on the server.  Defaults to 64 MB.</dd>
 <dt class="flush"><code>secret</code></dt><dd>The 64-byte secret key used for all <span class="man-ref"><code>blueprint-push</code><span class="s">(1)</span></span> calls and <span class="man-ref"><code>blueprint-pull</code><span class="s">(1)</span></span> calls that don't specify a full URL.</dd>
 <dt class="flush"><code>server</code></dt><dd>The Blueprint I/O Server that receives push and pull calls.  <code>https://devstructure.com</code> by default.</dd>
+</dl>
+
+
+<h3 id="-s3-">[s3]</h3>
+
+<dl>
+<dt><code>access_key</code></dt><dd>An AWS access key.</dd>
+<dt class="flush"><code>bucket</code></dt><dd>The name of an existing bucket to be used for blueprints.</dd>
+<dt class="flush"><code>region</code></dt><dd>The region that contains the <code>bucket</code>.  <code>US</code> by default.</dd>
+<dt><code>secret_key</code></dt><dd>An AWS secret key that matches the <code>access_key</code>.</dd>
+</dl>
+
+
+<h3 id="-librato-">[librato]</h3>
+
+<dl>
+<dt class="flush"><code>token</code></dt><dd>A Librato API token.</dd>
+<dt><code>username</code></dt><dd>A Librato API username (which is typically an email address).</dd>
+</dl>
+
+
+<h3 id="-statsd-">[statsd]</h3>
+
+<dl>
+<dt class="flush"><code>host</code></dt><dd>The hostname or IP address of a StatsD instance.</dd>
+<dt class="flush"><code>port</code></dt><dd>The port of a StatsD instance.  Defaults to <code>8125</code>.</dd>
 </dl>
 
 
@@ -114,8 +141,8 @@ secret = 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-
 <h2 id="AUTHOR">AUTHOR</h2>
 
 <ul>
-<li>Matt Tanase <a href="&#x6d;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#x6d;&#97;&#116;&#116;&#64;&#x64;&#101;&#118;&#x73;&#116;&#x72;&#x75;&#x63;&#116;&#117;&#x72;&#x65;&#x2e;&#99;&#x6f;&#x6d;" data-bare-link="true">&#x6d;&#x61;&#x74;&#116;&#x40;&#x64;&#101;&#x76;&#115;&#116;&#114;&#117;&#99;&#x74;&#117;&#x72;&#x65;&#46;&#99;&#x6f;&#x6d;</a></li>
-<li>Richard Crowley <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#114;&#105;&#99;&#x68;&#97;&#x72;&#x64;&#x40;&#100;&#x65;&#118;&#115;&#x74;&#114;&#117;&#x63;&#x74;&#117;&#x72;&#101;&#x2e;&#x63;&#111;&#109;" data-bare-link="true">&#x72;&#105;&#99;&#x68;&#97;&#x72;&#100;&#64;&#x64;&#101;&#x76;&#x73;&#x74;&#114;&#117;&#x63;&#x74;&#117;&#x72;&#x65;&#x2e;&#x63;&#111;&#109;</a></li>
+<li>Matt Tanase <a href="&#109;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6d;&#97;&#116;&#x74;&#x40;&#x64;&#101;&#x76;&#115;&#x74;&#x72;&#117;&#x63;&#x74;&#x75;&#x72;&#x65;&#x2e;&#99;&#x6f;&#x6d;" data-bare-link="true">&#x6d;&#97;&#116;&#x74;&#64;&#x64;&#101;&#118;&#x73;&#116;&#x72;&#x75;&#99;&#x74;&#117;&#114;&#x65;&#x2e;&#99;&#111;&#x6d;</a></li>
+<li>Richard Crowley <a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#114;&#105;&#x63;&#x68;&#97;&#x72;&#x64;&#x40;&#100;&#x65;&#x76;&#x73;&#116;&#114;&#x75;&#99;&#x74;&#x75;&#114;&#101;&#x2e;&#99;&#111;&#109;" data-bare-link="true">&#x72;&#x69;&#99;&#x68;&#97;&#x72;&#100;&#64;&#x64;&#x65;&#118;&#115;&#116;&#x72;&#x75;&#x63;&#116;&#117;&#114;&#101;&#46;&#x63;&#x6f;&#109;</a></li>
 </ul>
 
 
