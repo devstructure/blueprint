@@ -138,6 +138,12 @@ The `blueprint.git` module exposes the `git`(1) tools to Python via the standard
 * `blueprint.io.secret(`_server_`)`:
   Fetch a new secret from _server_.
 
+### blueprint.io.server
+
+The `blueprint.io.server` module contains a Flask application called `app` which implements the HTTP endpoints expected by `blueprint-push`(1) and `blueprint-pull`(1).
+
+This application requires the `Flask` and `boto` Python libraries and recommends the `gunicorn` HTTP server.  The tests reqmore the `nose` and `nose-cov` Python libraries.
+
 ### blueprint.managers
 
 The `blueprint.managers.PackageManager` class is a `unicode` subclass that is used as the key in the `packages` dictionary.  It is a callable that can translate package names and versions into shell commands for installing the package.  For example: `blueprint.managers.PackageManager(`_'apt'_`)(`_'python'_`, `_'2.6.6-2ubuntu1'_`)`.

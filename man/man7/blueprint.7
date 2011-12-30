@@ -223,6 +223,12 @@ Push a blueprint to \fIsecret\fR and \fIb\.name\fR on \fIserver\fR\.
 \fBblueprint\.io\.secret(\fR\fIserver\fR\fB)\fR
 Fetch a new secret from \fIserver\fR\.
 .
+.SS "blueprint\.io\.server"
+The \fBblueprint\.io\.server\fR module contains a Flask application called \fBapp\fR which implements the HTTP endpoints expected by \fBblueprint\-push\fR(1) and \fBblueprint\-pull\fR(1)\.
+.
+.P
+This application requires the \fBFlask\fR and \fBboto\fR Python libraries and recommends the \fBgunicorn\fR HTTP server\. The tests reqmore the \fBnose\fR and \fBnose\-cov\fR Python libraries\.
+.
 .SS "blueprint\.managers"
 The \fBblueprint\.managers\.PackageManager\fR class is a \fBunicode\fR subclass that is used as the key in the \fBpackages\fR dictionary\. It is a callable that can translate package names and versions into shell commands for installing the package\. For example: \fBblueprint\.managers\.PackageManager(\fR\fI\'apt\'\fR\fB)(\fR\fI\'python\'\fR\fB,\fR\fI\'2\.6\.6\-2ubuntu1\'\fR\fB)\fR\.
 .
