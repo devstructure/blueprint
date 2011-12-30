@@ -13,10 +13,9 @@ from blueprint import cfg
 
 
 try:
-    host, port = cfg.get('statsd', 'addr').split(':', 1)
-    addr = (host, int(port))
+    host, port = cfg.get('statsd', 'host'), cfg.getint('statsd', 'port')
 except (NoOptionError, NoSectionError, ValueError):
-    addr = None
+    host = port = None
 
 
 def timing(stat, time, sample_rate=1):
@@ -59,7 +58,7 @@ def _send(data, sample_rate=1):
     """
     Squirt the metrics over UDP.
     """
-    if addr is None:
+    if host is None or port is None:
         return
     sampled_data = {}
     if 1 > sample_rate:
@@ -72,6 +71,6 @@ def _send(data, sample_rate=1):
     try:
         for k, v in sampled_data.iteritems():
             #print('{0}:{1}'.format(k, v))
-            s.sendto('{0}:{1}'.format(k, v), addr)
+            s.sendto('{0}:{1}'.format(k, v), (host, port))
     except:
         logging.error(repr(sys.exc_info()))

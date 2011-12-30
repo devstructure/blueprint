@@ -15,10 +15,37 @@ The file is INI-style and divided into sections, of which there is only one, cur
 
 ### [io]
 
+* `max_content_length`:
+  The maximal `Content-Length` to allow on the server.  Defaults to 64 MB.
 * `secret`:
   The 64-byte secret key used for all `blueprint-push`(1) calls and `blueprint-pull`(1) calls that don't specify a full URL.
 * `server`:
   The Blueprint I/O Server that receives push and pull calls.  `https://devstructure.com` by default.
+
+### [s3]
+
+* `access_key`:
+  An AWS access key.
+* `bucket`:
+  The name of an existing bucket to be used for blueprints.
+* `region`:
+  The region that contains the `bucket`.  `US` by default.
+* `secret_key`:
+  An AWS secret key that matches the `access_key`.
+
+### [librato]
+
+* `token`:
+  A Librato API token.
+* `username`:
+  A Librato API username (which is typically an email address).
+
+### [statsd]
+
+* `host`:
+  The hostname or IP address of a StatsD instance.
+* `port`:
+  The port of a StatsD instance.  Defaults to `8125`.
 
 ## FILES
 

@@ -20,7 +20,8 @@ import walk
 DEFAULTS = {'io': {'max_content_length': 67108864,
                    'server': 'https://devstructure.com'},
             's3': {'region': 'US',
-                   'use_https': True}}
+                   'use_https': True},
+            'statsd': {'port': 8125}}
 
 
 cfg = ConfigParser()
