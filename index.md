@@ -58,6 +58,12 @@ Blueprint is a simple configuration management tool that reverse-engineers serve
 * [`blueprint-show-services`(1)](http://devstructure.github.com/blueprint/blueprint-show-services.1.html): show services in a blueprint.
 * [`blueprint-show-sources`(1)](http://devstructure.github.com/blueprint/blueprint-show-sources.1.html): show source tarballs in a blueprint.
 
+APIs
+----
+
+* [Blueprint Server Protocols](#protocols)
+* [Blueprint Server Endpoints](#endpoints)
+
 ----
 
 <h1 id="philosophy">Philosophy</h1>
@@ -706,7 +712,15 @@ Just as `blueprint-show`'s `-S` option helps bootstrap systems with zero depende
 
 <pre><code>curl https://devstructure.com/<em>secret</em>/<em>name</em>/<em>name</em>.sh | sh</code></pre>
 
-An open-source edition of the server is in the works.
+The server is available in the `blueprint.io.server` module.  It is a [Flask](http://flask.pocoo.org) application that requires the [`boto`](http://code.google.com/p/boto/) library and recommends the [`gunicorn`](http://gunicorn.org) HTTP server.  You can run it in development mode:
+
+	python /usr/lib/python2.7/dist-packages/blueprint/io/server/__init__.py
+
+or in production mode:
+
+	gunicorn blueprint.io.server:app
+
+(Note that the pathname may be different on your system, particularly if you installed Blueprint from source or from PyPI.)  The [protocols](#protocols) and [endpoints](#endpoints) are documented for adventurous users that want to implement their own client or server.
 
 Example
 -------
@@ -1396,3 +1410,141 @@ If Blueprint's not your cup of tea, check out the following tools.  It's much be
 * [Bcfg2](http://trac.mcs.anl.gov/projects/bcfg2/)
 * [CFEngine](http://cfengine.com/)
 * [Juju](http://juju.ubuntu.com/)
+
+----
+
+<h1 id="protocols">Blueprint Server Protocols</h1>
+
+Prerequisite: obtain a secret key via the <code>GET /secret</code> endpoint.
+
+Storing a blueprint
+-------------------
+
+1. Store the JSON representation of a blueprint via the [<code>PUT /<em>secret</em>/<em>name</em></code>](#PUT-blueprint) endpoint.
+2. Store each tarball referenced in the `"sources"` object in the blueprint via the [<code>PUT /<em>secret</em>/<em>name</em>/<em>sha</em>.tar</code>](#PUT-tarball) endpoint.
+
+Fetching a blueprint
+--------------------
+
+1. Fetch the JSON representation of a blueprint via the [<code>GET /<em>secret</em>/<em>name</em></code>](#GET-blueprint) endpoint.
+2. Fetch each tarball referenced in the `"sources"` object in the blueprint via the [<code>GET /<em>secret</em>/<em>name</em>/<em>sha</em>.tar</code>](#GET-tarball) endpoint.
+
+Bootstrapping on AWS
+--------------------
+
+1. Fetch the user data script for a blueprint via the [<code>GET /<em>secret</em>/<em>name</em>/user-data.sh</code>](#GET-user-data) endpoint.
+2. Provision instances with the script as their user data via the AWS Management Console or an argument to the EC2 command-line tools.
+
+Configuring production instances
+--------------------------------
+
+Production instances can use blueprints without installing Blueprint (and therefore Git and friends) by asking the Blueprint I/O Server to generate POSIX shell code.
+
+1. Fetch the POSIX shell representation of the blueprint via the [<code>GET /<em>secret</em>/<em>name</em>/<em>name</em>.sh</code>](#GET-sh) endpoint.  The resulting program will fetch tarballs as needed via the [<code>GET /<em>secret</em>/<em>name</em>/<em>sha</em>.tar</code>](#GET-tarball) endpoint.
+2. <code>sh <em>name</em>.sh</code> interactively, at boot, or periodically via `cron`(8).
+
+----
+
+<h1 id="endpoints">Blueprint Server Endpoints</h1>
+
+<h2 id="GET-secret"><code>GET /secret</code></h2>
+
+Create a new secret key known only to the caller.  This is the namespace beneath which the caller's blueprints are stored.
+
+Responses:
+
+* 201: success; the body contains a new 64-byte secret key.
+* 502: failure; the upstream storage service failed.
+
+<h2 id="PUT-blueprint"><code>PUT /<em>secret</em>/<em>name</em></code></h2>
+
+Store the JSON representation of the blueprint _name_.  The `Content-Type` of the body must be `application/json`.
+
+Parameters:
+
+* _secret_: a 64-byte identifier containing numbers, letters, underscores, and dashes.
+* _name_: a blueprint name; it may not contain whitespace or `/` characters.
+
+Responses:
+
+* 202: success; the blueprint was well-formed and stored; the body contains pre-signed URIs for uploading source tarballs.
+* 400: failure; the blueprint was not well-formed.
+* 502: failure; the upstream storage service failed.
+
+<h2 id="GET-blueprint"><code>GET /<em>secret</em>/<em>name</em></code></h2>
+
+Fetch the JSON representation of the blueprint _name_.
+
+Parameters:
+
+* _secret_: a 64-byte identifier containing numbers, letters, underscores, and dashes.
+* _name_: a blueprint name; it may not contain whitespace or `/` characters.
+
+Responses:
+
+* 200: success; the body contains the JSON representation of the blueprint _name_.
+* 404: failure; the _secret_ or blueprint _name_ was not found.
+* 502: failure; the upstream storage service failed.
+
+<h2 id="PUT-tarball"><code>PUT /<em>secret</em>/<em>name</em>/<em>sha</em>.tar</code></h2>
+
+Store a source tarball referenced by blueprint _name_.  The `Content-Type` of the body must be `application/x-tar`.
+
+Parameters:
+
+* _secret_: a 64-byte identifier containing numbers, letters, underscores, and dashes.
+* _name_: a blueprint name; it may not contain whitespace or `/` characters.
+* _sha_: a 40-byte hexadecimal representation of a SHA1 sum.
+
+Responses:
+
+* 202: success; the tarball was stored.
+* 400: failure; the SHA1 sum of the body did not match _sha_.
+* 404: failure; the _secret_ or blueprint _name_ was not found.
+* 502: failure; the upstream storage service failed.
+
+<h2 id="GET-tarball"><code>GET /<em>secret</em>/<em>name</em>/<em>sha</em>.tar</code></h2>
+
+Fetch a source tarball referenced by blueprint _name_.
+
+Parameters:
+
+* _secret_: a 64-byte identifier containing numbers, letters, underscores, and dashes.
+* _name_: a blueprint name; it may not contain whitespace or `/` characters.
+* _sha_: a 40-byte hexadecimal representation of a SHA1 sum.
+
+Responses:
+
+* 200: success; the body contains the `application/x-tar` content of the source tarball.
+* 404: failure; the _secret_, blueprint _name_, or _sha_ was not found.
+* 502: failure; the upstream storage service failed.
+
+<h2 id="GET-sh"><code>GET /<em>secret</em>/<em>name</em>/<em>name</em>.sh</code></h2>
+
+Fetch the POSIX shell representation of the blueprint _name_.  The resulting program will fetch tarballs as needed via the <code>GET /<em>secret</em>/<em>name</em>/<em>sha</em>.tar</code> endpoint.
+
+Parameters:
+
+* _secret_: a 64-byte identifier containing numbers, letters, underscores, and dashes.
+* _name_: a blueprint name; it may not contain whitespace or `/` characters.
+
+Responses:
+
+* 200: success; the body contains the POSIX shell representation of the blueprint _name_.
+* 404: failure; the _secret_ or blueprint _name_ was not found.
+* 502: failure; the upstream storage service failed.
+
+<h2 id="GET-user-data"><code>GET /<em>secret</em>/<em>name</em>/user-data.sh</code></h2>
+
+Fetch POSIX shell commands to download and apply the blueprint _name_.  EC2 instances provisioned from an AMI with [`cloud-init`](https://help.ubuntu.com/community/CloudInit) will execute this program if given as user data.
+
+Parameters:
+
+* _secret_: a 64-byte identifier containing numbers, letters, underscores, and dashes.
+* _name_: a blueprint name; it may not contain whitespace or `/` characters.
+
+Responses:
+
+* 200: success; the body contains the POSIX shell representation of the blueprint _name_.
+* 404: failure; the _secret_ or blueprint _name_ was not found.
+* 502: failure; the upstream storage service failed.
