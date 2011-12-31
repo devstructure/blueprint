@@ -91,7 +91,7 @@ def parse_service(pathname):
             content = open(pathname).read()
         except IOError:
             raise ValueError('not a readable SysV init script')
-        if not re.search(r'Default-Start:\s*[2345]|chkconfig:', content):
+        if not re.search(r'(?:Default-Start|chkconfig):\s*[2345]', content):
             raise ValueError('not a running service')
 
         return ('sysvinit', basename)
