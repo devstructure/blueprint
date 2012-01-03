@@ -10,7 +10,7 @@ import subprocess
 
 
 # Precompile a pattern to extract the manager from a pathname.
-pattern_manager = re.compile(r'lib/(python[^/]+)/(dist|site)-packages')
+pattern_manager = re.compile(r'lib/(python[^/]*)/(dist|site)-packages')
 
 # Precompile patterns for differentiating between packages built by
 # `easy_install` and packages built by `pip`.
