@@ -180,3 +180,12 @@ def commit_tree(tree, message='', parent=None):
     if 0 != status:
         return None
     return stdout.rstrip()
+
+
+def configured():
+    """
+    Return `True` if the author is configured in Git.  This allows Blueprint
+    to bail out early for users that don't have things configured just right.
+    """
+    return not git('config', 'user.name', raise_exc=False)[0] \
+       and not git('config', 'user.email', raise_exc=False)[0]

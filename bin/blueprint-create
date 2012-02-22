@@ -7,6 +7,7 @@ import sys
 
 import blueprint.cli
 from blueprint import context_managers
+import blueprint.git
 
 parser = optparse.OptionParser('Usage: %prog [-d <subtrahend>] [-P|-C|-S|...] '
                                '[-m <message>] [-r] [-q] <name>')
@@ -55,6 +56,14 @@ if options.quiet:
 
 if 1 != len(args):
     parser.print_usage()
+    sys.exit(1)
+
+if not blueprint.git.configured():
+    logging.error('please give Git your name and email address so commits have an author')
+    logging.error('')
+    logging.error('    git config --global user.email "you@example.com"')
+    logging.error('    git config --global user.name "Your Name"')
+    logging.error('')
     sys.exit(1)
 
 b = blueprint.cli.create(options, args)
