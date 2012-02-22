@@ -327,8 +327,7 @@ class Script(object):
 
         # Write the actual shell code.
         for out in self.out:
-            f.write(out)
-            f.write('\n')
+            f.write('{0}\n'.format(out))
         f.close()
 
         # Bring source tarballs along.

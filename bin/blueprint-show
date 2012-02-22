@@ -7,7 +7,7 @@ import sys
 
 import blueprint.cli
 
-parser = optparse.OptionParser('Usage: %prog [-P|-C|-S|...] '
+parser = optparse.OptionParser('Usage: %prog [-P|-C|-S|-R|...] '
                                '[-r] [-q] [<name>]')
 parser.add_option('-P', '--puppet',
                   dest='generate',
@@ -24,6 +24,11 @@ parser.add_option('-S', '--sh',
                   action='store_const',
                   const='sh',
                   help='generate POSIX shell code')
+parser.add_option('-R', '--rules',
+                  dest='generate',
+                  action='store_const',
+                  const='blueprint_rules',
+                  help='generate Blueprint rules')
 parser.add_option('--cfn',
                   dest='generate',
                   action='store_const',

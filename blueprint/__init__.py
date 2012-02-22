@@ -472,6 +472,13 @@ class Blueprint(dict):
         import frontend.sh
         return frontend.sh.sh(self, relaxed, server, secret)
 
+    def blueprint_rules(self, relaxed=False):
+        """
+        Generate Blueprint rules.
+        """
+        import frontend.rules
+        return frontend.rules.rules(self, relaxed)
+
     def cfn(self, relaxed=False):
         """
         Generate an AWS CloudFormation template.
