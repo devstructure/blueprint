@@ -26,6 +26,8 @@ Blueprint is a simple configuration management tool that reverse-engineers serve
 15. [Local Git repository](#git)
 16. [Contributing to Blueprint](#contributing)
 17. [Alternatives to Blueprint](#alternatives)
+18. [Blueprint Server Protocols](#protocols)
+18. [Blueprint Server Endpoints](#endpoints)
 
 <h2 id="man">Manuals</h2>
 
