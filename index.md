@@ -24,7 +24,7 @@ Blueprint is a simple configuration management tool that reverse-engineers serve
 13. [Integrating with AWS CloudFormation](#cloudformation)
 14. [Deploying your application with Blueprint](#deploy)
 15. [Local Git repository](#git)
-16. [Using Blueprint Server](#server)
+16. [Running your own Blueprint Server](#server)
 17. [Blueprint Server Protocols](#protocols)
 18. [Blueprint Server Endpoints](#endpoints)
 19. [Contributing to Blueprint](#contributing)
@@ -697,9 +697,16 @@ gem -i -v4.1.1 unicorn &gt;/dev/null || gem install --no-rdoc --no-ri -v4.1.1 un
 
 <h1 id="push-pull">Sharing and distributing blueprints</h1>
 
+**DevStructure runs a free Blueprint Server at `devstructure.com` but this service will not be available after June 30<sup>th</sup>, 2012.**  Learn more about [running your own Blueprint Server](#server)
+
 We at DevStructure saw the workflow unfolding around these generated shell scripts and in them an opportunity for a macro don't-repeat-yourself optimization.  Thus were born `blueprint-push`(1) and `blueprint-pull`(1).
 
-`blueprint-push` uploads the JSON document and all source tarballs referenced by a blueprint to `devstructure.com`, which stores them behind a long secret key in AWS S3.  The URL that may be used to pull the blueprint later is printed to standard output.
+If you decide to [run your own Blueprint Server](#server), you'll need to configure a `server` ahead of time in `/etc/blueprint.cfg`:
+
+<pre><code>[io]
+server = <em>server</em></code></pre>
+
+`blueprint-push` uploads the JSON document and all source tarballs referenced by a blueprint to a Blueprint Server, which stores them behind a long secret key in AWS S3.  The URL that may be used to pull the blueprint later is printed to standard output.
 
 <pre><code>blueprint push <em>name</em></code></pre>
 
@@ -714,16 +721,6 @@ The first time you run this command it will prompt you with the contents of `/et
 Just as `blueprint-show`'s `-S` option helps bootstrap systems with zero dependencies, `devstructure.com` can generate shell scripts remotely so Blueprint doesn't have to be installed ahead of time.  You can bootstrap a new system from a pushed blueprint in one command:
 
 <pre><code>curl https://devstructure.com/<em>secret</em>/<em>name</em>/<em>name</em>.sh | sh</code></pre>
-
-The server is available in the `blueprint.io.server` module.  It is a [Flask](http://flask.pocoo.org) application that requires the [`boto`](http://code.google.com/p/boto/) library and recommends the [`gunicorn`](http://gunicorn.org) HTTP server.  You can run it in development mode:
-
-	python /usr/lib/python2.7/dist-packages/blueprint/io/server/__init__.py
-
-or in production mode:
-
-	gunicorn blueprint.io.server:app
-
-(Note that the pathname may be different on your system, particularly if you installed Blueprint from source or from PyPI.)  The [protocols](#protocols) and [endpoints](#endpoints) are documented for adventurous users that want to implement their own client or server.
 
 Example
 -------
@@ -1393,23 +1390,28 @@ The JSON document is pretty-printed for storage so Git's diffs will actually be 
 
 ----
 
-<h1 id="server">Blueprint Server</h1>
+<h1 id="server">Running your own Blueprint Server</h1>
+
+**DevStructure runs a free Blueprint Server at `devstructure.com` but this service will not be available after June 30<sup>th</sup>, 2012.**
 
 Running a Blueprint Server opens up the `blueprint-push`(1) and `blueprint-pull`(1) commands so you can store your blueprints remotely and share them with your team.
 
-**DevStructure runs a free Blueprint Server at `devstructure.com` but this service will not be available after June 30<sup>th</sup>, 2012.**
+The Blueprint Server [protocols](#protocols) and [endpoints](#endpoints) are documented for adventurous users that want to implement their own client or server.
 
 Installation
 ------------
 
 Prerequisites:
 
-* Flask <http://flask.pocoo.org>
-* GUnicorn <http://gunicorn.org>
+* [Boto](http://code.google.com/p/boto/)
+* [Flask](http://flask.pocoo.org)
+* [GUnicorn](http://gunicorn.org)
 
-	sudo pip install flask gunicorn
+Install the prerequisites from PyPI:
 
-The rest of Blueprint Server comes bundled with Blueprint itself.
+	sudo pip install boto flask gunicorn
+
+The rest of Blueprint Server comes bundled with Blueprint itself in the `blueprint.io.server` module.
 
 Configuration
 -------------
@@ -1448,7 +1450,13 @@ Other platforms will have similar production configurations.
 Usage
 -----
 
-Start the server running in the foreground:
+Start the server in development mode:
+
+	python /usr/lib/python2.7/dist-packages/blueprint/io/server/__init__.py
+
+(Note that the pathname may be different on your system, particularly if you installed Blueprint from source or from PyPI.)
+
+Start the server in production mode running in the foreground:
 
 	gunicorn blueprint.io.server:app
 
