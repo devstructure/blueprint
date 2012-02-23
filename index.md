@@ -24,10 +24,11 @@ Blueprint is a simple configuration management tool that reverse-engineers serve
 13. [Integrating with AWS CloudFormation](#cloudformation)
 14. [Deploying your application with Blueprint](#deploy)
 15. [Local Git repository](#git)
-16. [Contributing to Blueprint](#contributing)
-17. [Alternatives to Blueprint](#alternatives)
-18. [Blueprint Server Protocols](#protocols)
+16. [Using Blueprint Server](#server)
+17. [Blueprint Server Protocols](#protocols)
 18. [Blueprint Server Endpoints](#endpoints)
+19. [Contributing to Blueprint](#contributing)
+20. [Alternatives to Blueprint](#alternatives)
 
 <h2 id="man">Manuals</h2>
 
@@ -1392,26 +1393,81 @@ The JSON document is pretty-printed for storage so Git's diffs will actually be 
 
 ----
 
-<h1 id="contributing">Contributing to Blueprint</h1>
+<h1 id="server">Blueprint Server</h1>
 
-Blueprint is open-source, BSD-licensed software.  Contributions are welcome via pull requests on GitHub.
+Running a Blueprint Server opens up the `blueprint-push`(1) and `blueprint-pull`(1) commands so you can store your blueprints remotely and share them with your team.
 
-* Source code: <https://github.com/devstructure/blueprint>
-* Issue tracker: <https://github.com/devstructure/blueprint/issues>
-* Mailing list: <https://groups.google.com/forum/#!forum/blueprint-users>
-* IRC: [`irc.freenode.net#devstructure`](irc://freenode.net/devstructure)
+**DevStructure runs a free Blueprint Server at `devstructure.com` but this service will not be available after June 30<sup>th</sup>, 2012.**
 
-----
+Installation
+------------
 
-<h1 id="alternatives">Alternatives to Blueprint</h1>
+Prerequisites:
 
-If Blueprint's not your cup of tea, check out the following tools.  It's much better to have some form of configuration management than none at all.
+* Flask <http://flask.pocoo.org>
+* GUnicorn <http://gunicorn.org>
 
-* [Puppet](http://docs.puppetlabs.com)
-* [Chef](http://wiki.opscode.com/display/chef/Home)
-* [Bcfg2](http://trac.mcs.anl.gov/projects/bcfg2/)
-* [CFEngine](http://cfengine.com/)
-* [Juju](http://juju.ubuntu.com/)
+	sudo pip install flask gunicorn
+
+The rest of Blueprint Server comes bundled with Blueprint itself.
+
+Configuration
+-------------
+
+Configure your Blueprint Server in `/etc/blueprint.cfg`:
+
+<pre><code>[s3]
+access_key = <em>access_key</em>
+secret_key = <em>secret_key</em>
+bucket = <em>bucket</em></code></pre>
+
+Configure your other servers to communicate with the Blueprint Server in `/etc/blueprint.cfg`:
+
+<pre><code>[io]
+server = <em>server</em></code></pre>
+
+Supervise Blueprint Server with Upstart on Ubuntu or CentOS 6:
+
+	description "Blueprint Server"
+
+	start on runlevel [2345]
+	stop on runlevel [!2345]
+
+	respawn
+
+	env VIA=upstart
+
+	pre-start exec mkdir -p /var/log/blueprint-server
+
+	exec gunicorn -p/var/run/blueprint-server.pid -b0.0.0.0:5000 -w4 blueprint.io.server:app >>/var/log/blueprint-server/error.log 2>&1
+
+	# Mention /etc/blueprint.cfg so Blueprint will connect this service to that file.
+
+Other platforms will have similar production configurations.
+
+Usage
+-----
+
+Start the server running in the foreground:
+
+	gunicorn blueprint.io.server:app
+
+Some sort of process supervision, like Upstart as shown above, is recommended for production use.
+
+Example
+-------
+
+First, start your Blueprint Server:
+
+	start blueprint-server
+
+Push one of your blueprints to the Blueprint Server for safe-keeping or sharing with others:
+
+	blueprint push example
+
+Pull a blueprint from the Blueprint Server to configure new development environments or extra production capacity:
+
+	blueprint pull example
 
 ----
 
@@ -1550,3 +1606,26 @@ Responses:
 * 200: success; the body contains the POSIX shell representation of the blueprint _name_.
 * 404: failure; the _secret_ or blueprint _name_ was not found.
 * 502: failure; the upstream storage service failed.
+
+----
+
+<h1 id="contributing">Contributing to Blueprint</h1>
+
+Blueprint is open-source, BSD-licensed software.  Contributions are welcome via pull requests on GitHub.
+
+* Source code: <https://github.com/devstructure/blueprint>
+* Issue tracker: <https://github.com/devstructure/blueprint/issues>
+* Mailing list: <https://groups.google.com/forum/#!forum/blueprint-users>
+* IRC: [`irc.freenode.net#devstructure`](irc://freenode.net/devstructure)
+
+----
+
+<h1 id="alternatives">Alternatives to Blueprint</h1>
+
+If Blueprint's not your cup of tea, check out the following tools.  It's much better to have some form of configuration management than none at all.
+
+* [Puppet](http://docs.puppetlabs.com)
+* [Chef](http://wiki.opscode.com/display/chef/Home)
+* [Bcfg2](http://trac.mcs.anl.gov/projects/bcfg2/)
+* [CFEngine](http://cfengine.com/)
+* [Juju](http://juju.ubuntu.com/)
