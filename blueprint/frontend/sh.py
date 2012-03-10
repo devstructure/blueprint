@@ -53,15 +53,15 @@ def sh(b, relaxed=False, server='https://devstructure.com', secret=None):
             if '.zip' == pathname[-4:]:
                 s.add('unzip "{0}" -d "{1}"', args=(filename, dirname))
             else:
-                s.add('tar xf "{0}" -C "{1}"', args=(filename, dirname))
+                s.add('$(test -d "{1}" || mkdir -p "{1}") && tar xf "{0}" -C "{1}"', args=(filename, dirname))
         elif secret is not None:
             s.add_list(('curl -O "{0}/{1}/{2}/{3}"',),
                        ('wget "{0}/{1}/{2}/{3}"',),
                        args=(server, secret, b.name, filename),
                        operator='||')
-            s.add('tar xf "{0}" -C "{1}"', args=(filename, dirname))
+            s.add('$(test -d "{1}" || mkdir -p "{1}") && tar xf "{0}" -C "{1}"', args=(filename, dirname))
         elif gen_content is not None:
-            s.add('tar xf "{0}" -C "{1}"', args=(filename, dirname))
+            s.add('$(test -d "{1}" || mkdir -p "{1}") && tar xf "{0}" -C "{1}"', args=(filename, dirname))
             s.add_source(filename, git.blob(tree, filename))
         for manager, service in lut['sources'][dirname]:
             s.add_list(('[ "$MD5SUM" != "$(find "{0}" -printf %T@\\\\n '
