@@ -78,7 +78,7 @@ Make sure `pip` is using Python >= 2.6, otherwise the installation will succeed 
 
 ### From source on CentOS 5 and RHEL 5
 
-	rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+	rpm -Uvh http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
 	yum install python26
 	git clone git://github.com/devstructure/blueprint.git
 	cd blueprint
