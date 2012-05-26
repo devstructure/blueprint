@@ -7,9 +7,9 @@ blueprint-show(1) -- generate code from a blueprint
 
 ## DESCRIPTION
 
-`blueprint-show` generates code from the blueprint _name_ as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the `--puppet`, `--chef`, `--sh`, or `--cfn` option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to standard output.
+`blueprint-show` generates code from the blueprint _name_ as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the `--puppet`, `--chef`, `--bcfg2`, `--sh`, or `--cfn` option.  The generated code will be written to a file or directory in the current working directory and its name will be printed to standard output.
 
-If none of `--puppet`, `--chef`, `--sh`, or `--cfn` are given, the raw JSON data structure that describes the blueprint is printed as described in `blueprint`(5).
+If none of `--puppet`, `--chef`, `--bcfg2`, `--sh`, or `--cfn` are given, the raw JSON data structure that describes the blueprint is printed as described in `blueprint`(5).
 
 The POSIX shell code generator is the only one prepared to handle files to be rendered from a template.  All other code generators will print a warning and ignore such files.
 
@@ -21,6 +21,8 @@ If _name_ is omitted or `-`, a blueprint is read from standard input and treated
   Generate a Puppet module.
 * `-C`, `--chef`:
   Generate a Chef cookbook.
+* `-B`, `--bcfg2`:
+  Generate bcfg2 configuration.
 * `-S`, `--sh`:
   Generate POSIX shell code.
 * `--cfn`:

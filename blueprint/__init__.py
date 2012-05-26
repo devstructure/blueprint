@@ -462,6 +462,13 @@ class Blueprint(dict):
         import frontend.chef
         return frontend.chef.chef(self, relaxed)
 
+    def bcfg2(self, relaxed=False):
+        """
+        Generate bcfg2 code.
+        """
+        import frontend.bcfg2
+        return frontend.bcfg2.bcfg2(self, relaxed)
+
     def sh(self,
            relaxed=False,
            server='https://devstructure.com',

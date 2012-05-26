@@ -19,7 +19,7 @@ If standard input is not a TTY, a blueprint is read from standard input rather t
 If a \fIsubtrahend\fR is given, it is subtracted from the generated or provided blueprint and the difference is committed as \fIname\fR\.
 .
 .P
-If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output\.
+If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-bcfg2\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR is given, a Puppet module, a Chef cookbook, a bcfg2 repository, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output\.
 .
 .P
 Debian packages, Ruby gems, NPM packages, Python packages, PHP PEAR/PECL packages are enumerated in the blueprint\.
@@ -46,6 +46,10 @@ Generate a Puppet module\.
 .TP
 \fB\-C\fR, \fB\-\-chef\fR
 Generate a Chef cookbook\.
+.
+.TP
+\fB\-B\fR, \fB\-\-bcfg2\fR
+Generate bcfg2 configuration\.
 .
 .TP
 \fB\-S\fR, \fB\-\-sh\fR

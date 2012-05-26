@@ -13,7 +13,7 @@ If standard input is not a TTY, a blueprint is read from standard input rather t
 
 If a _subtrahend_ is given, it is subtracted from the generated or provided blueprint and the difference is committed as _name_.
 
-If one of `--puppet`, `--chef`, `--sh`, or `--cfn` is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output.
+If one of `--puppet`, `--chef`, `--bcfg2`, `--sh`, or `--cfn` is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output.
 
 Debian packages, Ruby gems, NPM packages, Python packages, PHP PEAR/PECL packages are enumerated in the blueprint.
 
@@ -31,6 +31,8 @@ Anything installed in `/usr/local` will be archived and included in the blueprin
   Generate a Puppet module.
 * `-C`, `--chef`:
   Generate a Chef cookbook.
+* `-B`, `--bcfg2`:
+  Generate bcfg2 configuration.
 * `-S`, `--sh`:
   Generate POSIX shell code.
 * `--cfn`:
