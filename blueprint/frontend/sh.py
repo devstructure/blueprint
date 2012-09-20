@@ -10,7 +10,7 @@ import os.path
 import re
 from shutil import copyfile
 import tarfile
-
+import unicodedata
 from blueprint import git
 from blueprint import util
 
@@ -327,6 +327,8 @@ class Script(object):
 
         # Write the actual shell code.
         for out in self.out:
+            if type(out) == unicode:
+               out = unicodedata.normalize('NFKD', out).encode('utf-8', 'ignore')
             f.write('{0}\n'.format(out))
         f.close()
 
