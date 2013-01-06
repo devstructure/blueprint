@@ -56,6 +56,8 @@ Prerequisites:
 * Python >= 2.6
 * Git >= 1.7 (not just for installation from source)
 
+You may need to add `Defaults !always_set_home` to `/etc/sudoers` to run `blueprint` as `root`, which is required in order to capture source tarballs.
+
 ### From DevStructure’s Debian archive
 
 	echo "deb http://packages.devstructure.com $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/devstructure.list
