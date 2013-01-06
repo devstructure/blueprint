@@ -98,7 +98,7 @@ build-deb:
 		-m "Richard Crowley <richard@devstructure.com>" \
 		--url "https://github.com/devstructure/blueprint" \
 		--description "Reverse-engineer server configuration." \
-		--edit
+		--edit .
 	make uninstall prefix=/usr sysconfdir=/etc DESTDIR=debian
 
 build-pypi:
