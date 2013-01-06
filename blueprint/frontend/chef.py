@@ -40,9 +40,13 @@ def chef(b, relaxed=False):
                    backup=False,
                    source=pathname[1:])
         if '.zip' == pathname[-4:]:
-            c.execute('unzip "{0}"'.format(pathname), cwd=dirname)
+            c.execute('{0}'.format(pathname),
+                      command='unzip "{0}"'.format(pathname),
+                      cwd=dirname)
         else:
-            c.execute('tar xf "{0}"'.format(pathname), cwd=dirname)
+            c.execute('{0}'.format(pathname),
+                      command='tar xf "{0}"'.format(pathname),
+                      cwd=dirname)
 
     def file(pathname, f):
         """
