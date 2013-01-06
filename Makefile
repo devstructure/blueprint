@@ -24,7 +24,7 @@ clean:
 	rm -f bin/blueprint-template blueprint/frontend/mustache.sh
 	rm -rf \
 		*.deb \
-		setup.py build dist *.egg *.egg-info \
+		setup.py blueprint-$(VERSION) build dist *.egg *.egg-info \
 		man/man*/*.html
 	find . -name \*.pyc -delete
 
@@ -108,17 +108,17 @@ build-pypi:
 deploy: deploy-deb deploy-pypi
 
 deploy-deb:
-	scp -i ~/production.pem blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb ubuntu@packages.devstructure.com:
+	scp blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb freight@packages.devstructure.com:
 	make deploy-deb-$(PYTHON_VERSION)
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "rm blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb"
+	ssh -t freight@packages.devstructure.com rm blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb
 
 deploy-deb-2.6:
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/lenny apt/squeeze apt/lucid apt/maverick"
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight cache apt/lenny apt/squeeze apt/lucid apt/maverick"
+	ssh -t freight@packages.devstructure.com freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/lenny apt/squeeze apt/lucid apt/maverick
+	ssh -t freight@packages.devstructure.com freight cache apt/lenny apt/squeeze apt/lucid apt/maverick
 
 deploy-deb-2.7:
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/natty apt/oneiric"
-	ssh -i ~/production.pem -t ubuntu@packages.devstructure.com "sudo freight cache apt/natty apt/oneiric"
+	ssh -t freight@packages.devstructure.com freight add blueprint_$(VERSION)-$(BUILD)py$(PYTHON_VERSION)_all.deb apt/natty apt/oneiric apt/precise
+	ssh -t freight@packages.devstructure.com freight cache apt/natty apt/oneiric apt/precise
 
 deploy-pypi:
 	$(PYTHON) setup.py sdist upload
