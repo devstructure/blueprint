@@ -14,10 +14,9 @@ def apt(b, r):
     # Try for the full list of packages.  If this fails, don't even
     # bother with the rest because this is probably a Yum/RPM-based
     # system.
+    output_format = '${Status}\x1E${binary:Package}\x1E${Version}\n'
     try:
-        p = subprocess.Popen(['dpkg-query',
-                              '-f=${Status}\x1E${binary:Package}\x1E${Version}\n',
-                              '-W'],
+        p = subprocess.Popen(['dpkg-query','-Wf',output_format],
                              close_fds=True, stdout=subprocess.PIPE)
     except OSError:
         return
