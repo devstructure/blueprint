@@ -2,6 +2,7 @@
 Search for `apt` packages to include in the blueprint.
 """
 
+import os
 import logging
 import subprocess
 
@@ -16,16 +17,17 @@ def apt(b, r):
 
     # try running dpkg --print-foreign-architectures to see if dpkg is
     # multi-arch aware. if not, revert to old style output_format
-    rv = subprocess.call(['dpkg', '--print-foreign-architectures'],
-                            stdout=FNULL, stderr=subprocess.STDOUT)
-    if rv != 0:
-        output_format = '${Status}\x1E${Package}\x1E${Version}\n'
+    with open(os.devnull, 'w') as fnull:
+        rv = subprocess.call(['dpkg', '--print-foreign-architectures'],
+                                stdout = fnull, stderr = fnull)
+        if rv != 0:
+            output_format = '${Status}\x1E${Package}\x1E${Version}\n'
 
     # Try for the full list of packages.  If this fails, don't even
     # bother with the rest because this is probably a Yum/RPM-based
     # system.
     try:
-        p = subprocess.Popen(['dpkg-query','-Wf',output_format],
+        p = subprocess.Popen(['dpkg-query','-Wf', output_format],
                              close_fds=True, stdout=subprocess.PIPE)
     except OSError:
         return
