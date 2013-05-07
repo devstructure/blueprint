@@ -16,7 +16,7 @@ def apt(b, r):
     # system.
     try:
         p = subprocess.Popen(['dpkg-query',
-                              '-f=${Status}\x1E${Package}\x1E${Version}\n',
+                              '-f=${Status}\x1E${binary:Package}\x1E${Version}\n',
                               '-W'],
                              close_fds=True, stdout=subprocess.PIPE)
     except OSError:
