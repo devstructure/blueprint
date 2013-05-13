@@ -5,7 +5,7 @@ Blueprint reverse-engineers servers.
 * Easy configuration management.
 * Detect relevant packages, files, and source installs.
 * Generate reusable server configs.
-* Convert blueprints to Puppet or Chef.
+* Convert blueprints to Puppet or Chef or CFEngine 3.
 * No DSLs, no extra servers, no workflow changes.
 
 Blueprint looks inside popular package managers, finds changes you made to configuration files, and archives software you built from source.  It runs on Debian- and RPM-based Linux distros with Python >= 2.6 and Git >= 1.7.  See <http://devstructure.github.com/blueprint/> for comprehensive documentation and examples.
@@ -28,7 +28,7 @@ Blueprint generates shell code from my-first-blueprint and executes it on the se
 
 	blueprint show -S my-first-blueprint
 
-`my-first-blueprint.sh` is written to your working directory.  Try out `-P` or `-C` to generate a Puppet module or a Chef cookbook.
+`my-first-blueprint.sh` is written to your working directory.  Try out `-P` or `-C` or `--cfengine3` to generate a Puppet module or a Chef cookbook or a CFEngine 3 sketch.
 
 ### Diff a blueprint
 

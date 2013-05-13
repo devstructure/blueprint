@@ -486,6 +486,13 @@ class Blueprint(dict):
         import frontend.cfn
         return frontend.cfn.cfn(self, relaxed)
 
+    def cfengine3(self, relaxed=False):
+        """
+        Generate a CFEngine 3 template.
+        """
+        import frontend.cfengine3
+        return frontend.cfengine3.cfengine3(self, relaxed)
+
     def blueprintignore(self):
         """
         Return an open file pointer to the blueprint's blueprintignore file,
