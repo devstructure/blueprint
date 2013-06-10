@@ -35,6 +35,11 @@ parser.add_option('--cfn',
                   action='store_const',
                   const='cfn',
                   help='generate an AWS CloudFormation template')
+parser.add_option('--cfengine3',
+                  dest='generate',
+                  action='store_const',
+                  const='cfengine3',
+                  help='generate a CFEngine 3 template')
 parser.add_option('-m', '--message',
                   dest='message',
                   default=None,
