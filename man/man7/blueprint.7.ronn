@@ -11,6 +11,7 @@ blueprint(7) -- Blueprint Python library
 	b2 = blueprint.Blueprint.checkout('foo')
 	b2.puppet().dumpf(gzip=True)
 	b2.chef().dumpf(gzip=True)
+	b2.bcfg2().dumpf(gzip=True)
 	b2.sh().dumpf(gzip=True)
 
 ## DESCRIPTION
@@ -42,7 +43,7 @@ The `blueprint.Blueprint` class manages blueprints stored in the local blueprint
 
 `commit(message=`_''_`)` records a new revision of this blueprint, optionally with _message_ as its Git commit message.
 
-`puppet()`, `chef()`, `sh()` return `Manifest`, `Cookbook`, and `Script` objects, respectively.  See the next section.
+`puppet()`, `chef()`, `bcfg2()`, `sh()` return `Manifest`, `Cookbook`, and `Script` objects, respectively.  See the next section.
 
 `walk()` is a generic implementation of the algorithm described in `blueprint`(5) which accepts callbacks as keyword arguments:
 
@@ -104,7 +105,7 @@ The `blueprint.context_managers` module implements context managers used through
 
 `blueprint.frontend.puppet.Manifest`, `blueprint.frontend.chef.Cookbook`, and `blueprint.frontend.sh.Script` all implement similar interfaces to code generation.
 
-`blueprint.frontend.puppet.puppet`, `blueprint.frontend.chef.chef`, and `blueprint.frontend.sh.sh` all accept a `blueprint.Blueprint` as their argument and return one of the above types, which have the following methods.
+`blueprint.frontend.puppet.puppet`, `blueprint.frontend.chef.chef`, `blueprint.frontend.bcfg2.bcfg2`, and `blueprint.frontend.sh.sh` all accept a `blueprint.Blueprint` as their argument and return one of the above types, which have the following methods.
 
 `dumps()` returns a string containing code in the language implemented by the class that received the call.  If the blueprint contains source tarballs, `dumps()` may raise `ValueError`.
 

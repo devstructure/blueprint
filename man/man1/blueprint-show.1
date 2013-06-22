@@ -10,10 +10,10 @@
 \fBblueprint show\fR [\fB\-P\fR|\fB\-C\fR|\fB\-S\fR|\|\.\|\.\|\.] [\fB\-r\fR] [\fB\-q\fR] [\fIname\fR]
 .
 .SH "DESCRIPTION"
-\fBblueprint\-show\fR generates code from the blueprint \fIname\fR as a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template as indicated by the \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR option\. The generated code will be written to a file or directory in the current working directory and its name will be printed to standard output\.
+\fBblueprint\-show\fR generates code from the blueprint \fIname\fR as a Puppet module, a Chef cookbook, a bcfg2 repository, POSIX shell code, or an AWS CloudFormation template as indicated by the \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-bcfg2\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR option\. The generated code will be written to a file or directory in the current working directory and its name will be printed to standard output\.
 .
 .P
-If none of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR are given, the raw JSON data structure that describes the blueprint is printed as described in \fBblueprint\fR(5)\.
+If none of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-bcfg2\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR are given, the raw JSON data structure that describes the blueprint is printed as described in \fBblueprint\fR(5)\.
 .
 .P
 The POSIX shell code generator is the only one prepared to handle files to be rendered from a template\. All other code generators will print a warning and ignore such files\.
@@ -30,6 +30,10 @@ Generate a Puppet module\.
 .TP
 \fB\-C\fR, \fB\-\-chef\fR
 Generate a Chef cookbook\.
+.
+.TP
+\fB\-B\fR, \fB\-\-bcfg2\fR
+Generate bcfg2 configuration\.
 .
 .TP
 \fB\-S\fR, \fB\-\-sh\fR

@@ -21,6 +21,8 @@ If one of `--puppet`, `--chef`, `--sh`, or `--cfn` is given, a Puppet module, a 
   Generate a Puppet module.
 * `-C`, `--chef`:
   Generate a Chef cookbook.
+* `-B`, `--bcfg2`:
+  Generate bcfg2 configuration.
 * `-S`, `--sh`:
   Generate POSIX shell code.
 * `--cfn`:

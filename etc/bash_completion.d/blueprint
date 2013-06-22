@@ -17,12 +17,12 @@ _blueprint() {
 		create|blueprint-create)
 			case "$prev" in
 				-m|--message|-h|--help) return 0;;
-				*) words="--sh --puppet --chef --cfn --cfengine3 --message --quiet --help";;
+				*) words="--sh --puppet --chef --cfn --bcfg2 --cfengine3 --message --quiet --help";;
 			esac;;
 		show|blueprint-show)
 			case "$prev" in
 				-h|--help) return 0;;
-				*) words="$(blueprint-list) --sh --puppet --chef --cfn --cfengine3 --quiet --help";;
+				*) words="$(blueprint-list) --sh --puppet --chef --cfn --bcfg2 --cfengine3 --quiet --help";;
 			esac;;
 		apply|blueprint-apply)
 			case "$prev" in

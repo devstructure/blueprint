@@ -19,7 +19,7 @@ If standard input is not a TTY or \fIpathname\fR is \fB\-\fR, rules are read fro
 The rendered blueprint will contain only the resources enumerated in \fIpathname\fR (or on standard input), opening the possibility of creating multiple orthogonal blueprints from the same system\.
 .
 .P
-If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR is given, a Puppet module, a Chef cookbook, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output\.
+If one of \fB\-\-puppet\fR, \fB\-\-chef\fR, \fB\-\-bcfg2\fR, \fB\-\-sh\fR, or \fB\-\-cfn\fR is given, a Puppet module, a Chef cookbook, a bcfg2 repository, POSIX shell code, or an AWS CloudFormation template will be generated, written to a file or directory in the current working directory, and its filename will be printed to standard output\.
 .
 .SH "OPTIONS"
 .
@@ -30,6 +30,10 @@ Generate a Puppet module\.
 .TP
 \fB\-C\fR, \fB\-\-chef\fR
 Generate a Chef cookbook\.
+.
+.TP
+\fB\-B\fR, \fB\-\-bcfg2\fR
+Generate bcfg2 configuration\.
 .
 .TP
 \fB\-S\fR, \fB\-\-sh\fR

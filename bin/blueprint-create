@@ -25,6 +25,11 @@ parser.add_option('-C', '--chef',
                   action='store_const',
                   const='chef',
                   help='generate a Chef cookbook')
+parser.add_option('-B', '--bcfg2',
+                  dest='generate',
+                  action='store_const',
+                  const='bcfg2',
+                  help='generate a Bcfg2 bundle')
 parser.add_option('-S', '--sh',
                   dest='generate',
                   action='store_const',

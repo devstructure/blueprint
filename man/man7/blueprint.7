@@ -18,6 +18,7 @@ b1\.commit()
 b2 = blueprint\.Blueprint\.checkout(\'foo\')
 b2\.puppet()\.dumpf(gzip=True)
 b2\.chef()\.dumpf(gzip=True)
+b2\.bcfg2()\.dumpf(gzip=True)
 b2\.sh()\.dumpf(gzip=True)
 .
 .fi
@@ -68,7 +69,7 @@ A dictionary that maps directory names to the name of the tarball that contains 
 \fBcommit(message=\fR\fI\'\'\fR\fB)\fR records a new revision of this blueprint, optionally with \fImessage\fR as its Git commit message\.
 .
 .P
-\fBpuppet()\fR, \fBchef()\fR, \fBsh()\fR return \fBManifest\fR, \fBCookbook\fR, and \fBScript\fR objects, respectively\. See the next section\.
+\fBpuppet()\fR, \fBchef()\fR, \fBbcfg2()\fR, \fBsh()\fR return \fBManifest\fR, \fBCookbook\fR, and \fBScript\fR objects, respectively\. See the next section\.
 .
 .P
 \fBwalk()\fR is a generic implementation of the algorithm described in \fBblueprint\fR(5) which accepts callbacks as keyword arguments:
@@ -170,7 +171,7 @@ Create a temporary directory and execute with it as the working directory\. The 
 \fBblueprint\.frontend\.puppet\.Manifest\fR, \fBblueprint\.frontend\.chef\.Cookbook\fR, and \fBblueprint\.frontend\.sh\.Script\fR all implement similar interfaces to code generation\.
 .
 .P
-\fBblueprint\.frontend\.puppet\.puppet\fR, \fBblueprint\.frontend\.chef\.chef\fR, and \fBblueprint\.frontend\.sh\.sh\fR all accept a \fBblueprint\.Blueprint\fR as their argument and return one of the above types, which have the following methods\.
+\fBblueprint\.frontend\.puppet\.puppet\fR, \fBblueprint\.frontend\.chef\.chef\fR, \fBblueprint\.frontend\.bcfg2\.bcfg2\fR, and \fBblueprint\.frontend\.sh\.sh\fR all accept a \fBblueprint\.Blueprint\fR as their argument and return one of the above types, which have the following methods\.
 .
 .P
 \fBdumps()\fR returns a string containing code in the language implemented by the class that received the call\. If the blueprint contains source tarballs, \fBdumps()\fR may raise \fBValueError\fR\.
