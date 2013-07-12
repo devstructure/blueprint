@@ -12,16 +12,19 @@ from blueprint import util
 def apt(b, r):
     logging.info('searching for APT packages')
 
-    # define a default output format string for dpkg-query
+    # Define a default output format string for dpkg-query.
     output_format = '${Status}\x1E${binary:Package}\x1E${Version}\n'
 
-    # try running dpkg --print-foreign-architectures to see if dpkg is
-    # multi-arch aware. if not, revert to old style output_format
-    with open(os.devnull, 'w') as fnull:
-        rv = subprocess.call(['dpkg', '--print-foreign-architectures'],
-                                stdout = fnull, stderr = fnull)
-        if rv != 0:
-            output_format = '${Status}\x1E${Package}\x1E${Version}\n'
+    # Try running dpkg --print-foreign-architectures to see if dpkg is
+    # multi-arch aware.  If not, revert to old style output_format.
+    try:
+        with open(os.devnull, 'w') as fnull:
+            rv = subprocess.call(['dpkg', '--print-foreign-architectures'],
+                                    stdout = fnull, stderr = fnull)
+            if rv != 0:
+                output_format = '${Status}\x1E${Package}\x1E${Version}\n'
+    except OSError:
+        return
 
     # Try for the full list of packages.  If this fails, don't even
     # bother with the rest because this is probably a Yum/RPM-based
