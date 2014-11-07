@@ -1634,6 +1634,7 @@ If Blueprint's not your cup of tea, check out the following tools.  It's much be
 
 * [Puppet](http://docs.puppetlabs.com)
 * [Chef](http://wiki.opscode.com/display/chef/Home)
+* [SaltStack](http://www.saltstack.com/)
 * [Bcfg2](http://trac.mcs.anl.gov/projects/bcfg2/)
 * [CFEngine](http://cfengine.com/)
 * [Juju](http://juju.ubuntu.com/)
